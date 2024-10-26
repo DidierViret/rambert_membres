@@ -130,6 +130,11 @@ abstract class BaseController extends Controller
         // The view to be constructed and displayed
         $viewToDisplay = '';
 
+        // If no data are sent, use an empty array as $data
+        if (is_null($data)) {
+            $data = [];
+        }
+
         // Add common headers to the view
         $viewToDisplay .=  view('Common\header', $data);
 
@@ -137,7 +142,7 @@ abstract class BaseController extends Controller
         $viewToDisplay .= view('Common\login_bar');
 
         // Add admin menu to the view if the current url is an admin url
-        foreach (config('Common\Config\AdminPanelConfig')->tabs as $tab){
+        foreach (config('\Common\Config\AdminPanelConfig')->tabs as $tab){
             if (strstr(current_url(),$tab['pageLink'])) {
                 $viewToDisplay .= view('\Common\adminMenu');
             }
