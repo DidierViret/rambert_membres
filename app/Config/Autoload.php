@@ -41,6 +41,10 @@ class Autoload extends AutoloadConfig
      */
     public $psr4 = [
         APP_NAMESPACE => APPPATH,
+        'Config'      => APPPATH . 'Config',
+        'Common'      => ROOTPATH.'rambert/common',
+        'Members'     => ROOTPATH.'rambert/members',
+        'Access'      => ROOTPATH.'rambert/access',
     ];
 
     /**
