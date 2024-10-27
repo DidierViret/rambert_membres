@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Oct 24, 2024 at 08:09 PM
+-- Generation Time: Oct 27, 2024 at 09:44 PM
 -- Server version: 8.0.30
 -- PHP Version: 8.1.10
 
@@ -53,6 +53,14 @@ CREATE TABLE `access_level` (
   `date_delete` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--
+-- Dumping data for table `access_level`
+--
+
+INSERT INTO `access_level` (`id`, `name`, `description`, `level`, `date_creation`, `date_modification`, `date_delete`) VALUES
+(1, 'Administrateur', '', 5, '2024-10-27 21:42:19', NULL, NULL),
+(2, 'Gestionnaire', 'Gestionnaire du fichier des membres', 4, '2024-10-27 21:42:19', NULL, NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -88,10 +96,10 @@ INSERT INTO `category` (`id`, `name`, `description`, `admission_price`, `annual_
 -- --------------------------------------------------------
 
 --
--- Table structure for table `change_log`
+-- Table structure for table `change`
 --
 
-CREATE TABLE `change_log` (
+CREATE TABLE `change` (
   `id` int UNSIGNED NOT NULL,
   `fk_change_author` int UNSIGNED NOT NULL,
   `fk_person_concerned` int UNSIGNED DEFAULT NULL,
@@ -105,10 +113,10 @@ CREATE TABLE `change_log` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `change_log_type`
+-- Table structure for table `change_type`
 --
 
-CREATE TABLE `change_log_type` (
+CREATE TABLE `change_type` (
   `id` int UNSIGNED NOT NULL,
   `name` varchar(100) NOT NULL,
   `description` varchar(255) DEFAULT NULL,
@@ -251,18 +259,18 @@ ALTER TABLE `category`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `change_log`
+-- Indexes for table `change`
 --
-ALTER TABLE `change_log`
+ALTER TABLE `change`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_person` (`fk_person_concerned`),
   ADD KEY `idx_change_type` (`fk_change_type`),
   ADD KEY `idx_change_author` (`fk_change_author`);
 
 --
--- Indexes for table `change_log_type`
+-- Indexes for table `change_type`
 --
-ALTER TABLE `change_log_type`
+ALTER TABLE `change_type`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -314,7 +322,7 @@ ALTER TABLE `access`
 -- AUTO_INCREMENT for table `access_level`
 --
 ALTER TABLE `access_level`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `category`
@@ -323,15 +331,15 @@ ALTER TABLE `category`
   MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
--- AUTO_INCREMENT for table `change_log`
+-- AUTO_INCREMENT for table `change`
 --
-ALTER TABLE `change_log`
+ALTER TABLE `change`
   MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `change_log_type`
+-- AUTO_INCREMENT for table `change_type`
 --
-ALTER TABLE `change_log_type`
+ALTER TABLE `change_type`
   MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
@@ -376,12 +384,12 @@ ALTER TABLE `access`
   ADD CONSTRAINT `access_person` FOREIGN KEY (`fk_person`) REFERENCES `person` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
--- Constraints for table `change_log`
+-- Constraints for table `change`
 --
-ALTER TABLE `change_log`
+ALTER TABLE `change`
   ADD CONSTRAINT `change_log_change_author` FOREIGN KEY (`fk_change_author`) REFERENCES `person` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   ADD CONSTRAINT `change_log_person_concerned` FOREIGN KEY (`fk_person_concerned`) REFERENCES `person` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  ADD CONSTRAINT `change_log_type` FOREIGN KEY (`fk_change_type`) REFERENCES `change_log_type` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+  ADD CONSTRAINT `change_log_type` FOREIGN KEY (`fk_change_type`) REFERENCES `change_type` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
 -- Constraints for table `contribution`
