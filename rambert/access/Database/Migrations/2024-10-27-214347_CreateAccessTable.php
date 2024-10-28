@@ -29,13 +29,8 @@ class CreateAccessTable extends Migration
                 'constraint' => 255,
                 'null'       => true,
             ],
-            'date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
-            'date_modification' => [
-                'type'       => 'TIMESTAMP',
-                'null'       => true,
-                'default'    => null,
-                'on_update'  => 'CURRENT_TIMESTAMP',
-            ],
+            'date_creation TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP',
+            'date_modification TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP',
             'date_delete' => [
                 'type'       => 'DATETIME',
                 'null'       => true,
