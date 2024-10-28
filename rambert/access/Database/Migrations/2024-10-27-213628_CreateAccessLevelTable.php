@@ -28,11 +28,7 @@ class CreateAccessLevelTable extends Migration
                 'type'       => 'INT',
                 'null'       => false,
             ],
-            'date_creation' => [
-                'type'       => 'TIMESTAMP',
-                'null'       => false,
-                'default'    => 'CURRENT_TIMESTAMP',
-            ],
+            'date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
             'date_modification' => [
                 'type'       => 'TIMESTAMP',
                 'null'       => true,

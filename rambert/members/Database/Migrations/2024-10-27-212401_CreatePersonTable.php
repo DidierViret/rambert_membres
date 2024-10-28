@@ -88,11 +88,7 @@ class CreatePersonTable extends Migration
                 'type' => 'TEXT',
                 'null' => true,
             ],
-            'date_creation' => [
-                'type'    => 'TIMESTAMP',
-                'null'    => false,
-                'default' => 'CURRENT_TIMESTAMP',
-            ],
+            'date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
             'date_modification' => [
                 'type'    => 'TIMESTAMP',
                 'null'    => true,

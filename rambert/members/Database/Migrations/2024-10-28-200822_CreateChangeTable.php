@@ -37,11 +37,7 @@ class CreateChangeTable extends Migration
                 'type' => 'TEXT',
                 'null' => true,
             ],
-            'date' => [
-                'type'    => 'TIMESTAMP',
-                'null'    => false,
-                'default' => 'CURRENT_TIMESTAMP',
-            ],
+            'date TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
         ]);
 
         $this->forge->addKey('id', true);
