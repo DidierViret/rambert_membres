@@ -2,9 +2,9 @@
 /**
  * French translations for common module
  *
- * @author      Didier Viret
- * @link        https://github.com/DidierViret
- * @copyright   Copyright (c), Didier Viret
+ * @author      Club Rambert, Didier Viret
+ * @link        https://rambert.ch
+ * @copyright   Copyright (c), club Rambert
  */
 
 return[

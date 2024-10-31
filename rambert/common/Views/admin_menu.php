@@ -4,9 +4,9 @@
  * 
  * This part of page is included by the BaseController display_view() method if user has administration rights.
  *
- * @author      Didier Viret
- * @link        https://github.com/DidierViret
- * @copyright   Copyright (c), Didier Viret
+ * @author      Club Rambert, Didier Viret
+ * @link        https://rambert.ch
+ * @copyright   Copyright (c), club Rambert
  */
 ?>
 
