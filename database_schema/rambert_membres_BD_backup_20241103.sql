@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Oct 27, 2024 at 09:44 PM
+-- Generation Time: Nov 03, 2024 at 09:16 PM
 -- Server version: 8.0.30
 -- PHP Version: 8.1.10
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `rambert_membres`
+-- Database: `rambert_membres_handmade`
 --
 
 -- --------------------------------------------------------
@@ -125,6 +125,21 @@ CREATE TABLE `change_type` (
   `date_delete` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--
+-- Dumping data for table `change_type`
+--
+
+INSERT INTO `change_type` (`id`, `name`, `description`, `date_creation`, `date_modification`, `date_delete`) VALUES
+(1, 'Admission', 'Inscription d\'une nouvelle personne en tant que membre du club Rambert', '2024-10-28 19:47:56', '2024-10-28 19:55:56', NULL),
+(2, 'Sortie', 'Démission, décès ou toute autre raison qui fait qu\'une personne n\'est plus membre du club Rambert', '2024-10-28 19:47:56', '2024-10-28 19:56:01', NULL),
+(3, 'Changement de catégorie de membre', NULL, '2024-10-28 19:50:11', '2024-10-28 19:53:20', NULL),
+(4, 'Changement d\'adresse postale', 'Changement de foyer ou modification de l\'adresse postale d\'un foyer', '2024-10-28 19:50:11', '2024-10-28 19:54:00', NULL),
+(5, 'Changement de nom', 'Modification du nom ou du prénom d\'un membre', '2024-10-28 19:55:45', NULL, NULL),
+(6, 'Changement de coordonnées', 'Modification d\'un numéro de téléphone ou de l\'e-mail d\'un membre', '2024-10-28 19:55:45', NULL, NULL),
+(7, 'Changement d\'une information', 'Modification des parrains, de la date de naissance ou de la profession d\'un membre', '2024-10-28 19:59:08', NULL, NULL),
+(8, 'Changement de mot de passe', 'Modification du mot de passe d\'un membre', '2024-10-28 19:59:08', NULL, NULL),
+(9, 'Changement de contribution', 'Début ou fin de la contribution d\'un membre à une commission ou autre fonction', '2024-10-28 20:00:39', NULL, NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -155,6 +170,36 @@ CREATE TABLE `function` (
   `date_delete` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--
+-- Dumping data for table `function`
+--
+
+INSERT INTO `function` (`id`, `fk_team`, `name`, `description`, `date_creation`, `date_modification`, `date_delete`) VALUES
+(1, 1, 'Président-e', NULL, '2024-10-28 20:23:45', NULL, NULL),
+(2, 1, 'Vice-président-e', NULL, '2024-10-28 20:23:45', '2024-10-28 20:24:00', NULL),
+(3, 1, 'Caissier / Caissière', NULL, '2024-10-28 20:25:05', NULL, NULL),
+(4, 1, 'Responsable des réservations de chalets', NULL, '2024-10-28 20:25:05', NULL, NULL),
+(5, 1, 'Membre', NULL, '2024-10-28 20:25:32', NULL, NULL),
+(6, 2, 'Membre', NULL, '2024-10-28 20:26:56', NULL, NULL),
+(7, 3, 'Président-e', NULL, '2024-10-28 20:27:29', NULL, NULL),
+(8, 3, 'Vice-président-e', NULL, '2024-10-28 20:29:55', NULL, NULL),
+(9, 3, 'Membre', NULL, '2024-10-28 20:27:29', '2024-10-28 20:29:31', NULL),
+(10, 4, 'Président-e', NULL, '2024-10-28 20:28:37', '2024-10-28 20:29:17', NULL),
+(11, 4, 'Secrétaire', NULL, '2024-10-28 20:30:39', NULL, NULL),
+(12, 4, 'Membre', NULL, '2024-10-28 20:28:37', '2024-10-28 20:29:10', NULL),
+(13, 5, 'Membre', NULL, '2024-10-28 20:32:42', NULL, NULL),
+(14, 6, 'Membre', NULL, '2024-10-28 20:33:05', NULL, NULL),
+(15, 7, 'Responsable', NULL, '2024-10-28 20:34:14', '2024-10-28 20:35:50', NULL),
+(16, 8, 'Président-e', NULL, '2024-10-28 20:34:14', NULL, NULL),
+(17, 8, 'Membre', NULL, '2024-10-28 20:34:28', NULL, NULL),
+(18, 9, 'Responsable', NULL, '2024-10-28 20:37:40', NULL, NULL),
+(19, 10, 'Responsable du site web', NULL, '2024-10-28 20:37:40', NULL, NULL),
+(20, 10, 'Responsable des réseaux sociaux', NULL, '2024-10-28 20:38:23', NULL, NULL),
+(21, 10, 'Membre', NULL, '2024-10-28 20:38:23', NULL, NULL),
+(22, 11, 'Responsable', NULL, '2024-10-28 20:39:26', NULL, NULL),
+(23, 12, 'Responsable', NULL, '2024-10-28 20:39:26', NULL, NULL),
+(24, 13, 'Délégué', NULL, '2024-10-28 20:40:55', NULL, NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -182,6 +227,42 @@ CREATE TABLE `home` (
 
 INSERT INTO `home` (`id`, `address_title`, `address_name`, `address_line_1`, `address_line_2`, `postal_code`, `city`, `nb_bulletins`, `comments`, `date_creation`, `date_modification`, `date_delete`) VALUES
 (1, 'Monsieur', 'Prénom Nom', 'Route des tests 1', NULL, '9999', 'Maville', 2, 'C\'est juste un test, pas de quoi s\'inquiéter', '2024-10-22 20:07:04', '2024-10-22 20:07:44', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `newsletter`
+--
+
+CREATE TABLE `newsletter` (
+  `id` int UNSIGNED NOT NULL,
+  `title` varchar(100) NOT NULL,
+  `date_creation` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `date_modification` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `date_delete` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `newsletter`
+--
+
+INSERT INTO `newsletter` (`id`, `title`, `date_creation`, `date_modification`, `date_delete`) VALUES
+(1, 'Bulletin d\'informations par e-mail', '2024-11-03 20:54:11', NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `newsletter_subscription`
+--
+
+CREATE TABLE `newsletter_subscription` (
+  `id` int UNSIGNED NOT NULL,
+  `fk_person` int UNSIGNED NOT NULL,
+  `fk_newsletter` int UNSIGNED NOT NULL,
+  `date_creation` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `date_modification` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `date_delete` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -233,6 +314,25 @@ CREATE TABLE `team` (
   `date_modification` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   `date_delete` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `team`
+--
+
+INSERT INTO `team` (`id`, `name`, `description`, `date_creation`, `date_modification`, `date_delete`) VALUES
+(1, 'Comité central', NULL, '2024-10-28 20:21:12', NULL, NULL),
+(2, 'Commission de vérification des comptes', NULL, '2024-10-28 20:21:12', NULL, NULL),
+(3, 'Commission Rosaly', NULL, '2024-10-28 20:22:03', NULL, NULL),
+(4, 'Commission Saanenwald', NULL, '2024-10-28 20:22:03', NULL, NULL),
+(5, 'Commission des bâtiments', NULL, '2024-10-28 20:31:10', NULL, NULL),
+(6, 'Commission des finances', NULL, '2024-10-28 20:31:22', NULL, NULL),
+(7, 'Jeudistes', NULL, '2024-10-28 20:33:40', NULL, NULL),
+(8, 'Commission jeunesse', NULL, '2024-10-28 20:33:40', NULL, NULL),
+(9, 'Programme des courses', NULL, '2024-10-28 20:37:12', NULL, NULL),
+(10, 'Commission Internet', NULL, '2024-10-28 20:37:12', NULL, NULL),
+(11, 'Bulletin', NULL, '2024-10-28 20:39:02', NULL, NULL),
+(12, 'Livret annuel', NULL, '2024-10-28 20:39:02', NULL, NULL),
+(13, 'FUL, Foyer Unioniste Lausannois', NULL, '2024-10-28 20:40:22', NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -295,6 +395,20 @@ ALTER TABLE `home`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `newsletter`
+--
+ALTER TABLE `newsletter`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `newsletter_subscription`
+--
+ALTER TABLE `newsletter_subscription`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `newsletter_subscription_person` (`fk_person`),
+  ADD KEY `newsletter_subscription_newsletter` (`fk_newsletter`);
+
+--
 -- Indexes for table `person`
 --
 ALTER TABLE `person`
@@ -340,7 +454,7 @@ ALTER TABLE `change`
 -- AUTO_INCREMENT for table `change_type`
 --
 ALTER TABLE `change_type`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `contribution`
@@ -352,13 +466,25 @@ ALTER TABLE `contribution`
 -- AUTO_INCREMENT for table `function`
 --
 ALTER TABLE `function`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `home`
 --
 ALTER TABLE `home`
   MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `newsletter`
+--
+ALTER TABLE `newsletter`
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `newsletter_subscription`
+--
+ALTER TABLE `newsletter_subscription`
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `person`
@@ -370,7 +496,7 @@ ALTER TABLE `person`
 -- AUTO_INCREMENT for table `team`
 --
 ALTER TABLE `team`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- Constraints for dumped tables
@@ -403,6 +529,13 @@ ALTER TABLE `contribution`
 --
 ALTER TABLE `function`
   ADD CONSTRAINT `function_team` FOREIGN KEY (`fk_team`) REFERENCES `team` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+--
+-- Constraints for table `newsletter_subscription`
+--
+ALTER TABLE `newsletter_subscription`
+  ADD CONSTRAINT `newsletter_subscription_newsletter` FOREIGN KEY (`fk_newsletter`) REFERENCES `newsletter` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  ADD CONSTRAINT `newsletter_subscription_person` FOREIGN KEY (`fk_person`) REFERENCES `person` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
 -- Constraints for table `person`
