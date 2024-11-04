@@ -38,15 +38,13 @@
           <!-- END OF ADMIN ACCESS -->
 
           <!-- For logged in users, display a "change password" button -->
-          <?php if (!isset($_SESSION['azure_identification'])) { ?>
-            <a href="<?php echo base_url("access/auth/change_password"); ?>" ><?php echo lang('common_lang.btn_change_my_password'); ?></a>
-          <?php } ?>
+          <a href="<?php echo base_url("change_password"); ?>" ><?php echo lang('common_lang.btn_change_my_password'); ?></a>
           <!-- And a "logout" button -->
-          <a href="<?php echo base_url("access/auth/logout"); ?>" ><?php echo lang('common_lang.btn_logout'); ?></a>
+          <a href="<?php echo base_url("logout"); ?>" ><?php echo lang('common_lang.btn_logout'); ?></a>
 
         <?php } else { ?>
           <!-- For not logged in users, display a "login" button -->
-          <a id="login_button" href="<?php echo base_url("access/auth/login".(isset($after_login_redirect) ? '?after_login_redirect='.$after_login_redirect : '') ); ?>">
+          <a id="login_button" href="<?php echo base_url("login".(isset($after_login_redirect) ? '?after_login_redirect='.$after_login_redirect : '') ); ?>">
             <?php echo lang('common_lang.btn_login'); ?>
           </a>
         <?php } ?>
