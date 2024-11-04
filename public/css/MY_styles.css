@@ -1,0 +1,31 @@
+/* LOGIN BAR */
+#login-bar {
+    padding-bottom: 10px;
+    border-bottom: #003883 1px solid;
+    margin-bottom: 10px;
+}
+
+#app-logo {
+    max-height: 70px;
+}
+
+/* Center app title and modify its size depending of screen size */
+#app-title {
+    font-size: 2em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+/* Adjust for xs and sm screen sizes */
+@media screen and (max-width: 767px) {
+    #app-title {
+        font-size: 1.5em;
+    }
+}
+
+#login-menu {
+    display: flex;
+    justify-content: center;
+    height: 100%;
+}
