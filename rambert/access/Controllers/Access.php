@@ -13,6 +13,7 @@ use App\Controllers\BaseController;
 
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
+use CodeIgniter\HTTP\Response;
 use Psr\Log\LoggerInterface;
 
 use Access\Models\Access_model;

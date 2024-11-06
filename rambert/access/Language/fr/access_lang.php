@@ -17,4 +17,7 @@ return[
 
 // Buttons
 'btn_login'                         => 'Se connecter',
+
+// Error messages
+'msg_error_access_denied'           => 'Vous n\'avez pas l\'autorisation d\'accéder à cette fonction',
 ];

@@ -10,6 +10,8 @@ use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\HTTP\Exceptions\RedirectException;
 use Psr\Log\LoggerInterface;
 
+use Access\Exceptions\AccessDeniedException;
+
 /**
  * Class BaseController
  *
@@ -70,7 +72,7 @@ abstract class BaseController extends Controller
 
         // Check permission on construct
         if (!$this->check_permission()) {
-            throw new RedirectException('login');
+            throw AccessDeniedException::forPageAccessDenied();
         }
     }
 
@@ -85,11 +87,6 @@ abstract class BaseController extends Controller
     */
     protected function check_permission(?int $required_level = NULL): bool
     {
-        if (!isset($_SESSION['logged_in'])) {
-            // Create and initialize the variable
-            $_SESSION['logged_in'] = false;
-        }
-
         if (is_null($required_level)) {
             // No required level is defined, use the controller's default level
             $required_level = $this->access_level;
@@ -100,16 +97,16 @@ abstract class BaseController extends Controller
             return true;
         }
         else {
-            // Check if user is logged in, if not access is not allowed
-            if ($_SESSION['logged_in'] != true) {
-                return false;
+            // Check if user is logged in, if not redirect to login page
+            if (empty($_SESSION['logged_in'])) {
+                throw new RedirectException('login');
             }
             // User is logged in. Check if page is accessible for all logged in users
             elseif ($required_level == "@") {
                 return true;
             }
             // Access is limited, check the user's access level
-            elseif ($required_level <= $_SESSION['user_access']) {
+            elseif (!empty($_SESSION['user_access']) && $required_level <= $_SESSION['user_access']) {
                 return true;
             }
             // no permission
