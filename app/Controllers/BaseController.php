@@ -7,6 +7,7 @@ use CodeIgniter\HTTP\CLIRequest;
 use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
+use CodeIgniter\HTTP\Exceptions\RedirectException;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -69,7 +70,7 @@ abstract class BaseController extends Controller
 
         // Check permission on construct
         if (!$this->check_permission()) {
-            throw AccessDeniedException::forPageAccessDenied();
+            throw new RedirectException('login');
         }
     }
 
