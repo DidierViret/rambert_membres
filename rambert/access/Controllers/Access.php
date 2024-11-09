@@ -16,7 +16,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\HTTP\Response;
 use Psr\Log\LoggerInterface;
 
-use Access\Models\Access_model;
+use Access\Models\AccessModel;
 use Access\Models\Access_level_model;
 
 class Access extends BaseController
@@ -35,13 +35,20 @@ class Access extends BaseController
         helper('form');
 
         // Load required models
-        $this->access_model = new Access_model();
+        $this->accessModel = new AccessModel();
+    }
+
+    public function test() {
+        $this->accessModel->find([1,2]);
     }
 
     /**
      * Display login form.
      * Check login and password when submitted.
      * Redirect after login success.
+     * 
+     * @return string|Response : Display the view containing the login form or
+     *                           redirect to the after_login_redirect URL
      */
     public function login(): string|Response {
 
@@ -59,7 +66,7 @@ class Access extends BaseController
         }
 
         // If user not yet logged in
-        if(!(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true)) {
+        if(!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] != true) {
 
             // Check if the form has been submitted, else just display the form
             if (!is_null($this->request->getVar('btn_login'))) {
@@ -67,28 +74,27 @@ class Access extends BaseController
                 $email = $this->request->getVar('email');
                 $password = $this->request->getvar('password');
 
-                $user = $this->check_password($email, $password);
+                $user = $this->accessModel->check_password($email, $password);
 
                 if (empty($user)) {
                     // Login failed
-                    $this->session->setFlashdata('error_message', lang('user_lang.msg_err_invalid_password'));
+                    $this->session->setFlashdata('error_message', lang('access_lang.msg_error_invalid_password'));
 
                 } else {
                     // Login success, set session variables
-                    $this->session->set('user_id', $user->id);
-                    $this->session->set('username', $user->username);
-                    $this->session->set('user_access', $user->access_level);
-                    $this->session->set('logged_in', true);
+                    $_SESSION['user_id'] = $user->id;
+                    $_SESSION['user_email'] = $user->email;
+                    $_SESSION['user_access'] = $user->access_level;
+                    $_SESSION['logged_in'] = true;
 
                     // Redirect after login success
                     return redirect()->to($_SESSION['after_login_redirect']);
-
                 }
             }
 
             //Display login page
-            $output['title'] = lang('user_lang.title_page_login');
-            if(!is_null($this->session->getFlashdata('message-danger'))) {
+            $output['title'] = lang('access_lang.title_login');
+            if(!empty($_SESSION['error_message'])) {
                 $output['error_message'] = $session->getFlashdata('error_message');
             }
             return $this->display_view('\Access\login', $output);
@@ -96,6 +102,73 @@ class Access extends BaseController
         } else {
             // If user is already logged in, redirect
             return redirect()->to($_SESSION['after_login_redirect']);
+        }
+    }
+
+    /**
+     * Logout and destroy session
+     *
+     * @return Response : Redirect to the base_url
+     */
+    public function logout(): Response
+    {
+        // Restart session with empty parameters
+        $_SESSION = [];
+        session_reset();
+        session_unset();
+
+        return redirect()->to(base_url());
+    }
+
+    /**
+     * Let user change his own password
+     *
+     * @return string|Response : Display the form to let user change password or
+     *                           redirect
+     */
+    public function change_my_password(): string|Response
+    {
+        // Check if access is allowed
+        if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+
+            // Get user from DB, destroy session if user doesn't exist
+            $user = $this->user_model->withDeleted()->find($_SESSION['user_id']);
+            if (empty($user)) return redirect()->to('logout');
+
+            // Empty errors message in output
+            $output['errors'] = [];
+
+            // Check if the form has been submitted, else just display the form
+            if (!is_null($this->request->getVar('btn_change_password'))) {
+                $old_password = $this->request->getVar('old_password');
+
+                if($this->accessModel->check_password($user['email'], $old_password)) {
+                    $user['password'] = $this->request->getVar('new_password');
+                    $user['password_confirm'] = $this->request->getVar('confirm_password');
+
+                    $this->accessModel->update($user['id'], $user);
+
+                    if ($this->accessModel->errors()==null) {
+                        // No error happened, redirect
+                        return redirect()->to(base_url());
+                    } else {
+                        // Display error messages
+                        $output['errors'] = $this->accessModel->errors();
+                    }
+
+                } else {
+                    // Old password error
+                    $output['errors'][] = lang('access_lang.msg_error_invalid_old_password');
+                }
+            }
+
+            // Display the password change form
+            $output['title'] = lang('access_lang.title_change_my_password');
+            return $this->display_view('\Access\change_my_password', $output);
+
+        } else {
+            // User is not logged in, redirect to login form
+            return redirect()->to('login');
         }
     }
 } ?>
