@@ -10,7 +10,7 @@ class AccessTestSeeder extends Seeder
         // INSERTIONS IN home TABLE
         $data = [
             [
-                'id'                    => 1,
+                'id'                    => 10,
                 'address_name'          => 'Home address name',
                 'address_line_1'        => 'Home address line 1',
             ],
@@ -20,15 +20,15 @@ class AccessTestSeeder extends Seeder
         // INSERTIONS IN person TABLE
         $data = [
             [
-                'id'                    => 1,
-                'fk_home'               => 1,
+                'id'                    => 20,
+                'fk_home'               => 10,
                 'fk_category'           => 1,
                 'first_name'            => 'Administrator',
                 'last_name'             => 'Administrator',
             ],
             [
-                'id'                    => 2,
-                'fk_home'               => 1,
+                'id'                    => 21,
+                'fk_home'               => 10,
                 'fk_category'           => 1,
                 'first_name'            => 'Manager',
                 'last_name'             => 'Manager',
@@ -39,14 +39,14 @@ class AccessTestSeeder extends Seeder
         // INSERTIONS IN access TABLE
         $data = [
             [
-                'id'                    => 1,
+                'id'                    => 30,
                 'fk_access_level'       => 1, // Administrator
-                'fk_person'             => 1,
+                'fk_person'             => 20,
             ],
             [
-                'id'                    => 2,
+                'id'                    => 31,
                 'fk_access_level'       => 2, // Manager
-                'fk_person'             => 2,
+                'fk_person'             => 21,
             ],
         ];
         $this->db->table('access')->insertBatch($data);
