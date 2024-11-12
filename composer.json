@@ -11,11 +11,13 @@
     },
     "require": {
         "php": "^8.1",
-        "codeigniter4/framework": "^4.0"
+        "codeigniter4/framework": "^4.0",
+        "codeigniter4/translations": "^4.5"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9",
         "mikey179/vfsstream": "^1.6",
+        "phpunit/php-code-coverage": "^10.1",
         "phpunit/phpunit": "^10.5.16"
     },
     "autoload": {
