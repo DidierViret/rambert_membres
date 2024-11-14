@@ -24,22 +24,13 @@ class AccessModel extends Model {
 
     // Callbacks
     protected $afterFind = ['appendLinkedPerson', 'appendLinkedAccessLevel'];
+    protected $beforeInsert = ['hashPassword'];
+    protected $beforeUpdate = ['hashPassword'];
 
-    /* Define fields validation rules
-                    $validation_rules=[
-                        'username'=>[
-                        'label' => 'user_lang.field_username',
-                        'rules' => 'trim|required|'
-                            . 'min_length['.config("\User\Config\UserConfig")->username_min_length.']|'
-                            . 'max_length['.config("\User\Config\UserConfig")->username_max_length.']'],
-                        'password'=>[
-                            'label' => 'user_lang.field_password',
-                            'rules' => 'trim|required|'
-                                . 'min_length['.config("\User\Config\UserConfig")->password_min_length.']|'
-                                . 'max_length['.config("\User\Config\UserConfig")->password_max_length.']'
-                        ]
-                    ];
-    */
+    // Declare variables for validation
+
+    protected $validationRules;
+    protected $validationMessages;
 
     /**
      * Called just after the Model's constructor
@@ -47,6 +38,26 @@ class AccessModel extends Model {
     protected function initialize() {
         $this->accessLevelModel = new AccessLevelModel();
         $this->personModel = new PersonModel();
+
+        $this->validationRules = [
+            'id' => [
+                'rules' => 'permit_empty|numeric'
+            ],
+            'fk_access_level' =>
+                ['label' => lang('access_lang.field_access_level'),
+                 'rules' => 'required'],
+            'password' =>
+                ['label' => lang('access_lang.field_password'),
+                 'rules' => 'required|trim|'.
+                            'min_length['.config("\Access\Config\AccessConfig")->password_min_length.']|'.
+                            'max_length['.config("\Access\Config\AccessConfig")->password_max_length.']|'.
+                            'matches[password_confirm]'],
+        ];
+
+        $this->validationMessages=[
+            'password' =>
+                ['matches' => lang('access_lang.msg_err_password_not_matches')],
+        ];
     }
 
     /**
@@ -83,6 +94,20 @@ class AccessModel extends Model {
             }
         }
         return $data;
+    }
+
+    /**
+     * Callback method to hash the password before inserting or updating it
+     */
+    public function hashPassword(array $data) {
+        if (! isset($data['data']['password'])) {
+            // There is no password to insert or update
+            return $data;
+        } else {
+            // Replace the clear password with a hashed password
+            $data['data']['password'] = password_hash($data['data']['password'], config('\Access\Config\AccessConfig')->password_hash_algorithm);
+            return $data;
+        }
     }
 }
 ?>
