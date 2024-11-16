@@ -98,4 +98,46 @@ final class AccessModelTest extends CIUnitTestCase
         // Check that the attached person is the good one
         $this->assertEquals($access['person']['id'], $access['fk_person']);
     }
+
+    /**
+     * Check that password is hashed before storing it in database
+     */
+    public function testPasswordHash(): void
+    {
+        $model = new AccessModel();
+
+        // Get an access object
+        $access = $model->first();
+
+        // Set a password and save it
+        $password = "MySafePassword";
+        $data = [
+            'password' => $password,
+            'password_confirm' => $password
+        ];
+        $model->update($access['id'], $data);
+
+        // Get updated access object
+        $updatedAccess = $model->find($access['id']);
+
+        // Check that password has been saved, is not stored clear, is correctly hashed
+        $this->assertNotEmpty($updatedAccess['password']);
+        $this->assertNotEquals($updatedAccess['password'], $password);
+        $this->assertTrue(password_verify($password, $updatedAccess['password']));
+
+        // Create a new access object with a password and save it
+        $newAccess = [
+            'fk_access_level' => 2,
+            'fk_person' => 20,
+            'password' => $password,
+            'password_confirm' => $password,
+        ];
+        $insertedAccess = $model->insert($newAccess);
+        $insertedAccess = $model->find($insertedAccess);
+
+        // Check that password has been saved, is not stored clear, is correctly hashed
+        $this->assertNotEmpty($insertedAccess['password']);
+        $this->assertNotEquals($insertedAccess['password'], $password);
+        $this->assertTrue(password_verify($password, $insertedAccess['password']));
+    }
 }
