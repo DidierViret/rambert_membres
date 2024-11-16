@@ -61,6 +61,36 @@ class AccessModel extends Model {
     }
 
     /**
+     * Verify the identification of a user with his email and password.
+     * 
+     * @param string $email : The given e-mail address, used as person's identifier
+     * @param string $password : The given password, to be checked
+     * 
+     * @return : False if the access has not been found or if password is not correct
+     *           The corresponding access object else.
+     */
+    public function checkPassword(string $email, string $password) {
+        // Find the person corresponding to the given email
+        $person = $this->personModel->where('email', $email)->first();
+        if (empty($person)) {
+            return false;
+        }
+
+        // Find the access corresponding to the person found
+        $access = $this->where('fk_person', $person['id'])->first();
+        if (empty($access)) {
+            return false;
+        }
+
+        // Check if password is correct
+        if(password_verify($password, $access['password'])){
+            return $access;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Callback method to append datas from the linked person table
      */
     protected function appendPerson(array $data) {
@@ -119,7 +149,7 @@ class AccessModel extends Model {
     /**
      * Callback method to hash the password before inserting or updating it
      */
-    public function hashPassword(array $data) {
+    protected function hashPassword(array $data) {
         if (! isset($data['data']['password'])) {
             // There is no password to insert or update
             return $data;

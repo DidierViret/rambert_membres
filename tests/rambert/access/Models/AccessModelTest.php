@@ -140,4 +140,12 @@ final class AccessModelTest extends CIUnitTestCase
         $this->assertNotEquals($insertedAccess['password'], $password);
         $this->assertTrue(password_verify($password, $insertedAccess['password']));
     }
+
+    /**
+     * Check that the checkpassword method is working
+     */
+    public function testCheckPassword(): void
+    {
+        /** TODO : Check that soft deleted access or soft deleted person get "false" in checkPassword */
+    }
 }

@@ -31,6 +31,7 @@ class AccessTestSeeder extends Seeder
                 'fk_category'           => 1,
                 'first_name'            => 'Administrator',
                 'last_name'             => 'Administrator',
+                'email'                 => 'administrator@test.com',
             ],
             [
                 'id'                    => 21,
@@ -38,6 +39,7 @@ class AccessTestSeeder extends Seeder
                 'fk_category'           => 1,
                 'first_name'            => 'Manager',
                 'last_name'             => 'Manager',
+                'email'                 => 'manager@test.com',
             ],
         ];
         $this->db->table('person')->insertBatch($data);
