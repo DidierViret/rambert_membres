@@ -23,9 +23,9 @@ class AccessModel extends Model {
     protected $deletedField  = 'date_delete';
 
     // Callbacks
-    protected $afterFind = ['appendLinkedPerson', 'appendLinkedAccessLevel'];
-    protected $beforeInsert = ['hashPassword'];
-    protected $beforeUpdate = ['hashPassword'];
+    protected $afterFind = ['appendPerson', 'appendAccessLevel'];
+    protected $beforeInsert = ['hashPassword', 'unsetPerson', 'unsetAccessLevel'];
+    protected $beforeUpdate = ['hashPassword', 'unsetPerson', 'unsetAccessLevel'];
 
     // Declare variables for validation
 
@@ -63,7 +63,7 @@ class AccessModel extends Model {
     /**
      * Callback method to append datas from the linked person table
      */
-    protected function appendLinkedPerson(array $data) {
+    protected function appendPerson(array $data) {
 
         if($data['singleton'] && !empty($data['data'])) {
             // Single item, add datas to it
@@ -79,9 +79,19 @@ class AccessModel extends Model {
     }
 
     /**
+     * Callback method to remove datas from the linked person table before updating or inserting it
+     */
+    protected function unsetPerson(array $data) {
+        if (isset($data['data']['person'])) {
+            unset($data['data']['person']);
+        }
+        return $data;
+    }
+
+    /**
      * Callback method to append datas from the linked access_level table
      */
-    protected function appendLinkedAccessLevel(array $data) {
+    protected function appendAccessLevel(array $data) {
 
         if($data['singleton'] && !empty($data['data'])) {
             // Single item, add datas to it
@@ -92,6 +102,16 @@ class AccessModel extends Model {
             foreach ($data['data'] as &$access) {
                 $access['access_level'] = $this->accessLevelModel->find($access['fk_access_level']);
             }
+        }
+        return $data;
+    }
+
+    /**
+     * Callback method to remove access_level datas before updating or inserting it
+     */
+    protected function unsetAccessLevel(array $data) {
+        if (isset($data['data']['access_level'])) {
+            unset($data['data']['access_level']);
         }
         return $data;
     }

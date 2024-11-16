@@ -1,4 +1,10 @@
 <?php
+/**
+ * @author      Club Rambert, Didier Viret
+ * @link        https://rambert.ch
+ * @copyright   Copyright (c), club Rambert
+ */
+
 namespace Tests\rambert\access\Database\Seeds;
 
 use CodeIgniter\Database\Seeder;
