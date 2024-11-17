@@ -98,7 +98,7 @@ class Access extends BaseController
             //Display login page
             $output['title'] = lang('access_lang.title_login');
             if(!empty($_SESSION['error_message'])) {
-                $output['error_message'] = $session->getFlashdata('error_message');
+                $output['error_message'] = $this->session->getFlashdata('error_message');
             }
             return $this->display_view('\Access\login', $output);
 

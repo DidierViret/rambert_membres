@@ -37,13 +37,11 @@ return[
 // Error messages
 'msg_error_access_denied_header'    => 'Accès interdit',
 'msg_error_access_denied'           => 'Vous n\'avez pas l\'autorisation d\'accéder à cette fonction',
-'msg_error_invalid_password'        => 'L\'e-mail et le mot de passe ne sont pas valides',
+'msg_error_invalid_password'        => 'Ces identifiants ne sont pas valides',
 'msg_error_invalid_old_password'    => 'L\'ancien mot de passe n\'est pas valide',
 'msg_error_access_already_inactive' => 'Les droits d\'accès sont déjà désactivés',
 'msg_error_access_already_active'   => 'Les droits d\'accès sont déjà activés',
 'msg_error_access_level_not_exist'  => 'Ce niveau d\'accès n\'existe pas',
-'msg_error_invalid_password'        => 'L\'e-mail et le mot de passe ne sont pas valides',
-'msg_error_invalid_old_password'    => 'L\'ancien mot de passe n\'est pas valide',
 'msg_error_password_not_matches'    => 'Le mot de passe ne coïncide pas avec la confirmation du mot de passe',
 'msg_error_default'                 => 'Une erreur est survenue',
 
