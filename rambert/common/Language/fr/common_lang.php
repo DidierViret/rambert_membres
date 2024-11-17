@@ -16,9 +16,6 @@ return[
 
 // Buttons
 'btn_admin'                      => 'Administration',
-'btn_login'                      => 'Se connecter',
-'btn_logout'                     => 'Se déconnecter',
-'btn_change_my_password'         => 'Modifier mon mot de passe',
 'btn_back'                       => 'Retour',
 'btn_next'                       => 'Suivant',
 'btn_cancel'                     => 'Annuler',

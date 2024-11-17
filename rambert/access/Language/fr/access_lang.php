@@ -28,6 +28,9 @@ return[
 'field_deleted_access_display'      => 'Afficher les droits d\'accès désactivés',
 
 // Buttons
+'btn_login'                         => 'Se connecter',
+'btn_logout'                        => 'Se déconnecter',
+'btn_change_my_password'            => 'Modifier mon mot de passe',
 'btn_hard_delete_access'            => 'Supprimer ces droits d\'accès',
 'btn_disable_access'                => 'Désactiver ces droits d\'accès',
 

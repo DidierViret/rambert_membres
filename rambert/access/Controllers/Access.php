@@ -77,17 +77,17 @@ class Access extends BaseController
                 $email = $this->request->getVar('email');
                 $password = $this->request->getvar('password');
 
-                $user = $this->accessModel->check_password($email, $password);
+                $access = $this->accessModel->checkPassword($email, $password);
 
-                if (empty($user)) {
+                if (empty($access)) {
                     // Login failed
                     $this->session->setFlashdata('error_message', lang('access_lang.msg_error_invalid_password'));
 
                 } else {
                     // Login success, set session variables
-                    $_SESSION['user_id'] = $user->id;
-                    $_SESSION['user_email'] = $user->email;
-                    $_SESSION['user_access'] = $user->access_level;
+                    $_SESSION['user_id'] = $access['person']['id'];
+                    $_SESSION['user_email'] = $access['person']['email'];
+                    $_SESSION['user_access'] = $access['access_level']['level'];
                     $_SESSION['logged_in'] = true;
 
                     // Redirect after login success
@@ -145,7 +145,7 @@ class Access extends BaseController
             if (!is_null($this->request->getVar('btn_change_password'))) {
                 $old_password = $this->request->getVar('old_password');
 
-                if($this->accessModel->check_password($user['email'], $old_password)) {
+                if($this->accessModel->checkPassword($user['email'], $old_password)) {
                     $user['password'] = $this->request->getVar('new_password');
                     $user['password_confirm'] = $this->request->getVar('confirm_password');
 
