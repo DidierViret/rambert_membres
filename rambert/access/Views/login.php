@@ -15,7 +15,7 @@
 
             <!-- Error message -->
             <?php if(!empty($error_message)) { ?>
-                    <div class="alert alert-danger text-center"><?= $error_message ?></div>
+                    <div id="error" class="alert alert-danger text-center"><?= $error_message ?></div>
             <?php } ?>
             
             <!-- Login form -->

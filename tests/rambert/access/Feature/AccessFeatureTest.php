@@ -32,6 +32,7 @@ class AccessFeatureTest extends CIUnitTestCase
         // Display an empty login form
         $result = $this->get('login');
         $result->assertOK();
+        $result->assertDontSeeElement('#error');
         $result->assertSeeElement('#email');
         $result->assertSeeElement('#password');
 
@@ -39,6 +40,7 @@ class AccessFeatureTest extends CIUnitTestCase
         $result = $this->post('login', ['email' => 'bad@email.com', 'password' => 'wrongPassword', 'btn_login' => true]);
         $result->assertOK();
         $result->assertSee(lang('access_lang.msg_error_invalid_password'));
+        $result->assertSeeElement('#error');
         $result->assertSeeElement('#email');
         $result->assertSeeElement('#password');
     }
