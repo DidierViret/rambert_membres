@@ -10,6 +10,7 @@ namespace Access\Models;
 use CodeIgniter\Test\CIUnitTestCase;
 use CodeIgniter\Test\DatabaseTestTrait;
 use Access\Models\AccessModel;
+use Members\Models\PersonModel;
 use Tests\rambert\access\Database\Seeds\AccessTestSeeder;
 
 /**
@@ -60,7 +61,7 @@ final class AccessModelTest extends CIUnitTestCase
         // But it should still find it as archived
         $this->assertNotNull($model->withDeleted()->find($access['id']));
 
-        // Undelete the soft deleted access
+        // Restore the soft deleted access
         $model->update($access['id'], ['date_delete' => Null]);
         $this->assertNotNull($model->find($access['id']));
     }
@@ -139,6 +140,9 @@ final class AccessModelTest extends CIUnitTestCase
         $this->assertNotEmpty($insertedAccess['password']);
         $this->assertNotEquals($insertedAccess['password'], $password);
         $this->assertTrue(password_verify($password, $insertedAccess['password']));
+
+        // Purge the newly created access to avoid effects on other tests
+        $model->delete($insertedAccess['id'], true);
     }
 
     /**
@@ -146,6 +150,43 @@ final class AccessModelTest extends CIUnitTestCase
      */
     public function testCheckPassword(): void
     {
-        /** TODO : Check that soft deleted access or soft deleted person get "false" in checkPassword */
+        $model = new AccessModel();
+        $personModel = new PersonModel();
+
+        // Get an access object
+        $access = $model->first();
+
+        // Set a password and save it
+        $password = "MySafePassword";
+        $data = [
+            'password' => $password,
+            'password_confirm' => $password
+        ];
+        $model->update($access['id'], $data);
+
+        // Check that a correct email - password combination returns the right access object
+        $checkPasswordResult = $model->checkPassword($access['person']['email'], $password);
+        $this->assertNotEmpty($checkPasswordResult);
+        $this->assertEquals($checkPasswordResult['id'], $access['id']);
+
+        // Check that a wrong email - password combination returns an empty value
+        $checkPasswordResult = $model->checkPassword($access['person']['email'], 'wrongPassword');
+        $this->assertEmpty($checkPasswordResult);
+
+        // Check that trying to connect with a soft deleted access returns an empty value
+        $model->delete($access['id']);
+        $this->assertNotEmpty($model->withDeleted()->find($access['id']));
+        $this->assertEmpty($model->checkPassword($access['person']['email'], $password));
+        // Restore the soft deleted access
+        $model->update($access['id'], ['date_delete' => Null]);
+        $this->assertNotNull($model->find($access['id']));
+
+        // Check that trying to connect with a soft deleted person returns an empty value
+        $personModel->delete($access['fk_person']);
+        $this->assertNotEmpty($personModel->withDeleted()->find($access['fk_person']));
+        $this->assertEmpty($model->checkPassword($access['person']['email'], $password));
+        // Restore the soft deleted person
+        $personModel->update($access['fk_person'], ['date_delete' => Null]);
+        $this->assertNotNull($personModel->find($access['fk_person']));
     }
 }
