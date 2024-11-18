@@ -56,7 +56,7 @@ class AccessModel extends Model {
 
         $this->validationMessages=[
             'password' =>
-                ['matches' => lang('access_lang.msg_err_password_not_matches')],
+                ['matches' => lang('access_lang.msg_error_password_not_matches')],
         ];
     }
 

@@ -86,6 +86,7 @@ class Access extends BaseController
                 } else {
                     // Login success, set session variables
                     $_SESSION['user_id'] = $access['person']['id'];
+                    $_SESSION['access_id'] = $access['id'];
                     $_SESSION['user_email'] = $access['person']['email'];
                     $_SESSION['user_access'] = $access['access_level']['level'];
                     $_SESSION['logged_in'] = true;
@@ -134,9 +135,9 @@ class Access extends BaseController
         // Check if access is allowed
         if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
 
-            // Get user from DB, destroy session if user doesn't exist
-            $user = $this->user_model->withDeleted()->find($_SESSION['user_id']);
-            if (empty($user)) return redirect()->to('logout');
+            // Get access rights from DB, destroy session if no access rights are found
+            $access = $this->accessModel->find($_SESSION['access_id']);
+            if (empty($access)) return redirect()->to('logout');
 
             // Empty errors message in output
             $output['errors'] = [];
@@ -145,11 +146,11 @@ class Access extends BaseController
             if (!is_null($this->request->getVar('btn_change_password'))) {
                 $old_password = $this->request->getVar('old_password');
 
-                if($this->accessModel->checkPassword($user['email'], $old_password)) {
-                    $user['password'] = $this->request->getVar('new_password');
-                    $user['password_confirm'] = $this->request->getVar('confirm_password');
+                if($this->accessModel->checkPassword($access['person']['email'], $old_password)) {
+                    $access['password'] = $this->request->getVar('new_password');
+                    $access['password_confirm'] = $this->request->getVar('confirm_password');
 
-                    $this->accessModel->update($user['id'], $user);
+                    $this->accessModel->update($access['id'], $access);
 
                     if ($this->accessModel->errors()==null) {
                         // No error happened, redirect

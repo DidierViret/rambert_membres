@@ -10,7 +10,7 @@
 return[
 // Pages titles
 'title_login'                       => 'Connexion',
-'title_change_my_password'          => 'Modification de mon mot de passe',
+'title_change_my_password'          => 'Modifier mon mot de passe',
 'title_access_list'                 => 'Liste des droits d\'accès',
 'title_access_update'               => 'Modifier les droits d\'accès',
 'title_access_new'                  => 'Ajouter un droit d\'accès',
@@ -21,7 +21,7 @@ return[
 // Forms fields
 'field_email'                       => 'Adresse e-mail',
 'field_password'                    => 'Mot de passe',
-'field_old_password'                => 'Ancien mot de passe',
+'field_old_password'                => 'Mot de passe actuel',
 'field_new_password'                => 'Nouveau mot de passe',
 'field_password_confirm'            => 'Confirmer le mot de passe',
 'field_access_level'                => 'Niveau d\'accès',
