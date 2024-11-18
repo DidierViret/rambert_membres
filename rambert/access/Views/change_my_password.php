@@ -22,9 +22,11 @@
                 <legend><?= lang('access_lang.title_change_my_password'); ?></legend>
 
                 <!-- ERROR MESSAGES -->
-                <?php foreach ($errors as $error) { ?>
-                    <div class="alert alert-danger" role="alert">
-                        <?= $error ?>
+                <?php if (!empty($errors)) { ?>
+                    <div id="error" class="alert alert-danger" role="alert">
+                    <?php foreach ($errors as $error) { ?>
+                        <?= $error ?><br />
+                    <?php } ?>
                     </div>
                 <?php } ?>
                 
