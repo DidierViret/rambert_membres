@@ -88,7 +88,7 @@ class Access extends BaseController
                     $_SESSION['user_id'] = $access['person']['id'];
                     $_SESSION['access_id'] = $access['id'];
                     $_SESSION['user_email'] = $access['person']['email'];
-                    $_SESSION['user_access'] = $access['access_level']['level'];
+                    $_SESSION['access_level'] = $access['access_level']['level'];
                     $_SESSION['logged_in'] = true;
 
                     // Redirect after login success
@@ -133,7 +133,7 @@ class Access extends BaseController
     public function change_my_password(): string|Response
     {
         // Check if access is allowed
-        if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+        if($this->check_permission('@')) {
 
             // Get access rights from DB, destroy session if no access rights are found
             $access = $this->accessModel->find($_SESSION['access_id']);
@@ -169,10 +169,6 @@ class Access extends BaseController
             // Display the password change form
             $output['title'] = lang('access_lang.title_change_my_password');
             return $this->display_view('\Access\change_my_password', $output);
-
-        } else {
-            // User is not logged in, redirect to login form
-            return redirect()->to('login');
         }
     }
 } ?>

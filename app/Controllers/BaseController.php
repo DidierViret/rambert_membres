@@ -85,7 +85,7 @@ abstract class BaseController extends Controller
     * @return bool : true if user level is equal or higher than required level,
     *                false else
     */
-    protected function check_permission(?int $required_level = NULL): bool
+    protected function check_permission($required_level = NULL): bool
     {
         if (is_null($required_level)) {
             // No required level is defined, use the controller's default level
@@ -106,7 +106,7 @@ abstract class BaseController extends Controller
                 return true;
             }
             // Access is limited, check the user's access level
-            elseif (!empty($_SESSION['user_access']) && $required_level <= $_SESSION['user_access']) {
+            elseif (!empty($_SESSION['access_level']) && $required_level <= $_SESSION['access_level']) {
                 return true;
             }
             // no permission

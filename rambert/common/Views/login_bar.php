@@ -31,7 +31,7 @@
         <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
           
           <!-- ADMIN ACCESS ONLY -->
-          <?php if ($_SESSION['user_access'] >= config('\Access\Config\AccessConfig')->access_lvl_admin) { ?>
+          <?php if ($_SESSION['access_level'] >= config('\Access\Config\AccessConfig')->access_lvl_admin) { ?>
               <!-- Link to the first administration tab defined in Common\Config\AdminPanelConfig -->
               <a href="<?php echo base_url(config('\Common\Config\AdminPanelConfig')->tabs[0]['pageLink']); ?>" ><?php echo lang('common_lang.btn_admin'); ?></a>
           <?php } ?>
