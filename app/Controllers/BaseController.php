@@ -54,9 +54,9 @@ abstract class BaseController extends Controller
      * '@' accessible for logged in users
      * 
      * Other possible values are defined in Access\Config\AccessConfig
-     * For example : $access_level = config('Access\Config\AccessConfig')->access_lvl_admin
+     * For example : $accessLevel = config('Access\Config\AccessConfig')->access_lvl_admin
      */
-    protected $access_level = "*";
+    protected $accessLevel = "*";
 
     /**
      * @return void
@@ -89,7 +89,7 @@ abstract class BaseController extends Controller
     {
         if (is_null($required_level)) {
             // No required level is defined, use the controller's default level
-            $required_level = $this->access_level;
+            $required_level = $this->accessLevel;
         }
 
         if ($required_level == "*") {

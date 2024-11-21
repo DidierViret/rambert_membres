@@ -61,6 +61,26 @@ class AccessModel extends Model {
     }
 
     /**
+     * Get a list of access objects to display it in a table or dropdown.
+     * 
+     * @param bool $withDeleted : A boolean to include or not the soft deleted access objects
+     * @param string $orderBy : name of the field to use to sort the objects
+     * @param string $direction : ASC, DESC or RANDOM, the direction of the sorting
+     * 
+     * @return : An array of arrays, each representing an access object
+     */
+    public function getList(bool $withDeleted = false, string $orderBy = 'person.last_name', string $direction = 'ASC') {
+        $builder = $this->builder();
+        $builder->select('access.id, person.last_name, person.first_name, person.email, access_level.name AS access_level_name');
+        $builder->join('access_level', 'access.fk_access_level = access_level.id');
+        $builder->join('person', 'access.fk_person = person.id');
+        $builder->orderBy("$orderBy", "$direction");
+        $query = $builder->get();
+        
+        return $query->getResult('array');
+    }
+
+    /**
      * Verify the identification of a user with his email and password.
      * 
      * @param string $email : The given e-mail address, used as person's identifier

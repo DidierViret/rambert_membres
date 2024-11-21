@@ -18,7 +18,7 @@ class Members extends BaseController
     {   
         // Set Access level before calling parent constructor
         // Public access
-        $this->access_level = config('\Access\Config\AccessConfig')->access_lvl_manager;
+        $this->accessLevel = config('\Access\Config\AccessConfig')->access_lvl_manager;
         parent::initController($request, $response, $logger);
 
         // Load required helpers

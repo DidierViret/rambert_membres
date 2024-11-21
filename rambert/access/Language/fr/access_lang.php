@@ -11,7 +11,7 @@ return[
 // Pages titles
 'title_login'                       => 'Connexion',
 'title_change_my_password'          => 'Modifier mon mot de passe',
-'title_access_list'                 => 'Liste des droits d\'accès',
+'title_access_list'                 => 'Droits d\'accès',
 'title_access_update'               => 'Modifier les droits d\'accès',
 'title_access_new'                  => 'Ajouter un droit d\'accès',
 'title_access_delete'               => 'Supprimer un droit d\'accès',
@@ -26,6 +26,12 @@ return[
 'field_password_confirm'            => 'Confirmer le mot de passe',
 'field_access_level'                => 'Niveau d\'accès',
 'field_deleted_access_display'      => 'Afficher les droits d\'accès désactivés',
+
+// Lists columns
+'col_last_name'                     => 'Nom',
+'col_first_name'                    => 'Prénom',
+'col_email'                         => 'Courriel',
+'col_access_level'                  => 'Niveau d\'accès',
 
 // Buttons
 'btn_login'                         => 'Se connecter',

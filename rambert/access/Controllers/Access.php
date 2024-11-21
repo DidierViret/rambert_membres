@@ -1,6 +1,6 @@
 <?php
 /**
- * Login, logout, check access
+ * Login, logout and other access utilities for all users
  *
  * @author      Club Rambert, Didier Viret
  * @link        https://rambert.ch
@@ -17,7 +17,6 @@ use CodeIgniter\HTTP\Response;
 use Psr\Log\LoggerInterface;
 
 use Access\Models\AccessModel;
-use Access\Models\Access_level_model;
 
 class Access extends BaseController
 {
@@ -28,7 +27,7 @@ class Access extends BaseController
     {
         // Set Access level before calling parent constructor
         // Public access
-        $this->access_level = "*";
+        $this->accessLevel = "*";
         parent::initController($request, $response, $logger);
 
         // Load required helpers
