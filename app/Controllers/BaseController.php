@@ -142,7 +142,7 @@ abstract class BaseController extends Controller
         // Add admin menu to the view if the current url is an admin url
         foreach (config('\Common\Config\AdminPanelConfig')->tabs as $tab){
             if (strstr(current_url(),$tab['pageLink'])) {
-                $viewToDisplay .= view('\Common\adminMenu');
+                $viewToDisplay .= view('\Common\admin_menu');
             }
         }
 

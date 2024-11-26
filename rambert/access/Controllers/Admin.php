@@ -52,8 +52,8 @@ class Admin extends BaseController
         
         $data['columns'] = ['last_name' => lang('access_lang.col_last_name'),
                             'first_name' => lang('access_lang.col_first_name'),
-                            'email' => lang('access_lang.col_email'),
                             'access_level_name' => lang('access_lang.col_access_level'),
+                            'email' => lang('access_lang.col_email'),
         ];
       
         $data['items'] = $this->accessModel->getList($with_deleted);
@@ -71,5 +71,16 @@ class Admin extends BaseController
 	    return $this->display_view('Common\Views\items_list', $data);
     }
 
+    /**
+     * Display a form to add new access rights
+     * 
+     * @return string : The view containing the form
+     */
+    public function create(): string {
+
+        
+     
+	    return $this->display_view('Access\Views\form', $data);
+    }
     
 } ?>
