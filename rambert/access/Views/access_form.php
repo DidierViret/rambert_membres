@@ -6,7 +6,7 @@
  * @link        https://rambert.ch
  * @copyright   Copyright (c), club Rambert
  */
-$update = !empty($access);
+$update = (!empty($access) && !empty($access['id']) && $access['id'] > 0);
 ?>
 <div class="container">
     <!-- TITLE -->
@@ -56,7 +56,7 @@ $update = !empty($access);
                 <div class="form-group">
             <?php endif ?>
                 <?= form_label(lang('access_lang.field_email'), 'email', ['class' => 'form-label']); ?>
-                <?= form_input('email', $email ?? $access['email'] ?? '', [
+                <?= form_input('email', $access['person']['email'] ?? '', [
                     'maxlength' => config("\Access\Config\AccessConfig")->email_max_length,
                     'class' => 'form-control', 'id' => 'email', 'required' => ''
                 ]); ?>
@@ -68,13 +68,13 @@ $update = !empty($access);
             <?= form_label(lang('access_lang.field_access_level'), 'access_level', ['class' => 'form-label']); ?>
             <?php
                 $dropdown_options = ['class' => 'form-control', 'id' => 'access_level'];
-                if(isset($access) && isset($_SESSION['user_id']) && $_SESSION['user_id'] == $access['person']['id']){
+                if($update && isset($_SESSION['user_id']) && $_SESSION['user_id'] == $access['person']['id']){
                     $dropdown_options['disabled'] = 'disabled';
-                    echo form_hidden('access_level', $access_level ?? $access['fk_access_level'] ?? "");
+                    echo form_hidden('access_level', $access['fk_access_level'] ?? "");
                     echo "<div class=\"alert alert-info\">".lang('access_lang.access_update_level_himself')."</div>";
                 }
             ?>
-            <?= form_dropdown('access_level', $access_levels, $access_level ?? $access['fk_access_level'] ?? NULL, $dropdown_options); ?>
+            <?= form_dropdown('access_level', $access_levels, $access['fk_access_level'] ?? NULL, $dropdown_options); ?>
         </div>
     </div>
 
@@ -91,7 +91,7 @@ $update = !empty($access);
                 <?= form_label(lang('access_lang.field_password_confirm'), 'password_confirm', ['class' => 'form-label']); ?>
                 <?= form_password('password_confirm', '', [
                     'maxlength' => config('\Access\Config\AccessConfig')->password_max_length,
-                    'class' => 'form-control', 'id' => 'user_password_again'
+                    'class' => 'form-control', 'id' => 'password_confirm'
                 ]); ?>
             </div>
         </div>

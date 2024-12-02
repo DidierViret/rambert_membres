@@ -18,6 +18,7 @@ use Psr\Log\LoggerInterface;
 
 use Access\Models\AccessModel;
 use Access\Models\AccessLevelModel;
+use Members\Models\PersonModel;
 
 class Admin extends BaseController
 {
@@ -37,6 +38,7 @@ class Admin extends BaseController
         // Load required models
         $this->accessModel = new AccessModel();
         $this->accessLevelModel = new AccessLevelModel();
+        $this->personModel = new PersonModel();
     }
 
     public function test() {
@@ -91,8 +93,7 @@ class Admin extends BaseController
      * @return string : The view containing the form
      */
     public function updateAccess(int $id = 0): string|response {
-        $access_levels = $this->accessLevelModel->getDropdown();
-        $data['access_levels'] = $access_levels;
+        $data['access_levels'] = $this->accessLevelModel->getDropdown();
 
         if ($id == 0) {
             return redirect()->to('access');
@@ -104,62 +105,106 @@ class Admin extends BaseController
     }
 
     /**
-     * Save new access rights or update existing access rights
+     * Method called from the access_form to create new access rights or update existing access rights
      *
-     * @param integer $id = The id of the access to modify, leave blank to create a new one
      * @return : The newly created or modified access object
      */
-    public function saveAccess(?int $id = 0): string|Response
+    public function saveAccess(): string|Response
     {
-        //added user in current scope to manage its datas
-        $user=null;
+        // Get posted datas and find the person corresponding to the given e-mail address
         if (count($_POST) > 0) {
-            $user_id = $this->request->getPost('id');
-            $oldName = $this->request->getPost('user_name');
-            if($_SESSION['user_id'] != $user_id) {
-                $oldUsertype = $this->request->getPost('user_usertype');
-            }
-            $user = array(
-                'id'    => $user_id,
-                'fk_user_type' => intval($this->request->getPost('user_usertype')),
-                'username' => $this->request->getPost('user_name'),
-                'email' => $this->request->getPost('user_email') ?: NULL
-            );
-            if($this->request->getPost('user_password_again') !== null) {
-                $user['password_confirm'] = $this->request->getPost('user_password_again');
-            }
-            if ($user_id > 0) {
-                $this->user_model->update($user_id, $user);
-            }
-            else {
-                $user['password'] = $this->request->getPost('user_password');
-                $user['password_confirm'] = $this->request->getPost('user_password_again');
+            $accessId = $this->request->getPost('id');
 
-                $this->user_model->insert($user);
+            $access = [];
+            if ($accessId > 0) {
+                // An ID is defined, the existing access will be updated
+                $access = $this->accessModel->find($accessId);
+                // Don't keep hashed password in $access array
+                unset($access['password']);
             }
-            //In the case of errors
-            if ($this->user_model->errors()==null){
-                return redirect()->to('/user/admin/list_user');
+
+            $access['fk_access_level'] = $this->request->getPost('access_level');
+            
+            // Password could be empty in case of an update
+            if (!empty($this->request->getPost('password'))) {
+                $access['password'] = $this->request->getPost('password');
+                $access['password_confirm'] = $this->request->getPost('password_confirm');
             }
+
+            // Get the person corresponding to the given e-mail
+            $email = $this->request->getPost('email');
+            $person = $this->personModel->where('email', $email)->first();
+
+            if (empty($person)) {
+                // The given e-mail is not corresponding to an existing person, display error in the form
+                $data['errors'] = ['email' => lang('access_lang.msg_error_email_not_matches')];
+                // Send the given e-mail to the form, to let it display it again
+                $access['person']['email'] = $email;
+
+            } else {
+                // Give access to the matching person
+                $access['fk_person'] = $person['id'];
+                $this->accessModel->save($access);
+
+                // If no error occured, the operation is completed, redirect to access list
+                if ($this->accessModel->errors() == null) {
+                    return redirect()->to('access');
+                } else {
+                    // They were validation errors, display them in the form
+                    $data['errors'] = $this->accessModel->errors();
+                }
+            }
+
+        } else {
+            // No data posted, redirect to access list
+            return redirect()->to('access');
         }
-
-        //usertiarray is an array contained all usertype name and id
-        $usertiarray=$this->db->table('user_type')->select(['id','name'],)->get()->getResultArray();
-        $usertypes=[];
-        foreach ($usertiarray as $row){
-            $usertypes[$row['id']]=$row['name'];
-        }
-        $output = array(
-            'title'         => lang('user_lang.title_user_'.((bool)$user_id ? 'update' : 'new')),
-            'user'          => $this->user_model->withDeleted()->find($user_id),
-            'user_types'    => $usertypes,
-            'user_name'     => $oldName,
-            'user_usertype' => $oldUsertype,
-            'email'         => $user['email']??null,
-            'errors'        => $this->user_model->errors()==null?[]:$this->user_model->errors()
-        );
-
-        return $this->display_view('\User\admin\form_user', $output);
+        
+        // They were some errors, display the access form again
+        $data['access_levels'] = $this->accessLevelModel->getDropdown();
+        $data['access'] = $access;
+        
+        return $this->display_view('Access\Views\access_form', $data);
     }
-    
+
+    /**
+     * Method called to delete access rights
+     *
+     * @return : The newly created or modified access object
+     */
+    public function deleteAccess(int $accessId, ?int $action = 0): string|Response {
+        $access = $this->accessModel->withDeleted()->find($accessId);
+
+        // No access rights corresponding to the given id
+        if (empty($access)) {
+            return redirect()->to('access');
+        }
+
+        switch($action) {
+            case 0: // Display confirmation
+                $data = array(
+                    'access' => $access,
+                    'title' => lang('access_lang.title_access_delete')
+                );
+                return $this->display_view('\User\admin\delete_user', $data);
+                break;
+
+            case 1: // Disable (soft delete) access rights
+                if ($_SESSION['access_id'] != $accessId) {
+                    $this->accessModel->delete($accessId, FALSE);
+                }
+                return redirect()->to('access');
+                break;
+
+            case 2: // Hard delete access rights
+                if ($_SESSION['access_id'] != $accessId) {
+                    $this->accessModel->delete($accessId, TRUE);
+                }
+                return redirect()->to('access');
+                break;
+
+            default: // Do nothing
+                return redirect()->to('access');
+        }
+    }
 } ?>

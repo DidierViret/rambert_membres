@@ -49,6 +49,7 @@ return[
 'msg_error_access_already_active'   => 'Les droits d\'accès sont déjà activés',
 'msg_error_access_level_not_exist'  => 'Ce niveau d\'accès n\'existe pas',
 'msg_error_password_not_matches'    => 'Le mot de passe ne coïncide pas avec la confirmation du mot de passe',
+'msg_error_email_not_matches'       => 'L\'adresse e-mail ne correspond pas à un membre enregistré',
 'msg_error_default'                 => 'Une erreur est survenue',
 
 // Error code messages
