@@ -23,7 +23,10 @@ $routes->post('access/update/(:num)', '\Access\Controllers\Admin::updateAccess/$
 $routes->get('access/delete/(:num)', '\Access\Controllers\Admin::deleteAccess/$1');
 $routes->get('access/restore/(:num)', '\Access\Controllers\Admin::restoreAccess/$1');
 
+// Route for importation of the datas from the old Joomla/CommunityBuilder database
+$routes->get('import','\Members\Controllers\ImportData::import');
 
+// Routes used for testing some stuff during development
 $routes->get('test','\Access\Controllers\Access::test');
 $routes->get('testadmin','\Access\Controllers\Admin::test');
 ?>
