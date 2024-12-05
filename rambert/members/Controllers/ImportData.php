@@ -72,12 +72,73 @@ class ImportData extends BaseController
         
         // Insert each member in the new database, splitting informations in different tables
         foreach($cbMembers as $cbMember) {
+
+            // Insert home in DB and get its id
             $homeId = $this->importHome($cbMember);
 
+            // Get the corresponding category id
+            switch($cbMember['cb_categorie'])
+            {
+                case 'junior':
+                    $categoryId = 1;
+                    break;
+                case 'jeune':
+                    $categoryId = 2;
+                    break;
+                case 'actif':
+                    $categoryId = 3;
+                    break;
+                case 'conjoint_d_actif':
+                    $categoryId = 4;
+                    break;
+                case 'honoraire':
+                    $categoryId = 5;
+                    break;
+                case 'coinjoint_d_honoraire':
+                    $categoryId = 6;
+                    break;
+                case 'jubilaire':
+                    $categoryId = 7;
+                    break;
+                case 'honneur':
+                    $categoryId = 8;
+                    break;
+                case 'veuve':
+                    $categoryId = 9;
+                    break;
+            }
             
+            // Insert person in DB and get its id
+            $person = [];
+            $person['id'] = $cbMember['user_id'];
+            $person['fk_home'] = $homeId;
+            $person['fk_category'] = $categoryId;
+            $person['title'] = $cbMember['cb_titre'];
+            $person['first_name'] = $cbMember['firstname'];
+            $person['last_name'] = $cbMember['lastname'];
+            $person['email'] = $cbMember['email'];
+            $person['phone_1'] = $cbMember['cb_telmobile'];
+            $person['phone_2'] = $cbMember['cb_telfixe'];
+            $person['birth'] = $cbMember['cb_naissance'];
+            $person['profession'] = $cbMember['cb_profession'];
+            $person['godfathers'] = $cbMember['cb_parrains'];
+            $person['membership_start'] = $cbMember['cb_entreerambert'];
+            $person['membership_end'] = $cbMember['cb_sortierambert'];
+            $person['membership_end_reason'] = $cbMember['cb_motifsortie'];
+            $person['comments'] = $cbMember['cb_observations'];
+            if (!empty($cbMember['cb_sortierambert'])) {
+                // Consider the date of deletion as december 31 in the year of membership's end
+                $person['date_delete'] = $cbMember['cb_sortierambert']."-12-31 00:00:00";
+            }
+
+            // Avoid double entries if this method is called several times
+            $existingPerson = $this->personModel->withDeleted()->find($person['id']);
+            if (empty($existingPerson)) {
+                $this->personModel->insert($person);
+            }
         }
 
-        dd($this->homeModel->findAll());
+        dd($this->personModel->withDeleted()->findAll());
 
         // TODO : Script qui fait un soft_delete des homes dont tous les membres sont désactivés
     }
@@ -116,10 +177,11 @@ class ImportData extends BaseController
             }
 
             // Update the allready existing home and return its id
-            return $this->homeModel->save($existingHome);
+            $this->homeModel->save($existingHome);
+            return $existingHome['id'];
         } else {
             // Insert the new home and return its id
-            return $this->homeModel->save($home);
+            return $this->homeModel->insert($home);
         }
     }
 }

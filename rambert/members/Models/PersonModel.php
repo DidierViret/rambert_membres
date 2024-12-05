@@ -16,6 +16,7 @@ class PersonModel extends Model {
 
     // Columns allowed for save operations
     protected $allowedFields = [
+        'id',
         'fk_home',
         'fk_category',
         'title',
