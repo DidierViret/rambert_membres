@@ -18,7 +18,7 @@ class CreateContributionTable extends Migration
                 'type' => 'INT',
                 'unsigned' => true,
             ],
-            'fk_function' => [
+            'fk_role' => [
                 'type' => 'INT',
                 'unsigned' => true,
             ],
@@ -34,7 +34,7 @@ class CreateContributionTable extends Migration
 
         $this->forge->addKey('id', true);
         $this->forge->addForeignKey('fk_person', 'person', 'id', 'RESTRICT', 'RESTRICT');
-        $this->forge->addForeignKey('fk_function', 'function', 'id', 'RESTRICT', 'RESTRICT');
+        $this->forge->addForeignKey('fk_role', 'role', 'id', 'RESTRICT', 'RESTRICT');
 
         $this->forge->createTable('contribution');
     }

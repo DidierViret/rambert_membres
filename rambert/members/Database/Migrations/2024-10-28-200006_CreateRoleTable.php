@@ -4,7 +4,7 @@ namespace Members\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class CreateFunctionTable extends Migration
+class CreateRoleTable extends Migration
 {
     public function up()
     {
@@ -42,15 +42,15 @@ class CreateFunctionTable extends Migration
 
         $this->forge->addForeignKey('fk_team', 'team', 'id', 'RESTRICT', 'RESTRICT');
 
-        $this->forge->createTable('function');
+        $this->forge->createTable('role');
 
         // Insert entries in newly created table
         $seeder = \Config\Database::seeder();
-        $seeder->call('\Members\Database\Seeds\FunctionSeeder');
+        $seeder->call('\Members\Database\Seeds\RoleSeeder');
     }
 
     public function down()
     {
-        $this->forge->dropTable('function');
+        $this->forge->dropTable('role');
     }
 }

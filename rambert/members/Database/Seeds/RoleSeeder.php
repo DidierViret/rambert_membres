@@ -4,7 +4,7 @@ namespace Members\Database\Seeds;
 
 use CodeIgniter\Database\Seeder;
 
-class FunctionSeeder extends Seeder
+class RoleSeeder extends Seeder
 {
     public function run()
     {
@@ -36,6 +36,6 @@ class FunctionSeeder extends Seeder
         ];
 
         // Insert batch
-        $this->db->table('function')->insertBatch($data);
+        $this->db->table('role')->insertBatch($data);
     }
 }
