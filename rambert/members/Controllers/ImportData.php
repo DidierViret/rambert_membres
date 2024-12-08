@@ -17,6 +17,7 @@ use Psr\Log\LoggerInterface;
 
 use Members\Models\HomeModel;
 use Members\Models\PersonModel;
+use Access\Models\AccessModel;
 
 class ImportData extends BaseController
 {
@@ -143,10 +144,17 @@ class ImportData extends BaseController
                 $this->importContributions($cbMember);
             }
             */
-
         }
 
-        dd($this->personModel->withDeleted()->findAll());
+        // Add admin rights to Didier Viret
+        $accessModel = new AccessModel();
+        $admin['fk_access_level'] = 1;
+        $admin['fk_person'] = 42;
+        $admin['password'] = "admin1234";
+        $admin['password_confirm'] = "admin1234";
+        $accessModel->save($admin);
+
+        //dd($this->personModel->withDeleted()->findAll());
 
         // TODO : Script qui fait un soft_delete des homes dont tous les membres sont désactivés
     }
