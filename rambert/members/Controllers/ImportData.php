@@ -136,6 +136,14 @@ class ImportData extends BaseController
             if (empty($existingPerson)) {
                 $this->personModel->insert($person);
             }
+
+            // TODO Import the member's contributions
+            /*
+            if (!empty($cbMember['cb_activites_club']) && $cbMember['cb_activites_club'] != "-") {
+                $this->importContributions($cbMember);
+            }
+            */
+
         }
 
         dd($this->personModel->withDeleted()->findAll());
@@ -183,6 +191,36 @@ class ImportData extends BaseController
             // Insert the new home and return its id
             return $this->homeModel->insert($home);
         }
+    }
+
+    /**
+     * Get contribution informations from the Joomla database and process them
+     * to feet in the new database.
+     * 
+     * @param $cbMember : The member informations as registered in Joomla DB
+     */
+    protected function importContributions($cbMember): void {
+
+        // Transform given text in an array of contributions
+        $contributions = preg_split("/\r\n|\n|\r/", $cbMember['cb_activites_club']);
+
+        foreach($contributions as $contribution) {
+            // Separate the description and years parts
+            $parts = explode(":", $contribution);
+            $description = strtolower($parts[0]);
+            $years = strtolower($parts[1]);
+
+            // from the description, deduce the role for this contribution
+            if (strpos($description, "comité") !== false) {
+                if (strpos($description, "vice") !== false) {
+                    $role = 2;
+                } elseif (strpos($description, "président") !== false) {
+                    $role = 1;
+                } 
+            }
+        }
+
+        dd($contributions);
     }
 }
 
