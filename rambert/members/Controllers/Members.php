@@ -8,6 +8,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
 
 use Access\Exceptions\AccessDeniedException;
+use Members\Models\PersonModel;
 
 class Members extends BaseController
 {
@@ -22,14 +23,20 @@ class Members extends BaseController
         parent::initController($request, $response, $logger);
 
         // Load required helpers
-        
 
         // Load required models
-        
+        $this->personModel = new PersonModel();
     }
 
     public function index()
     {
-        return $this->display_view('Members\index');
+        return $this->membersList();
+    }
+
+    public function membersList()
+    {
+        $data['persons'] = $this->personModel->findAll();
+
+        return $this->display_view('Members\members_list', $data);
     }
 }
