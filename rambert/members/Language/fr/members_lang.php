@@ -15,7 +15,9 @@ return[
 'field_'                            => '',
 
 // Lists columns
-'col_'                              => '',
+'col_home_address'                  => 'Adresse du foyer',
+'col_category'                      => 'Catégorie de membre',
+'col_roles'                         => 'Fonction(s)',
 
 // Buttons
 'btn_'                              => '',
@@ -23,6 +25,7 @@ return[
 // Error messages
 'msg_error_valid_email'             => 'Veuillez entrer une adresse e-mail valide',
 'msg_error_email_length'            => 'L\'adresse e-mail ne doit pas dépasser 150 caractères',
+'msg_error_no_data_to_display'      => 'Il n\'y a pas de données à afficher',
 
 // Error code messages
 'code_error_401'                    => '401 - Non autorisé',

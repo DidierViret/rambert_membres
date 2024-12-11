@@ -8,7 +8,9 @@ use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
 
 use Access\Exceptions\AccessDeniedException;
+use Access\Models\AccessModel;
 use Members\Models\PersonModel;
+use Members\Models\ContributionModel;
 
 class Members extends BaseController
 {
@@ -26,6 +28,8 @@ class Members extends BaseController
 
         // Load required models
         $this->personModel = new PersonModel();
+        $this->accessModel = new AccessModel();
+        $this->contributionModel = new ContributionModel();
     }
 
     public function index()
@@ -35,7 +39,23 @@ class Members extends BaseController
 
     public function membersList()
     {
+        // Get the persons to display
         $data['persons'] = $this->personModel->findAll();
+
+        // Append all needed informations for the list to display
+        foreach($data['persons'] as &$person) {
+            // Access levels informations
+            $accesses = $this->accessModel->where('fk_person', $person['id'])->findAll();
+            foreach($accesses as $access) {
+                $person['access_levels'][] = $access['access_level'];
+            }
+
+            // Current contributions informations
+            $contributions = $this->contributionModel->where(['fk_person' => $person['id'], 'date_end' => null])->findAll();
+            foreach($contributions as $contribution) {
+                $person['roles'][] = $contribution['role'];
+            }
+        }
 
         return $this->display_view('Members\members_list', $data);
     }
