@@ -58,12 +58,16 @@ class RoleModel extends Model {
 
         if($data['singleton'] && !empty($data['data'])) {
             // Single item, add datas to it
-            $data['data']['team'] = $this->teamModel->find($data['data']['fk_team']);
+            if (!empty($data['data']['fk_team'])) {
+                $data['data']['team'] = $this->teamModel->find($data['data']['fk_team']);
+            }
 
         } elseif (!empty($data['data'])) {
             // Multiple items, add datas to each of them
             foreach ($data['data'] as &$role) {
-                $role['team'] = $this->teamModel->find($role['fk_team']);
+                if (!empty($role['fk_team'])) {
+                    $role['team'] = $this->teamModel->find($role['fk_team']);
+                }
             }
         }
         return $data;

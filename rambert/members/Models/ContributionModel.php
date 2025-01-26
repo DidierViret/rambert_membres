@@ -36,12 +36,16 @@ class ContributionModel extends Model {
 
         if($data['singleton'] && !empty($data['data'])) {
             // Single item, add datas to it
-            $data['data']['person'] = $this->personModel->find($data['data']['fk_person']);
+            if (!empty($data['data']['fk_person'])) {
+                $data['data']['person'] = $this->personModel->find($data['data']['fk_person']);
+            }
 
         } elseif (!empty($data['data'])) {
             // Multiple items, add datas to each of them
             foreach ($data['data'] as &$contribution) {
-                $contribution['person'] = $this->personModel->find($contribution['fk_person']);
+                if (!empty($contribution['fk_person'])) {
+                    $contribution['person'] = $this->personModel->find($contribution['fk_person']);
+                }
             }
         }
         return $data;
@@ -54,12 +58,16 @@ class ContributionModel extends Model {
 
         if($data['singleton'] && !empty($data['data'])) {
             // Single item, add datas to it
-            $data['data']['role'] = $this->roleModel->find($data['data']['fk_role']);
+            if(!empty($data['data']['fk_role'])) {
+                $data['data']['role'] = $this->roleModel->find($data['data']['fk_role']);
+            }
 
         } elseif (!empty($data['data'])) {
             // Multiple items, add datas to each of them
             foreach ($data['data'] as &$contribution) {
-                $contribution['role'] = $this->roleModel->find($contribution['fk_role']);
+                if(!empty($contribution['fk_role'])) {
+                    $contribution['role'] = $this->roleModel->find($contribution['fk_role']);
+                }
             }
         }
         return $data;

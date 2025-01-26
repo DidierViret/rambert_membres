@@ -99,12 +99,16 @@ class PersonModel extends Model {
 
         if($data['singleton'] && !empty($data['data'])) {
             // Single item, add datas to it
-            $data['data']['home'] = $this->homeModel->find($data['data']['fk_home']);
+            if (!empty($data['data']['fk_home'])) {
+                $data['data']['home'] = $this->homeModel->find($data['data']['fk_home']);
+            }
 
         } elseif (!empty($data['data'])) {
             // Multiple items, add datas to each of them
             foreach ($data['data'] as &$person) {
-                $person['home'] = $this->homeModel->find($person['fk_home']);
+                if(!empty($person['fk_home'])) {
+                    $person['home'] = $this->homeModel->find($person['fk_home']);
+                }
             }
         }
         return $data;
@@ -117,12 +121,16 @@ class PersonModel extends Model {
 
         if($data['singleton'] && !empty($data['data'])) {
             // Single item, add datas to it
-            $data['data']['category'] = $this->categoryModel->find($data['data']['fk_category']);
+            if (!empty($data['data']['fk_category'])) {
+                $data['data']['category'] = $this->categoryModel->find($data['data']['fk_category']);
+            }
 
         } elseif (!empty($data['data'])) {
             // Multiple items, add datas to each of them
             foreach ($data['data'] as &$person) {
-                $person['category'] = $this->categoryModel->find($person['fk_category']);
+                if(!empty($person['fk_category'])) {
+                    $person['category'] = $this->categoryModel->find($person['fk_category']);
+                }
             }
         }
         return $data;
