@@ -139,6 +139,10 @@ class ImportData extends BaseController
             }
 
             // TODO Import the member's contributions
+            /**
+             * Contributions syntax to put in the old Joomla database before importing :
+             * Team : Role : Year begin - Year end
+             */
             /*
             if (!empty($cbMember['cb_activites_club']) && $cbMember['cb_activites_club'] != "-") {
                 $this->importContributions($cbMember);
