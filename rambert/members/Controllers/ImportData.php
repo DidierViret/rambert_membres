@@ -17,6 +17,9 @@ use Psr\Log\LoggerInterface;
 
 use Members\Models\HomeModel;
 use Members\Models\PersonModel;
+use Members\Models\ContributionModel;
+use Members\Models\TeamModel;
+use Members\Models\RoleModel;
 use Access\Models\AccessModel;
 
 class ImportData extends BaseController
@@ -138,12 +141,13 @@ class ImportData extends BaseController
                 $this->personModel->insert($person);
             }
 
-            // TODO Import the member's contributions
-            /*
+            // TODO Import all members contributions when their syntax will be correct in the old Joomla database
+            // For now, only import contributions for Didier Viret and Stéphane Besuchet
             if (!empty($cbMember['cb_activites_club']) && $cbMember['cb_activites_club'] != "-") {
-                $this->importContributions($cbMember);
+                if ($cbMember['user_id'] == 42 || $cbMember['user_id'] == 43) {
+                    $this->importContributions($cbMember);
+                }
             }
-            */
         }
 
         // Add admin rights to Didier Viret
@@ -153,8 +157,6 @@ class ImportData extends BaseController
         $admin['password'] = "admin1234";
         $admin['password_confirm'] = "admin1234";
         $accessModel->save($admin);
-
-        //dd($this->personModel->withDeleted()->findAll());
 
         // TODO : Script qui fait un soft_delete des homes dont tous les membres sont désactivés
     }
@@ -214,24 +216,79 @@ class ImportData extends BaseController
 
         // Transform given text in an array of contributions
         $contributions = preg_split("/\r\n|\n|\r/", $cbMember['cb_activites_club']);
-
+        
         foreach($contributions as $contribution) {
-            // Separate the description and years parts
+            // Separate the Team, Role and Years parts
             $parts = explode(":", $contribution);
-            $description = strtolower($parts[0]);
-            $years = strtolower($parts[1]);
+            $teamName = trim($parts[0]);
+            $roleName = trim($parts[1]);
+            $years = trim($parts[2]);
 
-            // from the description, deduce the role for this contribution
-            if (strpos($description, "comité") !== false) {
-                if (strpos($description, "vice") !== false) {
-                    $role = 2;
-                } elseif (strpos($description, "président") !== false) {
-                    $role = 1;
-                } 
+            // Extract the years
+            $years = explode("-", $years);
+            $yearBegin = trim($years[0]);
+            if (empty($years[1])) {
+                $yearEnd = null;
+            } else {
+                $yearEnd = trim($years[1]);
+            }
+
+            // Get the corresponding team or create it if it doesn't exist
+            if (!empty($teamName)) {
+                $teamModel = new TeamModel();
+                $team = $teamModel->where('name', $teamName)->first();
+                if (empty($team)) {
+                    $team['name'] = $teamName;
+                    $teamId = $teamModel->insert($team);
+                    $team = $teamModel->find($teamId);
+                }
+            } else {
+                $team = null;
+            }
+
+            // Get the corresponding role or create it if it doesn't exist
+            if (!empty($roleName)) {
+                $roleModel = new RoleModel();
+
+                // If the role is linked to a team, get the team's id
+                if (empty($team)) {
+                    $teamId = null;
+                } else {
+                    $teamId = $team['id'];
+                }
+                
+                // Get the role or create it if it doesn't exist
+                // If the role is linked to a team, check if it exists in this team or add it in this team
+                $role = $roleModel->where(['name' => $roleName, 'fk_team' => $teamId])->first();
+                if (empty($role)) {
+                    $role['name'] = $roleName;
+                    $role['fk_team'] = $teamId;
+                    $roleId = $roleModel->insert($role);
+                    $role = $roleModel->find($roleId);
+                }
+            }
+
+            // Add the contribution in the database
+            $contributionModel = new ContributionModel();
+
+            // Avoid duplicate entries if the importation method is called several times
+            $existingContribution = $contributionModel->where(['fk_person' => $cbMember['user_id'],
+                                                              'fk_role' => $role['id'],
+                                                              'date_begin' => $yearBegin."-01-01 00:00:00"])->first();
+            if (empty($existingContribution)) {
+                $contribution = [];
+                $contribution['fk_person'] = $cbMember['user_id'];
+                $contribution['fk_role'] = $role['id'];
+                $contribution['date_begin'] = $yearBegin."-01-01 00:00:00";
+                if (empty($yearEnd)) {
+                    $contribution['date_end'] = null;
+                } else {
+                    $contribution['date_end'] = $yearEnd."-12-31 23:59:59";
+                }
+
+                $contributionModel->insert($contribution);
             }
         }
-
-        dd($contributions);
     }
 }
 
