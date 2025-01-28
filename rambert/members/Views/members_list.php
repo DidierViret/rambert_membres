@@ -52,7 +52,7 @@
 
                         <!-- If there are comments about the home, display them -->
                         <?php if (!empty($person['home']['comments'])): ?>
-                            <div class="small alert alert-info"><?= $person['home']['comments'] ?></div>
+                            <div class="small alert alert-info mt-2"><?= $person['home']['comments'] ?></div>
                         <?php endif; ?>
                     </div>
 
