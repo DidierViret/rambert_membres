@@ -10,6 +10,8 @@ use Psr\Log\LoggerInterface;
 use Access\Exceptions\AccessDeniedException;
 use Access\Models\AccessModel;
 use Members\Models\PersonModel;
+use Members\Models\HomeModel;
+use Members\Models\CategoryModel;
 use Members\Models\ContributionModel;
 
 class Members extends BaseController
@@ -29,6 +31,8 @@ class Members extends BaseController
         // Load required models
         $this->personModel = new PersonModel();
         $this->accessModel = new AccessModel();
+        $this->homeModel = new HomeModel();
+        $this->categoryModel = new CategoryModel();
         $this->contributionModel = new ContributionModel();
     }
 
@@ -40,7 +44,7 @@ class Members extends BaseController
     public function membersList()
     {
         // Get the persons to display
-        $data['persons'] = $this->personModel->findAll();
+        $data['persons'] = $this->personModel->getOrdered(false, 'last_name', 'ASC');
 
         // Append all needed informations for the list to display
         foreach($data['persons'] as &$person) {
@@ -48,6 +52,20 @@ class Members extends BaseController
             $accesses = $this->accessModel->where('fk_person', $person['id'])->findAll();
             foreach($accesses as $access) {
                 $person['access_levels'][] = $access['access_level'];
+            }
+
+            // Category informations
+            $person['category'] = $this->categoryModel->find($person['fk_category']);
+
+            // Home informations
+            $person['home'] = $this->homeModel->find($person['fk_home']);
+
+            // Other home members informations
+            $homeMembers = $this->personModel->where('fk_home', $person['fk_home'])->findAll();
+            foreach($homeMembers as $homeMember) {
+                if($homeMember['id'] != $person['id']) {
+                    $person['other_home_members'][] = $homeMember;
+                }
             }
 
             // Current contributions informations

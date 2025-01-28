@@ -15,6 +15,7 @@ return[
 'field_'                            => '',
 
 // Lists columns
+'col_other_home_members'            => 'Autres membres du foyer',
 'col_home_address'                  => 'Adresse du foyer',
 'col_category'                      => 'Catégorie de membre',
 'col_roles'                         => 'Fonction(s)',

@@ -78,20 +78,6 @@ class PersonModel extends Model {
         ];
     }
 
-    // Returns members by home
-    public function getByHome(int $homeId)
-    {
-        return $this->where('fk_home', $homeId)
-                    ->findAll();
-    }
-
-    // Returns members by category
-    public function getByCategory(int $categoryId)
-    {
-        return $this->where('fk_category', $categoryId)
-                    ->findAll();
-    }
-
     /**
      * Callback method to append datas from the linked home table
      */
@@ -134,6 +120,27 @@ class PersonModel extends Model {
             }
         }
         return $data;
+    }
+
+    /**
+     * Get an array of persons ordered by a field.
+     * 
+     * @param bool $withDeleted : A boolean to include or not the soft deleted persons
+     * @param string $orderBy : name of the field to use to sort the persons
+     * @param string $direction : ASC, DESC or RANDOM, the direction of the sorting
+     * 
+     * @return : An array of persons with all attributes, ordered by the mentioned field
+     */
+    public function getOrdered(bool $withDeleted = false, string $orderBy = 'id', string $direction = 'ASC') {
+        $builder = $this->builder();
+        $builder->select('*');
+        $builder->orderBy("$orderBy", "$direction");
+        if(!$withDeleted) {
+            $builder->where('date_delete IS NULL');
+        }
+
+        $query = $builder->get();
+        return $query->getResult('array');
     }
 }
 ?>
