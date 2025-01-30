@@ -29,7 +29,7 @@
             <div class="col-lg-7 col-md-5">
                 <!-- Display the list of persons living in the home -->
                 <?php foreach ($persons as $person): ?>
-                    <div class="row mb-4">
+                    <div class="person row bg-light border-bottom border-primary pt-2 pb-2 mb-4">
                         <div class="col-lg-6 mb-2">
                             <!-- Display the person's name with a link to modify this person -->
                             <strong><a href=""><?= $person['last_name'].' '.$person['first_name'] ?></a></strong>
