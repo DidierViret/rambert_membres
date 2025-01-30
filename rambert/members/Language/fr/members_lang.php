@@ -12,13 +12,20 @@ return[
 'title_'                            => '',
 
 // Forms fields
-'field_'                            => '',
+'field_nb_bulletins'                => 'Nombre de bulletins',
+'field_birth_date'                  => 'Naissance',
+'field_profession'                  => 'Profession',
+'field_godfathers'                  => 'Parrains / Marraines',
+'field_membership_start'            => 'Entrée au club',
+'field_membership_end'              => 'Sortie du club',
+'field_membership_end_reason'       => 'Raison de la sortie',
 
 // Lists columns
 'col_other_home_members'            => 'Autres membres du foyer',
 'col_home_address'                  => 'Adresse du foyer',
 'col_category'                      => 'Catégorie de membre',
 'col_roles'                         => 'Fonction(s)',
+'col_shipments'                     => 'Envois postaux',
 
 // Buttons
 'btn_'                              => '',

@@ -41,6 +41,9 @@ class Members extends BaseController
         return $this->membersList();
     }
 
+    /**
+     * Display the list of all members
+     */
     public function membersList()
     {
         // Get the persons to display
@@ -76,5 +79,24 @@ class Members extends BaseController
         }
 
         return $this->display_view('Members\members_list', $data);
+    }
+
+    /**
+     * Display the details of a home
+     */
+    public function homeDetails($id)
+    {
+        $data['home'] = $this->homeModel->find($id);
+        $data['persons'] = $this->personModel->where('fk_home', $id)->findAll();
+
+        foreach($data['persons'] as &$person) {
+            // Accesses informations
+            $person['accesses'] = $this->accessModel->where('fk_person', $person['id'])->findAll();
+
+            // Current contributions informations
+            $person['contributions'] = $this->contributionModel->where(['fk_person' => $person['id'], 'date_end' => null])->findAll();
+        }
+
+        return $this->display_view('Members\home_details', $data);
     }
 }
