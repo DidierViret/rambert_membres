@@ -13,6 +13,8 @@ use Members\Models\PersonModel;
 use Members\Models\HomeModel;
 use Members\Models\CategoryModel;
 use Members\Models\ContributionModel;
+use Members\Models\NewsletterModel;
+use Members\Models\NewsletterSubscriptionModel;
 
 class Members extends BaseController
 {
@@ -34,6 +36,8 @@ class Members extends BaseController
         $this->homeModel = new HomeModel();
         $this->categoryModel = new CategoryModel();
         $this->contributionModel = new ContributionModel();
+        $this->newsletterModel = new NewsletterModel();
+        $this->newsletterSubscriptionModel = new NewsletterSubscriptionModel();
     }
 
     public function index()
@@ -103,6 +107,9 @@ class Members extends BaseController
                     $contribution['date_end'] = date('Y', strtotime($contribution['date_end']));
                 }
             }
+
+            // Newsletter subscriptions informations
+            $person['newsletter_subscriptions'] = $this->newsletterSubscriptionModel->where('fk_person', $person['id'])->findAll();
         }
 
         return $this->display_view('Members\home_details', $data);

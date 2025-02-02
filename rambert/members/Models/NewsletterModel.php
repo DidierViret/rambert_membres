@@ -19,10 +19,5 @@ class NewsletterModel extends Model {
 
     protected $useSoftDeletes = true;
     protected $deletedField = 'date_delete';
-
-    public function initialize()
-    {
-        $this->newsletterSubscriptionModel = new NewsletterSubscriptionModel();
-    }
 }
 ?>

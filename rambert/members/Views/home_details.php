@@ -86,7 +86,7 @@
                                 <?php endforeach; ?>
                                 </div>
                                 <!-- List contributions which are not active anymore -->
-                                <div class="mt-2">
+                                <div class="mt-2 text-muted">
                                 <?php foreach ($person['contributions'] as $contribution): ?>
                                     <div class="small">
                                         <?php if (!empty($contribution['date_end'])): ?>
@@ -99,6 +99,22 @@
                                     </div>
                                 <?php endforeach; ?>
                                 </div>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- Display the person's newsletter subscriptions -->
+                        <div class="col-lg-6 mb-2">
+                            <div><strong><?= lang('members_lang.col_newsletter_subscriptions') ?></strong></div>
+                            <?php if (!empty($person['newsletter_subscriptions'])): ?>
+                            <ul>
+                                <?php foreach ($person['newsletter_subscriptions'] as $subscription): ?>
+                                    <li>
+                                        <?= $subscription['newsletter']['title'] ?>
+                                </li>
+                                <?php endforeach; ?>
+                            </ul>
+                            <?php else: ?>
+                                <div class="small"><?= lang('members_lang.no_subscription') ?></div>
                             <?php endif; ?>
                         </div>
                     </div>
