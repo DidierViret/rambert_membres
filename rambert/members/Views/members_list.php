@@ -5,7 +5,7 @@
                 <div id="<?= $person['id'] ?>" class="person row bg-light border-bottom border-primary pt-2 pb-2 mb-4">
                     <div class="col-lg-4 col-md-6">
                         <div>
-                            <strong><a href=""><?= $person['last_name'].' '.$person['first_name'] ?></a></strong>
+                            <strong><a href="<?= 'home/'.$person['fk_home'] ?>" ><?= $person['last_name'].' '.$person['first_name'] ?></a></strong>
                             <!-- If the personn has access rights, display a badge for each access_level -->
                             <?php if (!empty($person['access_levels'])): ?>
                                 <?php foreach ($person['access_levels'] as $access_level): ?>
@@ -25,7 +25,7 @@
 
                     <div class="col-lg-4 col-md-6">
                         <!-- Display the home address -->
-                        <div class="small"><strong><a href=""><?= lang('members_lang.col_home_address') ?></a></strong></div>
+                        <div class="small"><strong><a href="<?= 'home/'.$person['fk_home'] ?>" ><?= lang('members_lang.col_home_address') ?></a></strong></div>
                         <div class="small"><?= $person['home']['address_title'] ?></div>
                         <div class="small"><?= $person['home']['address_name'] ?></div>
                         <div class="small"><?= $person['home']['address_line_1'] ?></div>
@@ -35,7 +35,7 @@
                         <!-- If the person has other home members, display their names with a link to show them -->
                         <?php if (!empty($person['other_home_members'])): ?>
                             <div class="mt-2">
-                                <div class="small"><strong><a href=""><?= lang('members_lang.col_other_home_members') ?></a></strong></div>
+                                <div class="small"><strong><?= lang('members_lang.col_other_home_members') ?></strong></div>
                                 <div class="small">
                                     <?php $count = 0; ?>
                                     <?php foreach ($person['other_home_members'] as $home_member): ?>
@@ -58,10 +58,10 @@
 
                     <!-- Display the category and roles of the person -->
                     <div class="col-lg-4 col-md-6">
-                        <div class="small"><strong><a href=""><?= lang('members_lang.col_category') ?></a></strong></div>
+                        <div class="small"><strong><?= lang('members_lang.col_category') ?></strong></div>
                         <div class="small"><?= $person['category']['name'] ?></div>
                         <?php if (!empty($person['roles'])): ?>
-                            <div class="small mt-2"><strong><a href=""><?= lang('members_lang.col_roles') ?></a></strong></div>
+                            <div class="small mt-2"><strong><?= lang('members_lang.col_roles') ?></strong></div>
                             <?php foreach ($person['roles'] as $role): ?>
                                 <div class="small">
                                     <?php if (!empty($role['team'])): ?>

@@ -91,7 +91,7 @@ class CategorySeeder extends Seeder
             ],
             [
                 'id'              => 9,
-                'name'            => 'Veuf-ve',
+                'name'            => 'Veuf-ve de membre',
                 'description'     => 'Conjoint ou conjointe veuf-ve d\'un membre décédé',
                 'admission_price' => null,
                 'annual_price'    => null,
