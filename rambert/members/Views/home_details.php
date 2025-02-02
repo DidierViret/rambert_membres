@@ -31,6 +31,7 @@
                 <?php foreach ($persons as $person): ?>
                     <div class="person row bg-light border-bottom border-primary pt-2 pb-2 mb-4">
                         <div class="col-lg-6 mb-2">
+                            <?= $person['title'] ?><br />
                             <!-- Display the person's name with a link to modify this person -->
                             <strong><a href=""><?= $person['last_name'].' '.$person['first_name'] ?></a></strong>
                             
@@ -57,6 +58,47 @@
                             <?php endif; ?>
                             <?php if (!empty($person['godfathers'])): ?>
                                 <div class="small"><?= lang('members_lang.field_godfathers').' :</br>'.$person['godfathers'] ?></div>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- Display the person's membership category -->
+                        <div class="col-lg-6 mb-2">
+                            <div><strong><?= lang('members_lang.col_category') ?></strong></div>
+                            <div><?= $person['category']['name'] ?></div>
+                        </div>
+
+                        <!-- Display the person's contributions to the club -->
+                        <div class="col-lg-6 mb-2">
+                            <?php if (!empty($person['contributions'])): ?>
+                                <div><strong><?= lang('members_lang.col_contributions') ?></strong></div>
+                                <!-- List contributions still active -->
+                                <div>
+                                <?php foreach ($person['contributions'] as $contribution): ?>
+                                    <div class="small">
+                                        <?php if (empty($contribution['date_end'])): ?>
+                                            <?php if (!empty($contribution['role']['team'])): ?>
+                                                <strong><?= $contribution['role']['team']['name'] ?></strong> :
+                                            <?php endif; ?>
+                                            
+                                            <?= $contribution['role']['name'].' ('.strtolower(lang('members_lang.since')).' '.$contribution['date_begin'].')' ?>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endforeach; ?>
+                                </div>
+                                <!-- List contributions which are not active anymore -->
+                                <div class="mt-2">
+                                <?php foreach ($person['contributions'] as $contribution): ?>
+                                    <div class="small">
+                                        <?php if (!empty($contribution['date_end'])): ?>
+                                            <?php if (!empty($contribution['role']['team'])): ?>
+                                                <strong><?= $contribution['role']['team']['name'] ?></strong> :
+                                            <?php endif; ?>
+                                            
+                                            <?= $contribution['role']['name'].' ('.$contribution['date_begin'].'-'.$contribution['date_end'].')' ?>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endforeach; ?>
+                                </div>
                             <?php endif; ?>
                         </div>
                     </div>

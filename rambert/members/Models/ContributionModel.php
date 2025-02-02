@@ -72,5 +72,33 @@ class ContributionModel extends Model {
         }
         return $data;
     }
+
+    /**
+     * Get an array of the contributions of one given person, ordered by a field.
+     * 
+     * @param int $personId : The id of the person to get the contributions from
+     * @param bool $withPassed : A boolean to include or not the passed contributions
+     * @param string $orderBy : name of the field to use to sort the contributions
+     * @param string $direction : ASC, DESC or RANDOM, the direction of the sorting
+     * 
+     * @return : An array of contributions with all attributes, ordered by the mentioned field
+     */
+    public function getOrdered(int $personId, bool $withPassed = false, string $orderBy = 'id', string $direction = 'ASC') {
+        $builder = $this->builder();
+        $builder->select('*');
+        $builder->orderBy("$orderBy", "$direction");
+        $builder->where('fk_person', $personId);
+        if(!$withPassed) {
+            $builder->where('date_end IS NULL');
+        }
+
+        $query = $builder->get();
+        $contributions = $query->getResult('array');
+        foreach($contributions as &$contribution) {
+            $contribution['role'] = $this->roleModel->find($contribution['fk_role']);
+        }
+
+        return $contributions;
+    }
 }
 ?>

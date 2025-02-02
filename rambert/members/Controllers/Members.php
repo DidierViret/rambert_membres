@@ -94,7 +94,15 @@ class Members extends BaseController
             $person['accesses'] = $this->accessModel->where('fk_person', $person['id'])->findAll();
 
             // Current contributions informations
-            $person['contributions'] = $this->contributionModel->where(['fk_person' => $person['id'], 'date_end' => null])->findAll();
+            $person['contributions'] = $this->contributionModel->getOrdered($person['id'], true, 'date_begin', 'DESC');
+
+            foreach($person['contributions'] as &$contribution) {
+                // Only keep the year of the dates
+                $contribution['date_begin'] = date('Y', strtotime($contribution['date_begin']));
+                if(!empty($contribution['date_end'])) {
+                    $contribution['date_end'] = date('Y', strtotime($contribution['date_end']));
+                }
+            }
         }
 
         return $this->display_view('Members\home_details', $data);

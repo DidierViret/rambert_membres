@@ -25,6 +25,7 @@ return[
 'col_home_address'                  => 'Adresse du foyer',
 'col_category'                      => 'Catégorie de membre',
 'col_roles'                         => 'Fonction(s)',
+'col_contributions'                 => 'Contributions au club',
 'col_shipments'                     => 'Envois postaux',
 
 // Buttons
@@ -40,5 +41,6 @@ return[
 'code_error_403'                    => '403 - Accès refusé',
 
 // Other texts
+'since'                             => 'Depuis',
 
 ];
