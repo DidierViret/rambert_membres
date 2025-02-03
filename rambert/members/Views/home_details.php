@@ -2,8 +2,13 @@
     <div id="home_details" class="row">
         <?php if (!empty($home)): ?>
             <div class="col-lg-5 col-md-7 mb-4">
+                <!-- Display home update button for managers and admins -->
+                <?php if ($_SESSION['access_level'] >= config('\Access\Config\AccessConfig')->access_lvl_manager): ?>
+                    <a href="<?= base_url('home/update/'.$home['id']) ?>" class="btn btn-outline-primary"><?= lang('members_lang.btn_update') ?></a>
+                <?php endif; ?>
+
                 <!-- Display the home address -->
-                <div><strong><a href=""><?= lang('members_lang.col_home_address') ?></a></strong></div>
+                <div><strong><?= lang('members_lang.col_home_address') ?></strong></div>
                 <div><?= $home['address_title'] ?></div>
                 <div><?= $home['address_name'] ?></div>
                 <div><?= $home['address_line_1'] ?></div>
@@ -57,7 +62,7 @@
                         </div>
                         <div class="col-lg-6 mb-2">
                             <!-- Display the person's details -->
-                            <div class="small"><?= lang('members_lang.field_birth_date').' : '.$person['birth'] ?></div>
+                            <div class="small"><?= lang('members_lang.field_birth').' : '.$person['birth'] ?></div>
                             <div class="small"><?= lang('members_lang.field_membership_start').' : '.$person['membership_start'] ?></div>
                             <?php if (!empty($person['membership_end'])): ?>   
                                 <div class="small"><?= lang('members_lang.field_membership_end').' : '.$person['membership_end'] ?></div>

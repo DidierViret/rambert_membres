@@ -12,13 +12,27 @@ return[
 'title_'                            => '',
 
 // Forms fields
-'field_nb_bulletins'                => 'Nombre de bulletins',
-'field_birth_date'                  => 'Naissance',
+'field_title'                       => 'Titre',
+'field_last_name'                   => 'Nom',
+'field_first_name'                  => 'Prénom',
+'field_email'                       => 'E-mail',
+'field_phone_1'                     => 'Téléphone 1',
+'field_phone_2'                     => 'Téléphone 2',
+'field_comments'                    => 'Commentaires',
+'field_category'                    => 'Catégorie de membre',
+'field_birth'                       => 'Naissance',
 'field_profession'                  => 'Profession',
 'field_godfathers'                  => 'Parrains / Marraines',
 'field_membership_start'            => 'Entrée au club',
 'field_membership_end'              => 'Sortie du club',
 'field_membership_end_reason'       => 'Raison de la sortie',
+'field_address_title'               => 'Titre(s)',
+'field_address_name'                => 'Nom(s)',
+'field_address_line_1'              => 'Adresse ligne 1',
+'field_address_line_2'              => 'Adresse ligne 2',
+'field_postal_code'                 => 'Code postal',
+'field_city'                        => 'Localité',
+'field_nb_bulletins'                => 'Nombre de bulletins',
 
 // Lists columns
 'col_other_home_members'            => 'Autres membres du foyer',
@@ -31,7 +45,9 @@ return[
 'col_access_levels'                 => 'Accès au fichier des membres',
 
 // Buttons
-'btn_'                              => '',
+'btn_save'                          => 'Enregistrer',
+'btn_update'                        => 'Modifier',
+'btn_cancel'                        => 'Annuler',
 
 // Error messages
 'msg_error_valid_email'             => 'Veuillez entrer une adresse e-mail valide',
