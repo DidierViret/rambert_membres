@@ -28,6 +28,7 @@ return[
 'col_contributions'                 => 'Contributions au club',
 'col_shipments'                     => 'Envois postaux',
 'col_newsletter_subscriptions'      => 'Inscriptions newsletter',
+'col_access_levels'                 => 'Accès au fichier des membres',
 
 // Buttons
 'btn_'                              => '',

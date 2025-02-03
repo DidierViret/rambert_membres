@@ -94,8 +94,11 @@ class Members extends BaseController
         $data['persons'] = $this->personModel->where('fk_home', $id)->findAll();
 
         foreach($data['persons'] as &$person) {
-            // Accesses informations
-            $person['accesses'] = $this->accessModel->where('fk_person', $person['id'])->findAll();
+             // Access levels informations
+             $accesses = $this->accessModel->where('fk_person', $person['id'])->findAll();
+             foreach($accesses as $access) {
+                 $person['access_levels'][] = $access['access_level'];
+             }
 
             // Current contributions informations
             $person['contributions'] = $this->contributionModel->getOrdered($person['id'], true, 'date_begin', 'DESC');

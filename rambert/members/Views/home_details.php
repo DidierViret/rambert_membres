@@ -30,11 +30,21 @@
                 <!-- Display the list of persons living in the home -->
                 <?php foreach ($persons as $person): ?>
                     <div class="person row bg-light border-bottom border-primary pt-2 pb-2 mb-4">
+                        <!-- If the personn has access rights, display a badge for each access_level -->
+                        <?php if (!empty($person['access_levels'])): ?>
+                            <div class="col-12 mb-2">
+                                <span class="small" ><strong><?= lang('members_lang.col_access_levels') ?> : </strong></span>
+                                <?php foreach ($person['access_levels'] as $access_level): ?>
+                                    <span class="badge badge-warning"><?= $access_level['name'] ?></span>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
+
                         <div class="col-lg-6 mb-2">
                             <?= $person['title'] ?><br />
                             <!-- Display the person's name with a link to modify this person -->
                             <strong><a href=""><?= $person['last_name'].' '.$person['first_name'] ?></a></strong>
-                            
+
                             <!-- Display the person's contact informations -->
                             <div><a href="mailto:<?= $person['email'] ?>"><?= $person['email'] ?></a></div>
                             <div><?= $person['phone_1'] ?></div>
@@ -67,9 +77,25 @@
                             <div><?= $person['category']['name'] ?></div>
                         </div>
 
-                        <!-- Display the person's contributions to the club -->
+                        <!-- Display the person's newsletter subscriptions -->
                         <div class="col-lg-6 mb-2">
-                            <?php if (!empty($person['contributions'])): ?>
+                            <div><strong><?= lang('members_lang.col_newsletter_subscriptions') ?></strong></div>
+                            <?php if (!empty($person['newsletter_subscriptions'])): ?>
+                            <ul>
+                                <?php foreach ($person['newsletter_subscriptions'] as $subscription): ?>
+                                    <li>
+                                        <?= $subscription['newsletter']['title'] ?>
+                                </li>
+                                <?php endforeach; ?>
+                            </ul>
+                            <?php else: ?>
+                                <div class="small"><?= lang('members_lang.no_subscription') ?></div>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- Display the person's contributions to the club -->
+                        <?php if (!empty($person['contributions'])): ?> 
+                            <div class="col-lg-6 mb-2">
                                 <div><strong><?= lang('members_lang.col_contributions') ?></strong></div>
                                 <!-- List contributions still active -->
                                 <div>
@@ -99,24 +125,8 @@
                                     </div>
                                 <?php endforeach; ?>
                                 </div>
-                            <?php endif; ?>
-                        </div>
-
-                        <!-- Display the person's newsletter subscriptions -->
-                        <div class="col-lg-6 mb-2">
-                            <div><strong><?= lang('members_lang.col_newsletter_subscriptions') ?></strong></div>
-                            <?php if (!empty($person['newsletter_subscriptions'])): ?>
-                            <ul>
-                                <?php foreach ($person['newsletter_subscriptions'] as $subscription): ?>
-                                    <li>
-                                        <?= $subscription['newsletter']['title'] ?>
-                                </li>
-                                <?php endforeach; ?>
-                            </ul>
-                            <?php else: ?>
-                                <div class="small"><?= lang('members_lang.no_subscription') ?></div>
-                            <?php endif; ?>
-                        </div>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 <?php endforeach; ?>
             </div>
