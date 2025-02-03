@@ -20,6 +20,7 @@ use Members\Models\PersonModel;
 use Members\Models\ContributionModel;
 use Members\Models\TeamModel;
 use Members\Models\RoleModel;
+use Members\Models\NewsletterSubscriptionModel;
 use Access\Models\AccessModel;
 
 class ImportData extends BaseController
@@ -139,24 +140,35 @@ class ImportData extends BaseController
             $existingPerson = $this->personModel->withDeleted()->find($person['id']);
             if (empty($existingPerson)) {
                 $this->personModel->insert($person);
-            }
 
-            // TODO Import all members contributions when their syntax will be correct in the old Joomla database
-            // For now, only import contributions for Didier Viret and Stéphane Besuchet
-            if (!empty($cbMember['cb_activites_club']) && $cbMember['cb_activites_club'] != "-") {
-                if ($cbMember['user_id'] == 42 || $cbMember['user_id'] == 43) {
-                    $this->importContributions($cbMember);
+                // Insert newsletter subscription for every member with a valid email
+                if (!empty($cbMember['email']) && !strpos($cbMember['email'], 'pas-de-courriel')) {
+                    $newsletterSubscriptionModel = new NewsletterSubscriptionModel();
+                    $newsletterSubscription = [];
+                    $newsletterSubscription['fk_person'] = $cbMember['user_id'];
+                    $newsletterSubscription['fk_newsletter'] = 1;
+                    $newsletterSubscriptionModel->insert($newsletterSubscription);
+                }
+
+                // TODO Import all members contributions when their syntax will be correct in the old Joomla database
+                // For now, only import contributions for Didier Viret and Stéphane Besuchet
+                if (!empty($cbMember['cb_activites_club']) && $cbMember['cb_activites_club'] != "-") {
+                    if ($cbMember['user_id'] == 42 || $cbMember['user_id'] == 43) {
+                        $this->importContributions($cbMember);
+                    }
+                }
+
+                // Add admin rights to Didier Viret
+                if ($cbMember['user_id'] == 42) {
+                    $accessModel = new AccessModel();
+                    $admin['fk_access_level'] = 1;
+                    $admin['fk_person'] = 42;
+                    $admin['password'] = "admin1234";
+                    $admin['password_confirm'] = "admin1234";
+                    $accessModel->save($admin);
                 }
             }
         }
-
-        // Add admin rights to Didier Viret
-        $accessModel = new AccessModel();
-        $admin['fk_access_level'] = 1;
-        $admin['fk_person'] = 42;
-        $admin['password'] = "admin1234";
-        $admin['password_confirm'] = "admin1234";
-        $accessModel->save($admin);
 
         // TODO : Script qui fait un soft_delete des homes dont tous les membres sont désactivés
     }

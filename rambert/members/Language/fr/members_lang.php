@@ -27,7 +27,7 @@ return[
 'col_roles'                         => 'Fonction(s)',
 'col_contributions'                 => 'Contributions au club',
 'col_shipments'                     => 'Envois postaux',
-'col_newsletter_subscriptions'      => 'Abonnements newsletter',
+'col_newsletter_subscriptions'      => 'Inscriptions newsletter',
 
 // Buttons
 'btn_'                              => '',
@@ -43,6 +43,6 @@ return[
 
 // Other texts
 'since'                             => 'Depuis',
-'no_subscription'                   => 'Pas d\'abonnement',
+'no_subscription'                   => 'Pas d\'inscription',
 
 ];
