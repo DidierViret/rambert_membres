@@ -72,4 +72,33 @@ class MembersAdmin extends BaseController
 
         return $this->display_view('Members\home_form', $data);
     }
+
+    /**
+     * Create or update a home
+     */
+    public function homeSave($id = 0) {
+        // Check if the user has the right to access this page
+        if($this->session->get('access_level') < $this->accessLevel) {
+            throw AccessDeniedException::forPageAccessDenied();
+        }
+
+        // Get the home informations
+        if($id > 0) {
+            $home['id'] = $id;
+        } else {
+            $home[] = [];
+        }
+        $home = array_merge($home, $this->request->getPost());
+
+        if($id == 0) {
+            // Create the home
+            $id = $this->homeModel->insert($home);
+        } else {
+            // Update the home
+            $this->homeModel->update($id, $home);
+        }
+
+        // Redirect to the home details page
+        return redirect()->to('/home/'.$id);
+    }
 }

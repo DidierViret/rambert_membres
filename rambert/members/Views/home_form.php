@@ -3,7 +3,7 @@
 <div class="container" >
     <div id="home_form" class="row">
         <div class="col-lg-5 col-md-7 mb-4">
-            <?= form_open('home/save'.$home['id']) ?>
+            <?= form_open('home/save/'.$home['id']) ?>
                 <!-- Display action buttons -->
                 <a href="<?= base_url('home/'.$home['id']) ?>" class="btn btn-outline-secondary"><?= lang('members_lang.btn_cancel') ?></a>
                 <input type="submit" class="btn btn-outline-success" value="<?= lang('members_lang.btn_save') ?>" />
@@ -56,10 +56,11 @@
                     </div>
                 </div>
 
-                <!-- If there are comments about the home, display them -->
-                <?php if (!empty($home['comments'])): ?>
-                    <div class="alert alert-info mt-2"><?= $home['comments'] ?></div>
-                <?php endif; ?>
+                <!-- Display the home comments field -->
+                <div class="mt-2"><strong><?= lang('members_lang.field_comments') ?></strong></div>
+                <div class="form-group">
+                    <textarea name="comments" class="form-control" rows="5"><?= $home['comments'] ?></textarea>
+                </div>
             <?= form_close() ?>
         </div>
 
