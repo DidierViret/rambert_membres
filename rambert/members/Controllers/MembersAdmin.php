@@ -15,6 +15,8 @@ use Members\Models\CategoryModel;
 use Members\Models\ContributionModel;
 use Members\Models\NewsletterModel;
 use Members\Models\NewsletterSubscriptionModel;
+use Members\Models\ChangeModel;
+use Members\Models\ChangeTypeModel;
 
 class MembersAdmin extends BaseController
 {
@@ -38,6 +40,8 @@ class MembersAdmin extends BaseController
         $this->contributionModel = new ContributionModel();
         $this->newsletterModel = new NewsletterModel();
         $this->newsletterSubscriptionModel = new NewsletterSubscriptionModel();
+        $this->changeModel = new ChangeModel();
+        $this->changeTypeModel = new ChangeTypeModel();
     }
 
     /**
@@ -85,6 +89,7 @@ class MembersAdmin extends BaseController
         // Get the home informations
         if($id > 0) {
             $home['id'] = $id;
+            $home_old = $this->homeModel->find($id);
         } else {
             $home[] = [];
         }
