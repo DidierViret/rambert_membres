@@ -26,6 +26,7 @@ return[
 'field_membership_start'            => 'Entrée au club',
 'field_membership_end'              => 'Sortie du club',
 'field_membership_end_reason'       => 'Raison de la sortie',
+'field_home_address'                => 'Adresse du foyer',
 'field_address_title'               => 'Titre(s)',
 'field_address_name'                => 'Nom(s)',
 'field_address_line_1'              => 'Adresse ligne 1',

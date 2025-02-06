@@ -46,9 +46,6 @@ class PersonModel extends Model {
 
     public function initialize()
     {
-        $this->homeModel = new HomeModel();
-        $this->categoryModel = new CategoryModel();
-
         // Validation rules
         $this->validationRules = [
             'email' => 'permit_empty|valid_email|max_length[150]',
@@ -82,18 +79,19 @@ class PersonModel extends Model {
      * Callback method to append datas from the linked home table
      */
     protected function appendHome(array $data) {
+        $homeModel = new HomeModel();
 
         if($data['singleton'] && !empty($data['data'])) {
             // Single item, add datas to it
             if (!empty($data['data']['fk_home'])) {
-                $data['data']['home'] = $this->homeModel->find($data['data']['fk_home']);
+                $data['data']['home'] = $homeModel->find($data['data']['fk_home']);
             }
 
         } elseif (!empty($data['data'])) {
             // Multiple items, add datas to each of them
             foreach ($data['data'] as &$person) {
                 if(!empty($person['fk_home'])) {
-                    $person['home'] = $this->homeModel->find($person['fk_home']);
+                    $person['home'] = $homeModel->find($person['fk_home']);
                 }
             }
         }
@@ -104,18 +102,19 @@ class PersonModel extends Model {
      * Callback method to append datas from the linked category table
      */
     protected function appendCategory(array $data) {
+        $categoryModel = new CategoryModel();
 
         if($data['singleton'] && !empty($data['data'])) {
             // Single item, add datas to it
             if (!empty($data['data']['fk_category'])) {
-                $data['data']['category'] = $this->categoryModel->find($data['data']['fk_category']);
+                $data['data']['category'] = $categoryModel->find($data['data']['fk_category']);
             }
 
         } elseif (!empty($data['data'])) {
             // Multiple items, add datas to each of them
             foreach ($data['data'] as &$person) {
                 if(!empty($person['fk_category'])) {
-                    $person['category'] = $this->categoryModel->find($person['fk_category']);
+                    $person['category'] = $categoryModel->find($person['fk_category']);
                 }
             }
         }
