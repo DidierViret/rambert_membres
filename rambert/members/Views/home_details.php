@@ -4,7 +4,9 @@
             <div class="col-lg-5 col-md-7 mb-4">
                 <!-- Display home update button for managers and admins -->
                 <?php if ($_SESSION['access_level'] >= config('\Access\Config\AccessConfig')->access_lvl_manager): ?>
-                    <a href="<?= base_url('home/update/'.$home['id']) ?>" class="btn btn-outline-primary"><?= lang('members_lang.btn_update') ?></a>
+                    <div class="mb-2">
+                        <a href="<?= base_url('home/update/'.$home['id']) ?>" class="btn btn-outline-primary"><?= lang('members_lang.btn_update') ?></a>
+                    </div>
                 <?php endif; ?>
 
                 <!-- Display the home address -->
@@ -35,7 +37,14 @@
                 <!-- Display the list of persons living in the home -->
                 <?php foreach ($persons as $person): ?>
                     <div class="person row bg-light border-bottom border-primary pt-2 pb-2 mb-4">
-                        <!-- If the personn has access rights, display a badge for each access_level -->
+                        <!-- Display home update button for managers and admins -->
+                        <?php if ($_SESSION['access_level'] >= config('\Access\Config\AccessConfig')->access_lvl_manager): ?>
+                            <div class="col-12 mb-2">
+                                <a href="<?= base_url('person/update/'.$person['id']) ?>" class="btn btn-outline-primary"><?= lang('members_lang.btn_update') ?></a>
+                            </div>
+                        <?php endif; ?>
+
+                        <!-- If the person has access rights, display a badge for each access_level -->
                         <?php if (!empty($person['access_levels'])): ?>
                             <div class="col-12 mb-2">
                                 <span class="small" ><strong><?= lang('members_lang.col_access_levels') ?> : </strong></span>

@@ -53,25 +53,7 @@ class MembersAdmin extends BaseController
         $data['persons'] = $this->personModel->where('fk_home', $id)->findAll();
 
         foreach($data['persons'] as &$person) {
-             // Access levels informations
-             $accesses = $this->accessModel->where('fk_person', $person['id'])->findAll();
-             foreach($accesses as $access) {
-                 $person['access_levels'][] = $access['access_level'];
-             }
-
-            // Current contributions informations
-            $person['contributions'] = $this->contributionModel->getOrdered($person['id'], true, 'date_begin', 'DESC');
-
-            foreach($person['contributions'] as &$contribution) {
-                // Only keep the year of the dates
-                $contribution['date_begin'] = date('Y', strtotime($contribution['date_begin']));
-                if(!empty($contribution['date_end'])) {
-                    $contribution['date_end'] = date('Y', strtotime($contribution['date_end']));
-                }
-            }
-
-            // Newsletter subscriptions informations
-            $person['newsletter_subscriptions'] = $this->newsletterSubscriptionModel->where('fk_person', $person['id'])->findAll();
+            $this->get_person_informations($person);
         }
 
         return $this->display_view('Members\home_form', $data);
@@ -105,5 +87,52 @@ class MembersAdmin extends BaseController
 
         // Redirect to the home details page
         return redirect()->to('/home/'.$id);
+    }
+
+    /**
+     * Display a form to update a person
+     */
+    public function personUpdate($id) {
+        $homeId = $this->personModel->find($id)['fk_home'];
+        $data['home'] = $this->homeModel->find($homeId);
+        $data['persons'] = $this->personModel->where('fk_home', $homeId)->findAll();
+        $data['person_to_update'] = $id;
+
+        foreach($data['persons'] as &$person) {
+            $this->get_person_informations($person);
+        }
+
+        return $this->display_view('Members\person_form', $data);
+    }
+
+    /**
+     * Create or update a person
+     */
+    public function personSave($id = 0) {
+    }
+
+    /**
+     * Get the informations linked to a person
+     */
+    private function get_person_informations(&$person) {
+        // Access levels informations
+        $accesses = $this->accessModel->where('fk_person', $person['id'])->findAll();
+        foreach($accesses as $access) {
+            $person['access_levels'][] = $access['access_level'];
+        }
+
+        // Current contributions informations
+        $person['contributions'] = $this->contributionModel->getOrdered($person['id'], true, 'date_begin', 'DESC');
+
+        foreach($person['contributions'] as &$contribution) {
+            // Only keep the year of the dates
+            $contribution['date_begin'] = date('Y', strtotime($contribution['date_begin']));
+            if(!empty($contribution['date_end'])) {
+                $contribution['date_end'] = date('Y', strtotime($contribution['date_end']));
+            }
+        }
+
+        // Newsletter subscriptions informations
+        $person['newsletter_subscriptions'] = $this->newsletterSubscriptionModel->where('fk_person', $person['id'])->findAll();
     }
 }
