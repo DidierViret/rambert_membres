@@ -66,14 +66,15 @@ class ImportData extends BaseController
      */
     public function import()
     {
+        // Set session variable to avoid logging records updates during importation
+        $_SESSION['importation'] = true;
+
         // Get all informations from comprofiler and users tables
         $query = $this->dbJoomla->query('SELECT *
                                    FROM lyf7s_comprofiler
                                    INNER JOIN lyf7s_users ON lyf7s_comprofiler.user_id=lyf7s_users.id');
 
         $cbMembers = $query->getResult('array');
-        
-        //dd($cbMembers);
         
         // Insert each member in the new database, splitting informations in different tables
         foreach($cbMembers as $cbMember) {
@@ -150,13 +151,16 @@ class ImportData extends BaseController
                     $newsletterSubscriptionModel->insert($newsletterSubscription);
                 }
 
-                // TODO Import all members contributions when their syntax will be correct in the old Joomla database
-                // For now, only import contributions for Didier Viret and Stéphane Besuchet
+                // Import members contributions
                 if (!empty($cbMember['cb_activites_club']) && $cbMember['cb_activites_club'] != "-") {
-                    if ($cbMember['user_id'] == 42 || $cbMember['user_id'] == 43) {
+                    try {
                         $this->importContributions($cbMember);
+                    } catch (\Exception $e) {
+                        echo "Error while importing contributions for member ".$cbMember['user_id']." : ".$e->getMessage()."<br>";
+                        dd($cbMember);
                     }
                 }
+                
 
                 // Add admin rights to Didier Viret
                 if ($cbMember['user_id'] == 42) {
@@ -171,6 +175,9 @@ class ImportData extends BaseController
         }
 
         // TODO : Script qui fait un soft_delete des homes dont tous les membres sont désactivés
+
+        // Unset the session variable
+        unset($_SESSION['importation']);
     }
 
     /**

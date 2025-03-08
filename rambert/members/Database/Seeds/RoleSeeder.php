@@ -33,6 +33,8 @@ class RoleSeeder extends Seeder
             ['id' => 22, 'fk_team' => 11, 'name' => 'Responsable', 'description' => null, 'date_creation' => '2024-10-28 20:39:26', 'date_modification' => null, 'date_delete' => null],
             ['id' => 23, 'fk_team' => 12, 'name' => 'Responsable', 'description' => null, 'date_creation' => '2024-10-28 20:39:26', 'date_modification' => null, 'date_delete' => null],
             ['id' => 24, 'fk_team' => 13, 'name' => 'Délégué', 'description' => null, 'date_creation' => '2024-10-28 20:40:55', 'date_modification' => null, 'date_delete' => null],
+            ['id' => 25, 'fk_team' => 14, 'name' => 'Délégué', 'description' => null, 'date_creation' => '2024-10-28 20:40:55', 'date_modification' => null, 'date_delete' => null],
+            ['id' => 26, 'fk_team' => 15, 'name' => 'Membre', 'description' => null, 'date_creation' => '2024-10-28 20:40:55', 'date_modification' => null, 'date_delete' => null],
         ];
 
         // Insert batch

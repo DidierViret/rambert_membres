@@ -113,6 +113,22 @@ class TeamSeeder extends Seeder
                 'date_modification' => null,
                 'date_delete'   => null,
             ],
+            [
+                'id'            => 14,
+                'name'          => 'UCJG faisceau cantonal VD/VS',
+                'description'   => null,
+                'date_creation' => '2024-10-28 20:41:20',
+                'date_modification' => null,
+                'date_delete'   => null,
+            ],
+            [
+                'id'            => 15,
+                'name'          => 'Commission des courses',
+                'description'   => null,
+                'date_creation' => '2024-10-28 20:42:20',
+                'date_modification' => null,
+                'date_delete'   => null,
+            ],
         ];
 
         $this->db->table('team')->insertBatch($data);

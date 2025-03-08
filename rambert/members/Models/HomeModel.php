@@ -74,6 +74,11 @@ class HomeModel extends Model
      * Callback method to log the update
      */
     protected function logUpdate(array $data) {
+        // Do not log the update if the importation flag is set
+        if (isset($_SESSION['importation']) && $_SESSION['importation'] == true) {
+            return $data;
+        }
+
         $personModel = new PersonModel();
         $changeTypeModel = new ChangeTypeModel();
         $changeModel = new ChangeModel();
