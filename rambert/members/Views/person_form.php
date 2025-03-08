@@ -37,8 +37,37 @@
                         <?php if ($person['id'] == $person_to_update): ?>
                             <?= form_open('person/save/'.$person['id']) ?>
                                 <!-- Display action buttons -->
-                                <a href="<?= base_url('home/'.$home['id']) ?>" class="btn btn-outline-secondary"><?= lang('members_lang.btn_cancel') ?></a>
-                                <input type="submit" class="btn btn-outline-success" value="<?= lang('members_lang.btn_save') ?>" />
+                                <div class="col-12 mb-2">
+                                    <a href="<?= base_url('home/'.$home['id']) ?>" class="btn btn-outline-secondary"><?= lang('members_lang.btn_cancel') ?></a>
+                                    <input type="submit" class="btn btn-outline-success" value="<?= lang('members_lang.btn_save') ?>" />
+                                </div>
+
+                                <!-- If logged user has admin rights, give the possibility to update the person's access rights -->
+                                <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['access_level'] >= config('\Access\Config\AccessConfig')->access_lvl_admin): ?>
+                                    <div class="col-12 mb-2">
+                                        <label for="access_level" class="small" ><strong><?= lang('members_lang.col_access_levels') ?> : </strong></label>
+                                        
+                                        <select id="access_level" name="access_level" class="custom-select custom-select-sm">
+                                            <?php if (empty($person['access_levels'])): ?>
+                                                <option value="0" selected ><?= lang('members_lang.no_access_level') ?></option>
+                                            <?php else: ?>
+                                                <option value="0"><?= lang('members_lang.no_access_level') ?></option>
+                                            <?php endif; ?>
+
+                                            <?php foreach ($access_levels as $access_level): ?>
+                                                <?php $selected = ''; ?>
+                                                <?php if (!empty($person['access_levels'])): ?>
+                                                    <?php foreach ($person['access_levels'] as $person_access_level): ?>
+                                                        <?php if ($person_access_level['id'] == $access_level['id']): ?>
+                                                            <?php $selected = 'selected'; ?>
+                                                        <?php endif; ?>
+                                                    <?php endforeach; ?>
+                                                <?php endif; ?>
+                                                <option value="<?= $access_level['id'] ?>" <?= $selected ?>><?= $access_level['name'] ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                <?php endif; ?>
                             <?= form_close() ?>
 
                         <!-- if this is NOT the person to update, just display his informations -->

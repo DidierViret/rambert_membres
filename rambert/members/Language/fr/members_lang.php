@@ -62,5 +62,6 @@ return[
 // Other texts
 'since'                             => 'Depuis',
 'no_subscription'                   => 'Pas d\'inscription',
+'no_access_level'                   => 'Pas d\'accès',
 
 ];

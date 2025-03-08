@@ -9,6 +9,7 @@ use Psr\Log\LoggerInterface;
 
 use Access\Exceptions\AccessDeniedException;
 use Access\Models\AccessModel;
+use Access\Models\AccessLevelModel;
 use Members\Models\PersonModel;
 use Members\Models\HomeModel;
 use Members\Models\CategoryModel;
@@ -35,6 +36,7 @@ class MembersAdmin extends BaseController
         // Load required models
         $this->personModel = new PersonModel();
         $this->accessModel = new AccessModel();
+        $this->accessLevelModel = new AccessLevelModel();
         $this->homeModel = new HomeModel();
         $this->categoryModel = new CategoryModel();
         $this->contributionModel = new ContributionModel();
@@ -97,6 +99,7 @@ class MembersAdmin extends BaseController
         $data['home'] = $this->homeModel->find($homeId);
         $data['persons'] = $this->personModel->where('fk_home', $homeId)->findAll();
         $data['person_to_update'] = $id;
+        $data['access_levels'] = $this->accessLevelModel->find();
 
         foreach($data['persons'] as &$person) {
             $this->get_person_informations($person);
@@ -109,6 +112,42 @@ class MembersAdmin extends BaseController
      * Create or update a person
      */
     public function personSave($id = 0) {
+        // Check if the user has the right to access this page
+        if($this->session->get('access_level') < $this->accessLevel) {
+            throw AccessDeniedException::forPageAccessDenied();
+        }
+
+        // Get the person informations
+        if($id > 0) {
+            // Person allready exists, update her informations
+            $person['id'] = $id;
+            $person = array_merge($person, $this->request->getPost());
+            $personOld = $this->personModel->find($id);
+
+            // Keep the home id
+            $person['fk_home'] = $personOld['fk_home'];
+
+            // Update the person's access levels
+            if($this->session->get('access_level') >= config('\Access\Config\AccessConfig')->access_lvl_admin) {
+                $this->updatePersonAccesslevel($id, $person['access_level']);
+            }
+
+        } else {
+            $person[] = [];
+        }
+
+
+        
+        if($id == 0) {
+            // Create the person
+            //$id = $this->personModel->insert($person);
+        } else {
+            // Update the person
+            //$this->personModel->update($id, $person);
+        }
+
+        // Redirect to the person's home details page
+        return redirect()->to('/home/'.$person['fk_home']);
     }
 
     /**
@@ -134,5 +173,41 @@ class MembersAdmin extends BaseController
 
         // Newsletter subscriptions informations
         $person['newsletter_subscriptions'] = $this->newsletterSubscriptionModel->where('fk_person', $person['id'])->findAll();
+    }
+
+    /**
+     * Update a person's access level
+     */
+    private function updatePersonAccesslevel($personId, $accessLevelId) {
+        // Check if the user has admin rights
+        if($this->session->get('access_level') >= config('\Access\Config\AccessConfig')->access_lvl_admin) {
+            $personOld['accesses'] = $this->accessModel->where('fk_person', $personId)->findAll();
+
+            if(empty($personOld['accesses']) && !empty($accessLevelId)) {
+                // Add the new person's access level
+                $data = [
+                    'fk_person' => $personId,
+                    'fk_access_level' => $accessLevelId,
+                    'password' => "Rambert1901",
+                    'password_confirm' => "Rambert1901",
+                ];
+                $this->accessModel->insert($data);
+
+            } elseif(!empty($accessLevelId)) {
+                // Update the person's access level
+                if($personOld['accesses'][0]['fk_access_level'] != $accessLevelId) {
+                    $data = [
+                        'fk_access_level' => $accessLevelId,
+                    ];
+                    $this->accessModel->update($personOld['accesses'][0]['id'], $data);
+                }
+
+            } else {
+                // Delete the person's access level
+                foreach($personOld['accesses'] as $access) {
+                    $this->accessModel->delete($access['id']);
+                }
+            }
+        }
     }
 }
