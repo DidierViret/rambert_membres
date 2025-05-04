@@ -1,13 +1,9 @@
+<?php helper('form'); ?>
+
 <div class="container" >
     <div id="home_details" class="row">
         <?php if (!empty($home)): ?>
             <div class="col-lg-5 col-md-7 mb-4">
-                <!-- Display home update button for managers and admins -->
-                <?php if ($_SESSION['access_level'] >= config('\Access\Config\AccessConfig')->access_lvl_manager): ?>
-                    <div class="mb-2">
-                        <a href="<?= base_url('home/update/'.$home['id']) ?>" class="btn btn-outline-primary"><?= lang('members_lang.btn_update') ?></a>
-                    </div>
-                <?php endif; ?>
 
                 <!-- Display the home address -->
                 <div><strong><?= lang('members_lang.col_home_address') ?></strong></div>
@@ -36,8 +32,13 @@
             <div class="col-lg-7 col-md-5">
                 <!-- Display the list of persons living in the home -->
                 <?php foreach ($persons as $person): ?>
-                    <?= view('Members\person_update_button', ['person' => $person]); ?>
-                    <?= view('Members\person_details', ['person' => $person]); ?>
+                    <?php if ($person['id'] == $person_to_update): ?>
+                        <!-- if this is the person to update, display a form to update his informations -->
+                        <?= view('Members\person_form', ['person' => $person]); ?>
+                    <?php else: ?>
+                        <!-- if this is NOT the person to update, just display her informations -->
+                        <?= view('Members\person_details', ['person' => $person]); ?>
+                    <?php endif; ?>
                 <?php endforeach; ?>
             </div>
             

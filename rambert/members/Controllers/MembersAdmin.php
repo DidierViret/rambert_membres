@@ -106,7 +106,7 @@ class MembersAdmin extends BaseController
             $this->get_person_informations($person);
         }
 
-        return $this->display_view('Members\person_form', $data);
+        return $this->display_view('Members\home_person_form', $data);
     }
 
     /**
