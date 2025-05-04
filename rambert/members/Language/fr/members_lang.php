@@ -11,6 +11,11 @@ return[
 // Pages titles
 'title_'                            => '',
 
+// Subtitles
+'subtitle_person_informations'      => 'Informations personnelles',
+'subtitle_contact_informations'     => 'Coordonnées',
+'subtitle_membership_informations'  => 'Inscription au club',
+
 // Forms fields
 'field_title'                       => 'Titre',
 'field_last_name'                   => 'Nom',

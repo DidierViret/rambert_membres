@@ -100,6 +100,7 @@ class MembersAdmin extends BaseController
         $data['persons'] = $this->personModel->where('fk_home', $homeId)->findAll();
         $data['person_to_update'] = $id;
         $data['access_levels'] = $this->accessLevelModel->find();
+        $data['categories'] = $this->categoryModel->findAll();
 
         foreach($data['persons'] as &$person) {
             $this->get_person_informations($person);
