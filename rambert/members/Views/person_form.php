@@ -100,12 +100,12 @@
                     <div class="col-sm-8">
                         <input type="text" id="membership_start" name="membership_start" class="form-control form-control-sm" value="<?= $person['membership_start'] ?>" />
                     </div>
-                    <label for="category" class="col-sm-4 col-form-label-sm"><?= lang('members_lang.field_category') ?></label>
+                    <label for="fk_category" class="col-sm-4 col-form-label-sm"><?= lang('members_lang.field_category') ?></label>
                     <div class="col-sm-8">
-                        <select id="category" name="category" class="custom-select custom-select-sm">
+                        <select id="fk_category" name="fk_category" class="custom-select custom-select-sm">
                             <?php foreach ($categories as $category): ?>
                                 <?php $selected = ''; ?>
-                                <?php if ($person['category']['id'] == $category['id']): ?>
+                                <?php if ($person['fk_category'] == $category['id']): ?>
                                     <?php $selected = 'selected'; ?>
                                 <?php endif; ?>
                                 <option value="<?= $category['id'] ?>" <?= $selected ?>><?= $category['name'] ?></option>

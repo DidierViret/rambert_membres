@@ -128,11 +128,6 @@ class MembersAdmin extends BaseController
             // Keep the home id
             $person['fk_home'] = $personOld['fk_home'];
 
-            // Update the person's access levels
-            if($this->session->get('access_level') >= config('\Access\Config\AccessConfig')->access_lvl_admin) {
-                $this->updatePersonAccesslevel($id, $person['access_level']);
-            }
-
         } else {
             $person[] = [];
         }
@@ -143,8 +138,14 @@ class MembersAdmin extends BaseController
             // Create the person
             //$id = $this->personModel->insert($person);
         } else {
+            // Update the person's access levels
+            if($this->session->get('access_level') >= config('\Access\Config\AccessConfig')->access_lvl_admin) {
+                $this->updatePersonAccesslevel($id, $person['access_level']);
+            }
+            unset($person['access_level']);
+
             // Update the person
-            //$this->personModel->update($id, $person);
+            $this->personModel->update($id, $person);
         }
 
         // Redirect to the person's home details page
