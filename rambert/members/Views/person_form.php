@@ -125,6 +125,22 @@
                         <input type="text" id="membership_end_reason" name="membership_end_reason" class="form-control form-control-sm" value="<?= $person['membership_end_reason'] ?>" />
                     </div>
                 </div>
+
+                <!-- Display the person's newsletter subscribtions fields -->
+                <div class="form-group row">
+                    <p class="col-12"><strong><?= lang('members_lang.subtitle_newsletter_subscriptions') ?></strong></p>
+
+                    <div class="col-12">
+                        <div class="form-check">
+                            <?php foreach ($person['newsletters'] as $newsletter): ?>
+                                <input class="form-check-input" type="checkbox" value="" id="<?= $newsletter['id'] ?>" name="newsletters[]" <?= $newsletter['subscribed'] ? 'checked' : '' ?> />
+                                <label class="form-check-label" for="<?= $newsletter['id'] ?>">
+                                    <?= $newsletter['title'] ?>
+                                </label>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     <?= form_close() ?>

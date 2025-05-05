@@ -15,6 +15,7 @@ return[
 'subtitle_person_informations'      => 'Informations personnelles',
 'subtitle_contact_informations'     => 'Coordonnées',
 'subtitle_membership_informations'  => 'Inscription au club',
+'subtitle_newsletter_subscriptions' => 'Inscriptions aux newsletter',
 
 // Forms fields
 'field_title'                       => 'Titre',

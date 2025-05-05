@@ -50,15 +50,14 @@
     <!-- Display the person's newsletter subscriptions -->
     <div class="col-lg-6 mb-2">
         <div><strong><?= lang('members_lang.col_newsletter_subscriptions') ?></strong></div>
-        <?php if (!empty($person['newsletter_subscriptions'])): ?>
-        <ul>
-            <?php foreach ($person['newsletter_subscriptions'] as $subscription): ?>
-                <li>
-                    <?= $subscription['newsletter']['title'] ?>
-            </li>
-            <?php endforeach; ?>
-        </ul>
-        <?php else: ?>
+        <?php $no_subscription = true; ?>
+        <?php foreach ($person['newsletters'] as $newsletter): ?>
+            <?php if ($newsletter['subscribed']): ?>
+                <?php $no_subscription = false; ?>
+                <span class="badge badge-primary"><?= $newsletter['title'] ?></span><br />
+            <?php endif; ?>
+        <?php endforeach; ?>
+        <?php if($no_subscription): ?>
             <div class="small"><?= lang('members_lang.no_subscription') ?></div>
         <?php endif; ?>
     </div>

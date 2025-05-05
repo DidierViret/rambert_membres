@@ -112,7 +112,16 @@ class Members extends BaseController
             }
 
             // Newsletter subscriptions informations
-            $person['newsletter_subscriptions'] = $this->newsletterSubscriptionModel->where('fk_person', $person['id'])->findAll();
+            $person['newsletters'] = $this->newsletterModel->findAll();
+            foreach($person['newsletters'] as &$newsletter) {
+                // Check if the person is subscribed to the newsletter
+                $subscription = $this->newsletterSubscriptionModel->where(['fk_person' => $person['id'], 'fk_newsletter' => $newsletter['id']])->findAll();
+                if(!empty($subscription)) {
+                    $newsletter['subscribed'] = true;
+                } else {
+                    $newsletter['subscribed'] = false;
+                }
+            }
         }
 
         return $this->display_view('Members\home_details', $data);
