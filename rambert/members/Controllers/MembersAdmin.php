@@ -121,12 +121,8 @@ class MembersAdmin extends BaseController
         // Get the person informations
         if($id > 0) {
             // Person allready exists, update her informations
-            $person['id'] = $id;
-            $person = array_merge($person, $this->request->getPost());
+            $person = $this->request->getPost();
             $personOld = $this->personModel->find($id);
-
-            // Keep the home id
-            $person['fk_home'] = $personOld['fk_home'];
 
         } else {
             $person[] = [];
@@ -143,6 +139,35 @@ class MembersAdmin extends BaseController
                 $this->updatePersonAccesslevel($id, $person['access_level']);
             }
             unset($person['access_level']);
+
+            // Update the person's newsletter subscriptions
+            if(empty($person['newsletters'])) {
+                $this->newsletterSubscriptionModel->where('fk_person', $id)->delete();
+            } else {
+                // Get the current subscriptions
+                $subscriptions = $this->newsletterSubscriptionModel->where('fk_person', $id)->findAll();
+                foreach($subscriptions as $subscription) {
+                    // Check if the subscription is still valid
+                    if(!in_array($subscription['fk_newsletter'], $person['newsletters'])) {
+                        // Delete the subscription
+                        $this->newsletterSubscriptionModel->delete($subscription['id']);
+                    }
+                }
+
+                // Add the new subscriptions
+                foreach($person['newsletters'] as $newsletter) {
+                    // Check if the subscription already exists
+                    $subscription = $this->newsletterSubscriptionModel->where(['fk_person' => $id, 'fk_newsletter' => $newsletter])->findAll();
+                    if(empty($subscription)) {
+                        // Add the subscription
+                        $data = [
+                            'fk_person' => $id,
+                            'fk_newsletter' => $newsletter,
+                        ];
+                        $this->newsletterSubscriptionModel->insert($data);
+                    }
+                }
+            }
 
             // Update the person
             $this->personModel->update($id, $person);

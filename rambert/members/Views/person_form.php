@@ -13,6 +13,10 @@
             </div>
         </div>
 
+        <!-- Add hidden fields -->
+        <input type="hidden" id="id" name="id" value="<?= $person['id'] ?>" />
+        <input type="hidden" id="fk_home" name="fk_home" value="<?= $person['fk_home'] ?>" />
+
         <!-- If logged user has admin rights, give the possibility to update the person's access rights -->
         <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['access_level'] >= config('\Access\Config\AccessConfig')->access_lvl_admin): ?>
             <div class="row mb-2">
@@ -133,7 +137,7 @@
                     <div class="col-12">
                         <div class="form-check">
                             <?php foreach ($person['newsletters'] as $newsletter): ?>
-                                <input class="form-check-input" type="checkbox" value="" id="<?= $newsletter['id'] ?>" name="newsletters[]" <?= $newsletter['subscribed'] ? 'checked' : '' ?> />
+                                <input class="form-check-input" type="checkbox" value="<?= $newsletter['id'] ?>" id="<?= $newsletter['id'] ?>" name="newsletters[]" <?= $newsletter['subscribed'] ? 'checked' : '' ?> />
                                 <label class="form-check-label" for="<?= $newsletter['id'] ?>">
                                     <?= $newsletter['title'] ?>
                                 </label>
