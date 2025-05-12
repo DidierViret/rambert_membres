@@ -24,18 +24,8 @@ class CreateNewsletterSubscriptionTable extends Migration
                 'unsigned' => true,
                 'null' => false,
             ],
-            'date_creation' => [
-                'type' => 'DATETIME',
-                'null' => false,
-            ],
-            'date_modification' => [
-                'type' => 'DATETIME',
-                'null' => true,
-            ],
-            'date_delete' => [
-                'type' => 'DATETIME',
-                'null' => true,
-            ],
+            'date_creation TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP',
+            'date_modification TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP',
         ]);
 
         $this->forge->addKey('id', true);

@@ -16,10 +16,9 @@ class NewsletterSubscriptionModel extends Model {
     protected $table      = 'newsletter_subscription';
     protected $primaryKey = 'id';
 
-    protected $allowedFields = ['fk_person', 'fk_newsletter', 'date_delete'];
+    protected $allowedFields = ['fk_person', 'fk_newsletter'];
 
-    protected $useSoftDeletes = true;
-    protected $deletedField = 'date_delete';
+    protected $useSoftDeletes = false;
 
     // Callbacks
     protected $afterFind = ['appendNewsletter', 'appendPerson'];
