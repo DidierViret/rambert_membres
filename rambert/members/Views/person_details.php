@@ -63,9 +63,18 @@
     </div>
 
     <!-- Display the person's contributions to the club -->
-    <?php if (!empty($person['contributions'])): ?> 
-        <div class="col-lg-6 mb-2">
-            <div><strong><?= lang('members_lang.col_contributions') ?></strong></div>
+    <div class="col-lg-6 mb-2">
+        <div><strong><?= lang('members_lang.col_contributions') ?></strong></div>
+        <!-- If user has manager or admin access, display the update button -->
+        <?php if ($_SESSION['access_level'] >= config('\Access\Config\AccessConfig')->access_lvl_manager): ?>
+            <div class="contributions-update-button row bg-light pt-2 pb-2" >
+                <div class="col-12">
+                    <a href="<?= base_url('contributions/'.$person['id']) ?>" class="btn btn-outline-primary btn-sm"><?= lang('members_lang.btn_update') ?></a>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <?php if (!empty($person['contributions'])): ?> 
             <!-- List contributions still active -->
             <div>
             <?php foreach ($person['contributions'] as $contribution): ?>

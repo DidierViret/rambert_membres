@@ -246,4 +246,56 @@ class MembersAdmin extends BaseController
             }
         }
     }
+
+    /**
+     * Display the list of a person's contributions to let the user update them
+     * @param int $personId The person's ID
+     */
+    public function contributionsList($personId) {
+        // Check if the user has the right to access this page
+        if($this->session->get('access_level') < $this->accessLevel) {
+            throw AccessDeniedException::forPageAccessDenied();
+        }
+        // Get the person's informations
+        $person = $this->personModel->find($personId);
+
+        $data['list_title'] = $person['first_name']." ".$person['last_name']." - ".lang('members_lang.subtitle_contributions_list');
+
+        // Get the list of contributions
+        $data['items'] = $this->contributionModel->getOrdered($personId, true, 'date_begin', 'DESC');
+        
+        // Prepare the contributions list
+        foreach($data['items'] as &$contribution) {
+            // Only keep the year of the dates
+            $contribution['date_begin'] = date('Y', strtotime($contribution['date_begin']));
+            if(!empty($contribution['date_end'])) {
+                $contribution['date_end'] = date('Y', strtotime($contribution['date_end']));
+            }
+            // Get the team and role names
+            if(!empty($contribution['role'])) {
+                $contribution['description'] = $contribution['role']['name'];
+
+                if(!empty($contribution['role']['team'])) {
+                    $contribution['description'] = $contribution['role']['team']['name']." : ".$contribution['role']['name'];
+                }
+            }
+        }
+        
+        $data['columns'] = ['description' => 'Rôle',
+                            'date_begin' => 'Début',
+                            'date_end' => 'Fin'];
+      
+        $data['primary_key_field']  = 'id';
+        $data['btn_create_label']   = 'Add an item';
+        $data['deleted_field']      = 'deleted';
+        $data['url_detail'] = "items_list/detail/";
+        $data['url_update'] = "items_list/update/";
+        $data['url_delete'] = "items_list/delete/";
+        $data['url_create'] = "items_list/create/";
+        $data['url_getView'] = "items_list/display_item/";
+        $data['url_restore'] = "items_list/restore_item/";
+        $data['url_duplicate'] = "items_list/duplicate_item/";
+
+        return $this->display_view('Common\items_list', $data);
+    }
 }
