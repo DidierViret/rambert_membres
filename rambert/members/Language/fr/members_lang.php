@@ -17,6 +17,7 @@ return[
 'subtitle_membership_informations'  => 'Inscription au club',
 'subtitle_newsletter_subscriptions' => 'Inscriptions aux newsletter',
 'subtitle_contributions_list'       => 'Liste des contributions',
+'subtitle_contribution_update'      => 'Modification d\'une contribution',
 
 // Forms fields
 'field_title'                       => 'Titre',
@@ -41,6 +42,10 @@ return[
 'field_postal_code'                 => 'Code postal',
 'field_city'                        => 'Localité',
 'field_nb_bulletins'                => 'Nombre de bulletins',
+'field_team'                        => 'Groupe',
+'field_role'                        => 'Fonction',
+'field_contribution_start'          => 'Année de début',
+'field_contribution_end'            => 'Année de fin',
 
 // Lists columns
 'col_other_home_members'            => 'Autres membres du foyer',
@@ -56,6 +61,8 @@ return[
 'btn_save'                          => 'Enregistrer',
 'btn_update'                        => 'Modifier',
 'btn_cancel'                        => 'Annuler',
+'btn_add'                           => 'Ajouter',
+'btn_delete'                        => 'Supprimer',
 
 // Error messages
 'msg_error_valid_email'             => 'Veuillez entrer une adresse e-mail valide',

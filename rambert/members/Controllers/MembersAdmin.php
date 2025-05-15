@@ -18,6 +18,8 @@ use Members\Models\NewsletterModel;
 use Members\Models\NewsletterSubscriptionModel;
 use Members\Models\ChangeModel;
 use Members\Models\ChangeTypeModel;
+use Members\Models\TeamModel;
+use Members\Models\RoleModel;
 
 class MembersAdmin extends BaseController
 {
@@ -44,6 +46,8 @@ class MembersAdmin extends BaseController
         $this->newsletterSubscriptionModel = new NewsletterSubscriptionModel();
         $this->changeModel = new ChangeModel();
         $this->changeTypeModel = new ChangeTypeModel();
+        $this->teamModel = new TeamModel();
+        $this->roleModel = new RoleModel();
     }
 
     /**
@@ -259,7 +263,7 @@ class MembersAdmin extends BaseController
         // Get the person's informations
         $person = $this->personModel->find($personId);
 
-        $data['list_title'] = $person['first_name']." ".$person['last_name']." - ".lang('members_lang.subtitle_contributions_list');
+        $data['list_title'] = $person['last_name']." ".$person['first_name']." - ".lang('members_lang.subtitle_contributions_list');
 
         // Get the list of contributions
         $data['items'] = $this->contributionModel->getOrdered($personId, true, 'date_begin', 'DESC');
@@ -271,7 +275,7 @@ class MembersAdmin extends BaseController
             if(!empty($contribution['date_end'])) {
                 $contribution['date_end'] = date('Y', strtotime($contribution['date_end']));
             }
-            // Get the team and role names
+            // Get the team and role names as description of the contribution
             if(!empty($contribution['role'])) {
                 $contribution['description'] = $contribution['role']['name'];
 
@@ -286,16 +290,41 @@ class MembersAdmin extends BaseController
                             'date_end' => 'Fin'];
       
         $data['primary_key_field']  = 'id';
-        $data['btn_create_label']   = 'Add an item';
-        $data['deleted_field']      = 'deleted';
-        $data['url_detail'] = "items_list/detail/";
-        $data['url_update'] = "items_list/update/";
-        $data['url_delete'] = "items_list/delete/";
-        $data['url_create'] = "items_list/create/";
-        $data['url_getView'] = "items_list/display_item/";
-        $data['url_restore'] = "items_list/restore_item/";
-        $data['url_duplicate'] = "items_list/duplicate_item/";
+        $data['btn_create_label']   = lang('members_lang.btn_add');
+        $data['url_update'] = "contribution/update/";
+        $data['url_delete'] = "contribution/delete/";
+        $data['url_create'] = "contribution/create/";
 
         return $this->display_view('Common\items_list', $data);
+    }
+
+    /**
+     * Display a form to update a contribution
+     */
+    public function contributionUpdate($id) {
+        // Check if the user has the right to access this page
+        if($this->session->get('access_level') < $this->accessLevel) {
+            throw AccessDeniedException::forPageAccessDenied();
+        }
+
+        // Get the contribution informations
+        $contribution = $this->contributionModel->find($id);
+        $data['contribution'] = $contribution;
+
+        // Form title
+        $data['title'] = $contribution['person']['last_name']." ".$contribution['person']['first_name']." - ".lang('members_lang.subtitle_contribution_update');
+
+        // Keep the year of the dates
+        $data['contribution']['date_begin'] = date('Y', strtotime($data['contribution']['date_begin']));
+        if(!empty($data['contribution']['date_end'])) {
+            $data['contribution']['date_end'] = date('Y', strtotime($data['contribution']['date_end']));
+        }
+
+        // Get the list of teams
+        $data['teams'] = $this->teamModel->findAll();
+        // Get the list of roles
+        $data['roles'] = $this->roleModel->findAll();
+
+        return $this->display_view('Members\contribution_form', $data);
     }
 }
