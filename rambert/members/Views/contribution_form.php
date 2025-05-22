@@ -22,9 +22,7 @@
                 <div class="col-sm-6">
                     <label for="role"><?= lang('members_lang.field_role') ?></label>
                     <select name="role" id="role" class="form-control" required >
-                        <?php foreach ($roles as $role): ?>
-                            <option value="<?= $role['id'] ?>" <?= ($contribution['role']['id'] == $role['id']) ? 'selected' : '' ?>><?= $role['name'] ?></option>
-                        <?php endforeach; ?>
+                        <!-- Field will be filled with the roles of the selected team by javascript -->
                     </select>
                 </div>
             </div>
@@ -49,3 +47,35 @@
         <?= form_close() ?>
     </div>
 </div>
+
+<script>
+    // Convert PHP array to JavaScript object
+    const roles = <?= json_encode($roles) ?>;
+    const selectedRoleId = <?= json_encode($contribution['role']['id']) ?>;
+
+    // Function to update the roles dropdown based on the selected team
+    function updateRoles() {
+        const teamId = document.getElementById('team').value;
+        const roleSelect = document.getElementById('role');
+        
+        // Clear existing options
+        roleSelect.innerHTML = '';
+
+        // Filter roles for the selected team
+        const teamRoles = roles.filter(role => role.fk_team == teamId);
+
+        // Populate dropdown with filtered roles
+        teamRoles.forEach(role => {
+            const option = document.createElement('option');
+            option.value = role.id;
+            option.textContent = role.name;
+            option.selected = (role.id === selectedRoleId);
+            roleSelect.appendChild(option);
+        });
+    }
+
+    // Add event listener to the team select element
+    document.getElementById('team').addEventListener('change', updateRoles);
+    // Initialize roles on page load
+    document.addEventListener('DOMContentLoaded', updateRoles);
+</script>
