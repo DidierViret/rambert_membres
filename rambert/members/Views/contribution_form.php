@@ -7,12 +7,16 @@
             <h3><?= $title ?></h3>
         </div>
 
-        <?= form_open('contribution/save/'.$contribution['id'], ['class' => 'col-12', 'id' => 'contribution_form']) ?>
+        <!-- Display the contribution form -->
+        <?php
+        $hidden = ['fk_person' => $contribution['person']['id']];
+        echo form_open('contribution/save/'.$contribution['id'], ['class' => 'col-12', 'id' => 'contribution_form'], $hidden);
+        ?>
             <!-- Display the contribution fields -->
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <label for="team"><?= lang('members_lang.field_team') ?></label>
-                    <select name="team" id="team" class="form-control" required >
+                    <label for="fk_team"><?= lang('members_lang.field_team') ?></label>
+                    <select name="fk_team" id="fk_team" class="form-control" required >
                         <?php foreach ($teams as $team): ?>
                             <option value="<?= $team['id'] ?>" <?= ($contribution['role']['team']['id'] == $team['id']) ? 'selected' : '' ?>><?= $team['name'] ?></option>
                         <?php endforeach; ?>
@@ -20,20 +24,20 @@
                     
                 </div>
                 <div class="col-sm-6">
-                    <label for="role"><?= lang('members_lang.field_role') ?></label>
-                    <select name="role" id="role" class="form-control" required >
+                    <label for="fk_role"><?= lang('members_lang.field_role') ?></label>
+                    <select name="fk_role" id="fk_role" class="form-control" required >
                         <!-- Field will be filled with the roles of the selected team by javascript -->
                     </select>
                 </div>
             </div>
             <div class="row mb-2">
                 <div class="col-sm-3">
-                    <label for="contribution_start"><?= lang('members_lang.field_contribution_start') ?></label>
-                    <input type="number" name="contribution_start" id="contribution_start" class="form-control" value="<?= $contribution['date_begin'] ?>" required />
+                    <label for="date_begin"><?= lang('members_lang.field_contribution_start') ?></label>
+                    <input type="number" name="date_begin" id="date_begin" class="form-control" value="<?= $contribution['date_begin'] ?>" required />
                 </div>
                 <div class="col-sm-3">
-                    <label for="contribution_end"><?= lang('members_lang.field_contribution_end') ?></label>
-                    <input type="number" name="contribution_end" id="contribution_end" class="form-control" value="<?= $contribution['date_end'] ?>" />
+                    <label for="date_end"><?= lang('members_lang.field_contribution_end') ?></label>
+                    <input type="number" name="date_end" id="date_end" class="form-control" value="<?= $contribution['date_end'] ?>" />
                 </div>
             </div>
             
@@ -55,8 +59,8 @@
 
     // Function to update the roles dropdown based on the selected team
     function updateRoles() {
-        const teamId = document.getElementById('team').value;
-        const roleSelect = document.getElementById('role');
+        const teamId = document.getElementById('fk_team').value;
+        const roleSelect = document.getElementById('fk_role');
         
         // Clear existing options
         roleSelect.innerHTML = '';
@@ -75,7 +79,7 @@
     }
 
     // Add event listener to the team select element
-    document.getElementById('team').addEventListener('change', updateRoles);
+    document.getElementById('fk_team').addEventListener('change', updateRoles);
     // Initialize roles on page load
     document.addEventListener('DOMContentLoaded', updateRoles);
 </script>

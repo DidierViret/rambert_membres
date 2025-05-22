@@ -327,4 +327,36 @@ class MembersAdmin extends BaseController
 
         return $this->display_view('Members\contribution_form', $data);
     }
+
+    /**
+     * Create or update a contribution
+     */
+    public function contributionSave($id = 0) {
+        // Check if the user has the right to access this page
+        if($this->session->get('access_level') < $this->accessLevel) {
+            throw AccessDeniedException::forPageAccessDenied();
+        }
+
+        // Get the contribution informations
+        $contribution = $this->request->getPost();
+
+        // Convert year-only dates to MySQL format (YYYY-MM-DD)
+        $contribution['date_begin'] = $contribution['date_begin'] . '-01-01';
+        if(!empty($contribution['date_end'])) {
+            $contribution['date_end'] = $contribution['date_end'] . '-12-31';
+        } else {
+            $contribution['date_end'] = null;
+        }
+
+        if($id == 0) {
+            // Create the contribution
+            $id = $this->contributionModel->insert($contribution);
+        } else {
+            // Update the contribution
+            $this->contributionModel->update($id, $contribution);
+        }
+
+        // Redirect to the contributions list page
+        return redirect()->to(base_url('/contributions/'.$contribution['fk_person']));
+    }
 }
