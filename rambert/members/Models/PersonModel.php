@@ -9,8 +9,8 @@
 namespace Members\Models;
 
 use CodeIgniter\Model;
-use Members\Models\Homemodel;
-use Members\Models\Categorymodel;
+use Members\Models\HomeModel;
+use Members\Models\CategoryModel;
 
 class PersonModel extends Model {
     protected $table = 'person';
