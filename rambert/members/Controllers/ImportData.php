@@ -203,14 +203,10 @@ class ImportData extends BaseController
         
         if (!empty($existingHome)) {
             // Keep the most relevant informations between existing home and cbMember's home
-            if (strlen($home['address_title']) > strlen($existingHome['address_title'])) {
-                $existingHome['address_title'] = $home['address_title'];
-            }
-            if (strlen($home['address_name']) > strlen($existingHome['address_name'])) {
-                $existingHome['address_name'] = $home['address_name'];
-            }
             if ($home['nb_bulletins'] > $existingHome['nb_bulletins']) {
                 $existingHome['nb_bulletins'] = $home['nb_bulletins'];
+                $existingHome['address_title'] = $home['address_title'];
+                $existingHome['address_name'] = $home['address_name'];
             }
 
             // Update the allready existing home and return its id
