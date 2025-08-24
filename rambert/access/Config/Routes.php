@@ -22,6 +22,8 @@ $routes->get('access/update/(:num)', '\Access\Controllers\Admin::updateAccess/$1
 $routes->post('access/update/(:num)', '\Access\Controllers\Admin::updateAccess/$1');
 $routes->get('access/delete/(:num)', '\Access\Controllers\Admin::deleteAccess/$1');
 $routes->get('access/restore/(:num)', '\Access\Controllers\Admin::restoreAccess/$1');
+$routes->get('access/update_password/(:num)', '\Access\Controllers\Admin::updatePassword/$1');
+$routes->post('access/update_password/(:num)', '\Access\Controllers\Admin::updatePassword/$1');
 
 // Route for importation of the datas from the old Joomla/CommunityBuilder database
 $routes->get('import','\Members\Controllers\ImportData::import');
