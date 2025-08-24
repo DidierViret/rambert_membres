@@ -207,4 +207,40 @@ class Admin extends BaseController
                 return redirect()->to('access');
         }
     }
+
+    /**
+     * Update an access' password with a newly defined password
+     * @param int $accessId The access' ID
+     */
+    public function updatePassword($accessId) {
+        $access = $this->accessModel->find($accessId);
+
+        // No access rights corresponding to the given id
+        if (empty($access)) {
+            return redirect()->to('access');
+        }
+
+        $data['access'] = $access;
+        $data['errors'] = [];
+
+        // Check if the form has been submitted, else just display the form
+        if (!is_null($this->request->getVar('btn_update_password'))) {
+            $access['password'] = $this->request->getVar('new_password');
+            $access['password_confirm'] = $this->request->getVar('password_confirm');
+
+            $this->accessModel->update($access['id'], $access);
+
+            if ($this->accessModel->errors()==null) {
+                // No error happened, redirect
+                return redirect()->to('access');
+            } else {
+                // Display error messages
+                $data['errors'] = $this->accessModel->errors();
+            }
+        }
+
+        // Display the password change form
+        $data['title'] = lang('access_lang.title_access_password_reset').' : '.$access['person']['first_name'].' '.$access['person']['last_name'];
+        return $this->display_view('\Access\update_password', $data);
+    }
 } ?>

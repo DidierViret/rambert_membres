@@ -37,13 +37,6 @@ class Access extends BaseController
         $this->accessModel = new AccessModel();
     }
 
-    public function test() {
-        //$this->accessModel->update(1, ['password' => 'manager1234', 'password_confirm' => 'manager1234']);
-        //$this->accessModel->update(2, ['password' => 'admin1234', 'password_confirm' => 'admin1234']);
-
-        dd($this->accessModel->checkPassword('administrator@test.com', 'admin1234'));
-    }
-
     /**
      * Display login form.
      * Check login and password when submitted.

@@ -101,7 +101,7 @@ $update = (!empty($access) && !empty($access['id']) && $access['id'] > 0);
         <div class="row">
             <!-- RESET PASSWORD FOR EXISTING ACCESS -->
             <div class="col-12">
-                <a href="<?= base_url('user/admin/password_change_user/'.$access['id']); ?>" >
+                <a href="<?= base_url('access/update_password/'.$access['id']); ?>" >
                     <?= lang("access_lang.title_access_password_reset"); ?>
                 </a>
             </div>
