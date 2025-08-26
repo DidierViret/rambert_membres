@@ -406,9 +406,10 @@ class MembersAdmin extends BaseController
         // Get the contribution informations
         $contribution = $this->contributionModel->find($id);
         $person = $this->personModel->find($contribution['fk_person']);
+        $contributionTeamName = (!empty($contribution['role']['team'])) ? $contribution['role']['team']['name'] : '';
 
         // Confirmation message
-        $data['message'] = lang('members_lang.msg_contribution_confirm_delete')."<br><strong>".$person['first_name'].' '.$person['last_name'].' : '.$contribution['role']['team']['name'].' - '.$contribution['role']['name']."</strong>";
+        $data['message'] = lang('members_lang.msg_contribution_confirm_delete')."<br><strong>".$person['first_name'].' '.$person['last_name'].' : '.$contributionTeamName.' - '.$contribution['role']['name']."</strong>";
         $data['url_yes'] = base_url('/contribution/delete/'.$id);
         $data['url_no'] = base_url('/contributions/'.$person['id']);
 
