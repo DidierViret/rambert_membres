@@ -18,6 +18,7 @@ return[
 'subtitle_newsletter_subscriptions' => 'Inscriptions aux newsletter',
 'subtitle_contributions_list'       => 'Liste des contributions',
 'subtitle_contribution_update'      => 'Modification d\'une contribution',
+'subtitle_contribution_create'      => 'Ajout d\'une contribution',
 
 // Forms fields
 'field_title'                       => 'Titre',
@@ -68,6 +69,7 @@ return[
 'msg_error_valid_email'             => 'Veuillez entrer une adresse e-mail valide',
 'msg_error_email_length'            => 'L\'adresse e-mail ne doit pas dépasser 150 caractères',
 'msg_error_no_data_to_display'      => 'Il n\'y a pas de données à afficher',
+'msg_contribution_confirm_delete'   => 'Voulez-vous vraiment supprimer cette contribution ?',
 
 // Error code messages
 'code_error_401'                    => '401 - Non autorisé',

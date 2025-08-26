@@ -17,8 +17,8 @@
                 <div class="col-sm-6">
                     <label for="fk_team"><?= lang('members_lang.field_team') ?></label>
                     <select name="fk_team" id="fk_team" class="form-control" required >
-                        <?php foreach ($teams as $team): ?>
-                            <option value="<?= $team['id'] ?>" <?= ($contribution['role']['team']['id'] == $team['id']) ? 'selected' : '' ?>><?= $team['name'] ?></option>
+                        <?php foreach ($teams as $teamId => $team): ?>
+                            <option value="<?= $teamId ?>" <?= ($contribution['role']['team']['id'] == $teamId) ? 'selected' : '' ?>><?= $team ?></option>
                         <?php endforeach; ?>
                     </select>
                     
@@ -65,8 +65,14 @@
         // Clear existing options
         roleSelect.innerHTML = '';
 
-        // Filter roles for the selected team
-        const teamRoles = roles.filter(role => role.fk_team == teamId);
+        teamRoles = [];
+        if (teamId == 0) {
+            // If no team is selected, show roles which are not linked to any team
+            teamRoles = roles.filter(role => role.fk_team == null);
+        } else {
+            // Filter roles for the selected team
+            teamRoles = roles.filter(role => role.fk_team == teamId);
+        }
 
         // Populate dropdown with filtered roles
         teamRoles.forEach(role => {
