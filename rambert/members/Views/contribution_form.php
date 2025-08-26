@@ -18,10 +18,13 @@
                     <label for="fk_team"><?= lang('members_lang.field_team') ?></label>
                     <select name="fk_team" id="fk_team" class="form-control" required >
                         <?php foreach ($teams as $teamId => $team): ?>
-                            <option value="<?= $teamId ?>" <?= ($contribution['role']['team']['id'] == $teamId) ? 'selected' : '' ?>><?= $team ?></option>
+                            <?php if(!empty($contribution['role']['team'])): ?>
+                                <option value="<?= $teamId ?>" <?= ($contribution['role']['team']['id'] == $teamId) ? 'selected' : '' ?>><?= $team ?></option>
+                            <?php else: ?>
+                                <option value="<?= $teamId ?>" <?= ($teamId == 0) ? 'selected' : '' ?>><?= $team ?></option>
+                            <?php endif; ?>
                         <?php endforeach; ?>
                     </select>
-                    
                 </div>
                 <div class="col-sm-6">
                     <label for="fk_role"><?= lang('members_lang.field_role') ?></label>
