@@ -395,7 +395,7 @@ class MembersAdmin extends BaseController
     }
 
     /**
-     * Display a confirmation message and delete a contribution
+     * Display a confirmation message for the deletion of a contribution
      */
     public function contributionConfirmDelete($id) {
         // Check if the user has the right to access this page
