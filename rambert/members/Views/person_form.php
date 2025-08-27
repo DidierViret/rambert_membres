@@ -9,7 +9,7 @@
         <div class="row mb-2">
             <div class="col-12">
                 <a href="<?= base_url('home/'.$home['id']) ?>" class="btn btn-outline-secondary"><?= lang('members_lang.btn_cancel') ?></a>
-                <input type="submit" class="btn btn-outline-success" value="<?= lang('members_lang.btn_save') ?>" />
+                <input type="submit" class="btn btn-outline-primary" value="<?= lang('members_lang.btn_save') ?>" />
             </div>
         </div>
 

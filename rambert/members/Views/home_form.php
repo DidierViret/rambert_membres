@@ -6,7 +6,7 @@
             <?= form_open('home/save/'.$home['id']) ?>
                 <!-- Display action buttons -->
                 <a href="<?= base_url('home/'.$home['id']) ?>" class="btn btn-outline-secondary"><?= lang('members_lang.btn_cancel') ?></a>
-                <input type="submit" class="btn btn-outline-success" value="<?= lang('members_lang.btn_save') ?>" />
+                <input type="submit" class="btn btn-outline-primary" value="<?= lang('members_lang.btn_save') ?>" />
 
                 <!-- Display the home address fields -->
                 <div><strong><?= lang('members_lang.col_home_address') ?></strong></div>

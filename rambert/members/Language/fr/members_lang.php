@@ -64,6 +64,7 @@ return[
 'btn_cancel'                        => 'Annuler',
 'btn_add'                           => 'Ajouter',
 'btn_delete'                        => 'Supprimer',
+'btn_manage_contributions'          => 'Gérer les contributions',
 
 // Error messages
 'msg_error_valid_email'             => 'Veuillez entrer une adresse e-mail valide',

@@ -2,10 +2,11 @@
     <div id="home_details" class="row">
         <?php if (!empty($home)): ?>
             <div class="col-lg-5 col-md-7 mb-4">
-                <!-- Display home update button for managers and admins -->
+                <!-- Display home action buttons for managers and admins -->
                 <?php if ($_SESSION['access_level'] >= config('\Access\Config\AccessConfig')->access_lvl_manager): ?>
                     <div class="mb-2">
-                        <a href="<?= base_url('home/update/'.$home['id']) ?>" class="btn btn-outline-primary"><?= lang('members_lang.btn_update') ?></a>
+                        <a href="<?= base_url('home/update/'.$home['id']) ?>" class="btn btn-outline-primary"><i class="bi bi-pencil" style="font-size: 20px;"></i></a>
+                        <a href="<?= base_url('home/delete/'.$home['id']) ?>" class="btn btn-outline-danger"><i class="bi bi-trash" style="font-size: 20px;"></i></a>
                     </div>
                 <?php endif; ?>
 
