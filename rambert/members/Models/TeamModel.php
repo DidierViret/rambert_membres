@@ -20,7 +20,7 @@ class TeamModel extends Model {
     protected $deletedField  = 'date_delete';
 
     /**
-     * Get an array of teams to display them in a dropdown.
+     * Get an array of teams to display them in a dropdown. Add an empty value at the beginning of the list.
      * 
      * @param bool $withDeleted : A boolean to include or not the soft deleted teams
      * @param string $orderBy : name of the field to use to sort the objects
@@ -33,8 +33,10 @@ class TeamModel extends Model {
         $builder->select('id, name');
         $builder->orderBy("$orderBy", "$direction");
         $query = $builder->get();
-        
-        $array = [];
+
+        // Add an empty value at the beginning of the list
+        $array[0] = '---';
+
         foreach ($query->getResult('array') as $row) {
             $array[$row['id']] = $row['name'];
         }

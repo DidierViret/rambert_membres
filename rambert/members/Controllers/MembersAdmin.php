@@ -293,9 +293,43 @@ class MembersAdmin extends BaseController
         $data['btn_create_label']   = lang('members_lang.btn_add');
         $data['url_update'] = "contribution/update/";
         $data['url_delete'] = "contribution/delete/";
-        $data['url_create'] = "contribution/create/";
+        $data['url_create'] = "contribution/create/".$person['id'];
 
         return $this->display_view('Common\items_list', $data);
+    }
+
+    /**
+     * Display a form to create a contribution
+     */
+    public function contributionCreate($personId) {
+        // Check if the user has the right to access this page
+        if($this->session->get('access_level') < $this->accessLevel) {
+            throw AccessDeniedException::forPageAccessDenied();
+        }
+
+        // Get the person's informations
+        $contribution['person'] = $this->personModel->find($personId);
+        if(empty($contribution['person'])) {
+            // Person not found, redirect to members list
+            return redirect()->to(base_url('/members'));
+        }
+        $data['contribution'] = $contribution;
+
+        // Form title
+        $data['title'] = $contribution['person']['last_name']." ".$contribution['person']['first_name']." - ".lang('members_lang.subtitle_contribution_create');
+
+        // Default values for a new contribution
+        $data['contribution']['id'] = 0;
+        $data['contribution']['role'] = ['id' => 0, 'team' => ['id' => 0]];
+        $data['contribution']['date_begin'] = date('Y');
+        $data['contribution']['date_end'] = '';
+
+        // Get the list of teams
+        $data['teams'] = $this->teamModel->getDropdown();
+        // Get the list of roles
+        $data['roles'] = $this->roleModel->findAll();
+
+        return $this->display_view('Members\contribution_form', $data);
     }
 
     /**
@@ -321,7 +355,7 @@ class MembersAdmin extends BaseController
         }
 
         // Get the list of teams
-        $data['teams'] = $this->teamModel->findAll();
+        $data['teams'] = $this->teamModel->getDropdown();
         // Get the list of roles
         $data['roles'] = $this->roleModel->findAll();
 
@@ -358,5 +392,47 @@ class MembersAdmin extends BaseController
 
         // Redirect to the contributions list page
         return redirect()->to(base_url('/contributions/'.$contribution['fk_person']));
+    }
+
+    /**
+     * Display a confirmation message for the deletion of a contribution
+     */
+    public function contributionConfirmDelete($id) {
+        // Check if the user has the right to access this page
+        if($this->session->get('access_level') < $this->accessLevel) {
+            throw AccessDeniedException::forPageAccessDenied();
+        }
+
+        // Get the contribution informations
+        $contribution = $this->contributionModel->find($id);
+        $person = $this->personModel->find($contribution['fk_person']);
+        $contributionTeamName = (!empty($contribution['role']['team'])) ? $contribution['role']['team']['name'] : '';
+
+        // Confirmation message
+        $data['message'] = lang('members_lang.msg_contribution_confirm_delete')."<br><strong>".$person['first_name'].' '.$person['last_name'].' : '.$contributionTeamName.' - '.$contribution['role']['name']."</strong>";
+        $data['url_yes'] = base_url('/contribution/delete/'.$id);
+        $data['url_no'] = base_url('/contributions/'.$person['id']);
+
+        return $this->display_view('Common\confirm_delete', $data);
+    }
+
+    /**
+     * Delete a contribution
+     */
+    public function contributionDelete($id) {
+        // Check if the user has the right to access this page
+        if($this->session->get('access_level') < $this->accessLevel) {
+            throw AccessDeniedException::forPageAccessDenied();
+        }
+
+        // Get the contribution informations
+        $contribution = $this->contributionModel->find($id);
+        $personId = $contribution['fk_person'];
+
+        // Delete the contribution
+        $this->contributionModel->delete($id);
+
+        // Redirect to the contributions list page
+        return redirect()->to(base_url('/contributions/'.$personId));
     }
 }
