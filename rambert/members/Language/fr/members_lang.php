@@ -65,6 +65,11 @@ return[
 'btn_add'                           => 'Ajouter',
 'btn_delete'                        => 'Supprimer',
 'btn_manage_contributions'          => 'Gérer les contributions',
+'btn_add_home'                      => 'Nouveau foyer',
+
+// Warning messages
+'msg_warning_new_home'              => 'Vous êtes en train de créer un nouveau foyer. Si vous souhaitez ajouter une personne à un foyer existant,
+                                        veuillez annuler cette opération et afficher le foyer concerné pour y ajouter une personne.',
 
 // Error messages
 'msg_error_valid_email'             => 'Veuillez entrer une adresse e-mail valide',

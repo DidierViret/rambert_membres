@@ -15,6 +15,7 @@ $routes->post('person/save/(:num)', '\Members\Controllers\MembersAdmin::personSa
 // Home routes
 $routes->get('home/(:num)', '\Members\Controllers\Members::homeDetails/$1');
 $routes->get('home/update/(:num)', '\Members\Controllers\MembersAdmin::homeUpdate/$1');
+$routes->get('home/create', '\Members\Controllers\MembersAdmin::homeCreate');
 $routes->post('home/save/(:num)', '\Members\Controllers\MembersAdmin::homeSave/$1');
 
 // Contributions routes

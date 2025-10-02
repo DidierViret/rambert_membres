@@ -51,10 +51,32 @@ class MembersAdmin extends BaseController
     }
 
     /**
+     * Display a form to create a home
+     */
+    public function homeCreate() {
+        // Check if the user has the right to access this page
+        if($this->session->get('access_level') < $this->accessLevel) {
+            throw AccessDeniedException::forPageAccessDenied();
+        }
+
+        $data['home'] = [];
+        $data['persons'] = [];
+
+        return $this->display_view('Members\home_form', $data);
+    }
+
+        
+
+    /**
      * Display a form to update a home
      */
     public function homeUpdate($id)
     {
+        // Check if the user has the right to access this page
+        if($this->session->get('access_level') < $this->accessLevel) {
+            throw AccessDeniedException::forPageAccessDenied();
+        }
+
         $data['home'] = $this->homeModel->find($id);
         $data['persons'] = $this->personModel->where('fk_home', $id)->findAll();
 
