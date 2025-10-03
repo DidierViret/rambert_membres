@@ -9,7 +9,7 @@
 
 return[
 // Pages titles
-'title_'                            => '',
+'title_new_person'                  => 'Nouvelle personne',
 
 // Subtitles
 'subtitle_person_informations'      => 'Informations personnelles',
@@ -66,6 +66,7 @@ return[
 'btn_delete'                        => 'Supprimer',
 'btn_manage_contributions'          => 'Gérer les contributions',
 'btn_add_home'                      => 'Nouveau foyer',
+'btn_add_person'                    => 'Nouvelle personne',
 
 // Warning messages
 'msg_warning_new_home'              => 'Vous êtes en train de créer un nouveau foyer. Si vous souhaitez ajouter une personne à un foyer existant,

@@ -118,6 +118,28 @@ class MembersAdmin extends BaseController
     }
 
     /**
+     * Display a form to create a person
+     */
+    public function personCreate($homeId) {
+        $data['home'] = $this->homeModel->find($homeId);
+        $data['persons'] = $this->personModel->where('fk_home', $homeId)->findAll();
+
+        // Add an empty person with ID 0
+        $data['persons'][] = ['id' => 0, 'fk_home' => $homeId];
+        $data['person_to_update'] = 0;
+
+        // Get access levels and categories for the dropdowns
+        $data['access_levels'] = $this->accessLevelModel->find();
+        $data['categories'] = $this->categoryModel->findAll();
+
+        foreach($data['persons'] as &$person) {
+            $this->get_person_informations($person);
+        }
+
+        return $this->display_view('Members\home_person_form', $data);
+    }
+
+    /**
      * Display a form to update a person
      */
     public function personUpdate($id) {
@@ -125,6 +147,8 @@ class MembersAdmin extends BaseController
         $data['home'] = $this->homeModel->find($homeId);
         $data['persons'] = $this->personModel->where('fk_home', $homeId)->findAll();
         $data['person_to_update'] = $id;
+
+        // Get access levels and categories for the dropdowns
         $data['access_levels'] = $this->accessLevelModel->find();
         $data['categories'] = $this->categoryModel->findAll();
 
@@ -144,60 +168,51 @@ class MembersAdmin extends BaseController
             throw AccessDeniedException::forPageAccessDenied();
         }
 
-        // Get the person informations
-        if($id > 0) {
-            // Person allready exists, update her informations
-            $person = $this->request->getPost();
-            $personOld = $this->personModel->find($id);
-
-        } else {
-            $person[] = [];
-        }
-
-
-        
+        // Get the person's informations
+        $person = $this->request->getPost();
         if($id == 0) {
-            // Create the person
-            //$id = $this->personModel->insert($person);
-        } else {
-            // Update the person's access levels
-            if($this->session->get('access_level') >= config('\Access\Config\AccessConfig')->access_lvl_admin) {
-                $this->updatePersonAccesslevel($id, $person['access_level']);
-            }
-            unset($person['access_level']);
-
-            // Update the person's newsletter subscriptions
-            if(empty($person['newsletters'])) {
-                $this->newsletterSubscriptionModel->where('fk_person', $id)->delete();
-            } else {
-                // Get the current subscriptions
-                $subscriptions = $this->newsletterSubscriptionModel->where('fk_person', $id)->findAll();
-                foreach($subscriptions as $subscription) {
-                    // Check if the subscription is still valid
-                    if(!in_array($subscription['fk_newsletter'], $person['newsletters'])) {
-                        // Delete the subscription
-                        $this->newsletterSubscriptionModel->delete($subscription['id']);
-                    }
-                }
-
-                // Add the new subscriptions
-                foreach($person['newsletters'] as $newsletter) {
-                    // Check if the subscription already exists
-                    $subscription = $this->newsletterSubscriptionModel->where(['fk_person' => $id, 'fk_newsletter' => $newsletter])->findAll();
-                    if(empty($subscription)) {
-                        // Add the subscription
-                        $data = [
-                            'fk_person' => $id,
-                            'fk_newsletter' => $newsletter,
-                        ];
-                        $this->newsletterSubscriptionModel->insert($data);
-                    }
-                }
-            }
-
-            // Update the person
-            $this->personModel->update($id, $person);
+            // Create a new person
+            unset($person['id']);
+            $id = $this->personModel->insert($person);
         }
+
+        // Update the person's access levels
+        if($this->session->get('access_level') >= config('\Access\Config\AccessConfig')->access_lvl_admin) {
+            $this->updatePersonAccesslevel($id, $person['access_level']);
+        }
+        unset($person['access_level']);
+
+        // Update the person's newsletter subscriptions
+        if(empty($person['newsletters'])) {
+            $this->newsletterSubscriptionModel->where('fk_person', $id)->delete();
+        } else {
+            // Get the current subscriptions
+            $subscriptions = $this->newsletterSubscriptionModel->where('fk_person', $id)->findAll();
+            foreach($subscriptions as $subscription) {
+                // Check if the subscription is still valid
+                if(!in_array($subscription['fk_newsletter'], $person['newsletters'])) {
+                    // Delete the subscription
+                    $this->newsletterSubscriptionModel->delete($subscription['id']);
+                }
+            }
+
+            // Add the new subscriptions
+            foreach($person['newsletters'] as $newsletter) {
+                // Check if the subscription already exists
+                $subscription = $this->newsletterSubscriptionModel->where(['fk_person' => $id, 'fk_newsletter' => $newsletter])->findAll();
+                if(empty($subscription)) {
+                    // Add the subscription
+                    $data = [
+                        'fk_person' => $id,
+                        'fk_newsletter' => $newsletter,
+                    ];
+                    $this->newsletterSubscriptionModel->insert($data);
+                }
+            }
+        }
+
+        // Update the person
+        $this->personModel->update($id, $person);
 
         // Redirect to the person's home details page
         return redirect()->to('/home/'.$person['fk_home']);

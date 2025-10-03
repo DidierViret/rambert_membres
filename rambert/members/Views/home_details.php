@@ -35,6 +35,13 @@
             </div>
 
             <div class="col-lg-7 col-md-5">
+                <!-- Display add person button for managers and admins -->
+                <?php if ($_SESSION['access_level'] >= config('\Access\Config\AccessConfig')->access_lvl_manager): ?>
+                    <div class="mb-2">
+                        <a href="<?= base_url('person/create/'.$home['id']) ?>" class="btn btn-outline-primary"><i class="bi bi-plus-lg"></i> <?= lang('members_lang.btn_add_person') ?></a>
+                    </div>
+                <?php endif; ?>
+
                 <!-- Display the list of persons living in the home -->
                 <?php foreach ($persons as $person): ?>
                     <?= view('Members\person_update_button', ['person' => $person]); ?>

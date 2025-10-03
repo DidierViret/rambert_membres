@@ -10,6 +10,7 @@
 // Individual members routes
 $routes->get('members', '\Members\Controllers\Members::membersList');
 $routes->get('person/update/(:num)', '\Members\Controllers\MembersAdmin::personUpdate/$1');
+$routes->get('person/create/(:num)', '\Members\Controllers\MembersAdmin::personCreate/$1');
 $routes->post('person/save/(:num)', '\Members\Controllers\MembersAdmin::personSave/$1');
 
 // Home routes
