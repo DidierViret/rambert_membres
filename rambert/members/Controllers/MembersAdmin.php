@@ -219,6 +219,46 @@ class MembersAdmin extends BaseController
     }
 
     /**
+     * Display a confirmation message before deleting a person
+     */
+    public function personConfirmDelete($id = 0) {
+        // Check if the user has the right to access this page
+        if($this->session->get('access_level') < $this->accessLevel) {
+            throw AccessDeniedException::forPageAccessDenied();
+        }
+
+        // Get the person's informations
+        $person = $this->personModel->find($id);
+        $homeId = $person['fk_home'];
+
+        // Display the confirmation form
+        $data['message'] = lang('members_lang.msg_person_confirm_delete')."<br><strong>".$person['first_name'].' '.$person['last_name']."</strong>";
+        $data['url_yes'] = base_url('/person/delete/'.$id);
+        $data['url_no'] = base_url('/home/'.$homeId);
+        return $this->display_view('Common\confirm_delete', $data);
+    }
+
+    /**
+     * Delete a person
+     */
+    public function personDelete($id = 0) {
+        // Check if the user has the right to access this page
+        if($this->session->get('access_level') < $this->accessLevel) {
+            throw AccessDeniedException::forPageAccessDenied();
+        }
+
+        // Get the person's informations
+        $person = $this->personModel->find($id);
+        $homeId = $person['fk_home'];
+
+        // Delete the person
+        $this->personModel->delete($id);
+
+        // Redirect to the person's home details page
+        return redirect()->to('/home/'.$homeId);
+    }
+
+    /**
      * Get the informations linked to a person
      */
     private function get_person_informations(&$person) {

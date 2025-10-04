@@ -12,12 +12,15 @@ $routes->get('members', '\Members\Controllers\Members::membersList');
 $routes->get('person/update/(:num)', '\Members\Controllers\MembersAdmin::personUpdate/$1');
 $routes->get('person/create/(:num)', '\Members\Controllers\MembersAdmin::personCreate/$1');
 $routes->post('person/save/(:num)', '\Members\Controllers\MembersAdmin::personSave/$1');
+$routes->get('person/delete/(:num)', '\Members\Controllers\MembersAdmin::personConfirmDelete/$1');
+$routes->post('person/delete/(:num)', '\Members\Controllers\MembersAdmin::personDelete/$1');
 
 // Home routes
 $routes->get('home/(:num)', '\Members\Controllers\Members::homeDetails/$1');
 $routes->get('home/update/(:num)', '\Members\Controllers\MembersAdmin::homeUpdate/$1');
 $routes->get('home/create', '\Members\Controllers\MembersAdmin::homeCreate');
 $routes->post('home/save/(:num)', '\Members\Controllers\MembersAdmin::homeSave/$1');
+$routes->get('home/delete/(:num)', '\Members\Controllers\MembersAdmin::homeDelete/$1');
 
 // Contributions routes
 $routes->get('contributions/(:num)', '\Members\Controllers\MembersAdmin::contributionsList/$1');
