@@ -128,11 +128,11 @@
                     </div>
                     <label for="membership_end" class="col-sm-4 col-form-label-sm"><?= lang('members_lang.field_membership_end') ?></label>
                     <div class="col-sm-8">
-                        <input type="text" id="membership_end" name="membership_end" class="form-control form-control-sm" value="<?= $person['membership_end'] ?? '' ?>" />
+                        <input type="text" id="membership_end" name="membership_end" class="form-control form-control-sm" value="<?= $person['membership_end'] ?? '' ?>" disabled />
                     </div>
                     <label for="membership_end_reason" class="col-sm-4 col-form-label-sm"><?= lang('members_lang.field_membership_end_reason') ?></label>
                     <div class="col-sm-8">
-                        <input type="text" id="membership_end_reason" name="membership_end_reason" class="form-control form-control-sm" value="<?= $person['membership_end_reason'] ?? '' ?>" />
+                        <input type="text" id="membership_end_reason" name="membership_end_reason" class="form-control form-control-sm" value="<?= $person['membership_end_reason'] ?? '' ?>" disabled />
                     </div>
                 </div>
 
