@@ -99,7 +99,6 @@ class MembersAdmin extends BaseController
         // Get the home informations
         if($id > 0) {
             $home['id'] = $id;
-            $home_old = $this->homeModel->find($id);
         } else {
             $home[] = [];
         }
@@ -108,6 +107,8 @@ class MembersAdmin extends BaseController
         if($id == 0) {
             // Create the home
             $id = $this->homeModel->insert($home);
+            // Redirect to the person creation form
+            return redirect()->to('/person/create/'.$id);
         } else {
             // Update the home
             $this->homeModel->update($id, $home);
