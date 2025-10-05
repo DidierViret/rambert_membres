@@ -10,6 +10,7 @@
 return[
 // Pages titles
 'title_new_person'                  => 'Nouvelle personne',
+'title_person_membership_end'       => 'Désinscription d\'un membre',
 
 // Subtitles
 'subtitle_person_informations'      => 'Informations personnelles',
@@ -33,7 +34,7 @@ return[
 'field_profession'                  => 'Profession',
 'field_godfathers'                  => 'Parrains / Marraines',
 'field_membership_start'            => 'Entrée au club',
-'field_membership_end'              => 'Sortie du club',
+'field_membership_end'              => 'Année de sortie du club',
 'field_membership_end_reason'       => 'Raison de la sortie',
 'field_home_address'                => 'Adresse du foyer',
 'field_address_title'               => 'Titre(s)',
@@ -70,6 +71,7 @@ return[
 
 // Warning messages
 'msg_contribution_confirm_delete'   => 'Voulez-vous vraiment supprimer cette contribution ?',
+'msg_person_membership_end'         => 'Vous allez enregistrer la désinscription de ce membre.<br>Merci d\'indiquer l\'année et le motif de sa sortie du club.',
 'msg_person_confirm_delete'         => 'Voulez-vous vraiment supprimer cette personne ? ',
 'msg_warning_new_home'              => 'Vous êtes en train de créer un nouveau foyer. Si vous souhaitez ajouter une personne à un foyer existant,
                                         veuillez annuler cette opération et afficher le foyer concerné pour y ajouter une personne.',

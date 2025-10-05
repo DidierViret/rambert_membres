@@ -33,6 +33,7 @@ return[
 'btn_search'                     => 'Rechercher',
 'btn_restore'                    => 'Restaurer',
 'btn_copy'                       => 'Dupliquer',
+'btn_validate'                   => 'Valider',
 
 // Other common texts
 'yes'                            => 'Oui',

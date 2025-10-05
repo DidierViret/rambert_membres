@@ -232,10 +232,12 @@ class MembersAdmin extends BaseController
         $homeId = $person['fk_home'];
 
         // Display the confirmation form
-        $data['message'] = lang('members_lang.msg_person_confirm_delete')."<br><strong>".$person['first_name'].' '.$person['last_name']."</strong>";
+        $data['title'] = lang('members_lang.title_person_membership_end')." : ".$person['last_name'].' '.$person['first_name'];
+        $data['message'] = lang('members_lang.msg_person_membership_end');
         $data['url_yes'] = base_url('/person/delete/'.$id);
         $data['url_no'] = base_url('/home/'.$homeId);
-        return $this->display_view('Common\confirm_delete', $data);
+
+        return $this->display_view('Members\person_confirm_delete', $data);
     }
 
     /**
@@ -251,7 +253,14 @@ class MembersAdmin extends BaseController
         $person = $this->personModel->find($id);
         $homeId = $person['fk_home'];
 
-        // Delete the person
+        // Set the membership end date and reason
+        $data = [
+            'membership_end' => $membership_end = $this->request->getPost('membership_end'),
+            'membership_end_reason' => $this->request->getPost('membership_end_reason'),
+        ];
+        $this->personModel->update($id, $data);
+
+        // Soft delete the person
         $this->personModel->delete($id);
 
         // Redirect to the person's home details page
