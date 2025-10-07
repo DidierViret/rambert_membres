@@ -43,6 +43,11 @@ class PersonModel extends Model {
 
     // Callbacks
     protected $afterFind = ['appendHome', 'appendCategory'];
+    protected $beforeUpdate = ['keepOldValues'];
+    protected $afterUpdate = ['logUpdate'];
+
+    // Variables used in callbacks
+    private $oldValues = [];
 
     public function initialize()
     {
@@ -140,6 +145,58 @@ class PersonModel extends Model {
 
         $query = $builder->get();
         return $query->getResult('array');
+    }
+
+    /**
+     * Callback method to store old values before update
+     */
+    protected function keepOldValues(array $data) {
+
+        // Store old values
+        foreach ($data['id'] as $id) {
+            $this->oldValues[$id] = $this->find($id);
+        }
+        
+        return $data;
+    }
+
+    /**
+     * Callback method to log updates made to a person
+     */
+    protected function logUpdate(array $data) {
+        // Do not log the changes if the importation flag is set
+        if (isset($_SESSION['importation']) && $_SESSION['importation'] == true) {
+            return $data;
+        }
+
+        $personModel = new PersonModel();
+        $changeTypeModel = new ChangeTypeModel();
+        $changeModel = new ChangeModel();
+
+        
+        foreach ($data['id'] as $id) {
+            $oldValue = $this->oldValues[$id];
+            $newValue = $this->find($id);
+
+            // Log the membership end if the membership_end field has been modified
+            if ($oldValue['membership_end'] != $newValue['membership_end']) {
+                $changeTypeId = $changeTypeModel->getChangeTypeId('membership_end');
+                
+                $changeData = [
+                    'fk_change_author' => session()->get('user_id'),
+                    'fk_person_concerned' => $id,
+                    'fk_change_type' => $changeTypeId,
+                    'field' => lang('members_lang.field_membership_end'),
+                    
+                    // Concatenate the membership end date and reason in a single string
+                    'value_old' => (!empty($oldValue['membership_end']) ? $oldValue['membership_end'].' - '.$oldValue['membership_end_reason'] : ''),
+                    'value_new' => (!empty($newValue['membership_end']) ? $newValue['membership_end'].' - '.$newValue['membership_end_reason'] : ''),
+                ];
+                $changeModel->insert($changeData);
+            }
+        }
+
+        return $data;
     }
 }
 ?>
