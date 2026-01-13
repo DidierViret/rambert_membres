@@ -36,10 +36,6 @@ class CreateTeamTable extends Migration
         $this->forge->addKey('id', true);
 
         $this->forge->createTable('team');
-
-        // Insert entries in newly created table
-        $seeder = \Config\Database::seeder();
-        $seeder->call('\Members\Database\Seeds\TeamSeeder');
     }
 
     public function down()
