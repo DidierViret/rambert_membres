@@ -264,8 +264,18 @@ class MembersAdmin extends BaseController
         // Soft delete the person
         $this->personModel->delete($id);
 
-        // Redirect to the person's home details page
-        return redirect()->to('/home/'.$homeId);
+        // If the home has no more persons, soft delete the home too
+        $persons = $this->personModel->where('fk_home', $homeId)->findAll();
+        if(empty($persons)) {
+            $this->homeModel->delete($homeId);
+
+            // Redirect to the homepage
+            return redirect()->to(base_url());
+        } else {
+            // Redirect to the person's home details page
+            return redirect()->to('/home/'.$homeId);
+        }
+        
     }
 
     /**
