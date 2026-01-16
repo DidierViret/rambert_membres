@@ -43,6 +43,7 @@ class PersonModel extends Model {
 
     // Callbacks
     protected $afterFind = ['appendHome', 'appendCategory'];
+    protected $afterInsert = ['logCreate'];
     protected $beforeUpdate = ['keepOldValues'];
     protected $afterUpdate = ['logUpdate'];
 
@@ -161,6 +162,45 @@ class PersonModel extends Model {
     }
 
     /**
+     * Callback method to log the creation of a new person
+     */
+    protected function logCreate(array $data) {
+        // Do not log the changes if the importation flag is set
+        if (isset($_SESSION['importation']) && $_SESSION['importation'] == true) {
+            return $data;
+        }
+
+        $personModel = new PersonModel();
+        $homeModel = new HomeModel();
+        $changeTypeModel = new ChangeTypeModel();
+        $changeModel = new ChangeModel();
+
+        if ($data['id'] != 0) {
+            $newPerson = $data['data'];
+            $home = $homeModel->find($newPerson['fk_home']);
+
+            $changeTypeId = $changeTypeModel->getChangeTypeId('membership_start');
+            
+            $changeData = [
+                'fk_change_author' => session()->get('user_id'),
+                'fk_person_concerned' => $data['id'],
+                'fk_change_type' => $changeTypeId,
+                'field' => lang('members_lang.field_membership_start'),
+                'value_old' => '',
+                'value_new' => $newPerson['last_name'].' '.$newPerson['first_name']."\n".
+                               lang('members_lang.field_membership_start').': '.$newPerson['membership_start']."\n".
+                               ($home ? $home['address_line_1']."\n".
+                                        $home['address_line_2']."\n".
+                                        $home['postal_code'].' '.$home['city']
+                                      : ''),
+            ];
+            $changeModel->insert($changeData);
+        }
+
+        return $data;
+    }
+
+    /**
      * Callback method to log updates made to a person
      */
     protected function logUpdate(array $data) {
@@ -186,7 +226,6 @@ class PersonModel extends Model {
                     'fk_change_author' => session()->get('user_id'),
                     'fk_person_concerned' => $id,
                     'fk_change_type' => $changeTypeId,
-                    'field' => lang('members_lang.field_membership_end'),
                     
                     // Concatenate the membership end date and reason in a single string
                     'value_old' => (!empty($oldValue['membership_end']) ? $oldValue['membership_end'].' - '.$oldValue['membership_end_reason'] : ''),

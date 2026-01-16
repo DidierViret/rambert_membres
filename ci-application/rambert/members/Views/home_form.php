@@ -14,7 +14,13 @@
         <div class="col-lg-5 col-md-7 mb-4">
             <?= form_open('home/save/'.$homeId) ?>
                 <!-- Display action buttons -->
-                <a href="<?= base_url('home/'.$homeId) ?>" class="btn btn-outline-secondary"><?= lang('members_lang.btn_cancel') ?></a>
+                <?php if (empty($home)): ?>
+                    <!-- New home, cancel goes to home list -->
+                    <a href="<?= base_url() ?>" class="btn btn-outline-secondary"><?= lang('members_lang.btn_cancel') ?></a>
+                <?php else: ?>
+                    <!-- Existing home, cancel goes to home details -->
+                    <a href="<?= base_url('home/'.$homeId) ?>" class="btn btn-outline-secondary"><?= lang('members_lang.btn_cancel') ?></a>
+                <?php endif; ?>
                 <input type="submit" class="btn btn-outline-primary" value="<?= lang('members_lang.btn_save') ?>" />
 
                 <!-- Display the home address fields -->
