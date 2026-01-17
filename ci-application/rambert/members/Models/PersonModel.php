@@ -46,6 +46,8 @@ class PersonModel extends Model {
     protected $afterInsert = ['logCreate'];
     protected $beforeUpdate = ['keepOldValues'];
     protected $afterUpdate = ['logUpdate'];
+    protected $beforeDelete = ['keepOldValues'];
+    protected $afterDelete = ['logDelete'];
 
     // Variables used in callbacks
     private $oldValues = [];
@@ -218,8 +220,8 @@ class PersonModel extends Model {
             $oldValue = $this->oldValues[$id];
             $newValue = $this->find($id);
 
-            // Log the membership end if the membership_end field has been modified
-            if ($oldValue['membership_end'] != $newValue['membership_end']) {
+            // Log the membership end if the person was soft deleted
+            if (empty($oldValue['date_delete']) && !empty($newValue['date_delete'])) {
                 $changeTypeId = $changeTypeModel->getChangeTypeId('membership_end');
                 
                 $changeData = [
@@ -233,6 +235,58 @@ class PersonModel extends Model {
                 ];
                 $changeModel->insert($changeData);
             }
+
+            // (Re)log the membership start if the soft delete status has been removed
+            if (!empty($oldValue['date_delete']) && empty($newValue['date_delete'])) {
+                $changeTypeId = $changeTypeModel->getChangeTypeId('membership_start');
+                
+                $changeData = [
+                    'fk_change_author' => session()->get('user_id'),
+                    'fk_person_concerned' => $id,
+                    'fk_change_type' => $changeTypeId,
+                    'value_old' => (!empty($oldValue['membership_end']) ? $oldValue['membership_end'].' - '.$oldValue['membership_end_reason'] : ''),
+                    'value_new' => $newValue['last_name'].' '.$newValue['first_name']."\n".
+                                   lang('members_lang.field_membership_start').': '.$newValue['membership_start']."\n".
+                                   ($home ? $home['address_line_1']."\n".
+                                            $home['address_line_2']."\n".
+                                            $home['postal_code'].' '.$home['city']
+                                          : ''),
+                ];
+                $changeModel->insert($changeData);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Callback method to log the deletion of a person
+     */
+    protected function logDelete(array $data) {
+        // Do not log the changes if the importation flag is set
+        if (isset($_SESSION['importation']) && $_SESSION['importation'] == true) {
+            return $data;
+        }
+
+        $changeTypeModel = new ChangeTypeModel();
+        $changeModel = new ChangeModel();
+
+        foreach ($data['id'] as $id) {
+            $oldValue = $this->oldValues[$id];
+
+            // Log the membership end
+            $changeTypeId = $changeTypeModel->getChangeTypeId('membership_end');
+            
+            $changeData = [
+                'fk_change_author' => session()->get('user_id'),
+                'fk_person_concerned' => $id,
+                'fk_change_type' => $changeTypeId,
+                
+                // Concatenate the membership end date and reason in a single string
+                'value_old' => '',
+                'value_new' => (!empty($oldValue['membership_end']) ? $oldValue['membership_end'].' - '.$oldValue['membership_end_reason'] : ''),
+            ];
+            $changeModel->insert($changeData);
         }
 
         return $data;
