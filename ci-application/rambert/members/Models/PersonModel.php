@@ -214,7 +214,7 @@ class PersonModel extends Model {
         $personModel = new PersonModel();
         $changeTypeModel = new ChangeTypeModel();
         $changeModel = new ChangeModel();
-
+        $categoryModel = new CategoryModel();
         
         foreach ($data['id'] as $id) {
             $oldValue = $this->oldValues[$id];
@@ -252,6 +252,123 @@ class PersonModel extends Model {
                                             $home['postal_code'].' '.$home['city']
                                           : ''),
                 ];
+                $changeModel->insert($changeData);
+            }
+
+            // Log member name change
+            if ($oldValue['first_name'] != $newValue['first_name'] || $oldValue['last_name'] != $newValue['last_name']) {
+                $changeTypeId = $changeTypeModel->getChangeTypeId('name');
+
+                $changeData = [
+                    'fk_change_author' => session()->get('user_id'),
+                    'fk_person_concerned' => $id,
+                    'fk_change_type' => $changeTypeId,
+                    'value_old' => $oldValue['last_name'].' '.$oldValue['first_name'],
+                    'value_new' => $newValue['last_name'].' '.$newValue['first_name'],
+                ];
+
+                $changeModel->insert($changeData);
+            }
+
+            // Log member email or phone change
+            if ($oldValue['email'] != $newValue['email']|| $oldValue['phone_1'] != $newValue['phone_1'] ||
+                $oldValue['phone_2'] != $newValue['phone_2']) {
+                
+                $oldContact = '';
+                $newContact = '';
+
+                if ($oldValue['email'] != $newValue['email']) {
+                    $oldContact .= lang('members_lang.field_email').': '.$oldValue['email']."\n";
+                    $newContact .= lang('members_lang.field_email').': '.$newValue['email']."\n";
+                }
+                if ($oldValue['phone_1'] != $newValue['phone_1']) {
+                    $oldContact .= lang('members_lang.field_phone_1').': '.$oldValue['phone_1']."\n";
+                    $newContact .= lang('members_lang.field_phone_1').': '.$newValue['phone_1']."\n";
+                }
+                if ($oldValue['phone_2'] != $newValue['phone_2']) {
+                    $oldContact .= lang('members_lang.field_phone_2').': '.$oldValue['phone_2']."\n";
+                    $newContact .= lang('members_lang.field_phone_2').': '.$newValue['phone_2']."\n";
+                }
+
+                $changeTypeId = $changeTypeModel->getChangeTypeId('contact_informations');
+
+                $changeData = [
+                    'fk_change_author' => session()->get('user_id'),
+                    'fk_person_concerned' => $id,
+                    'fk_change_type' => $changeTypeId,
+                    'value_old' => $oldContact,
+                    'value_new' => $newContact,
+                ];
+
+                $changeModel->insert($changeData);
+            }
+
+            // Log member category change
+            if ($oldValue['fk_category'] != $newValue['fk_category']) {
+                $oldCategory = '';
+                $newCategory = '';
+
+                if (!empty($oldValue['fk_category'])) {
+                    $oldCatData = $categoryModel->withDeleted()->find($oldValue['fk_category']);
+                    if ($oldCatData) {
+                        $oldCategory = $oldCatData['name'].' ('.$oldCatData['description'].')';
+                    }
+                }
+
+                if (!empty($newValue['fk_category'])) {
+                    $newCatData = $categoryModel->withDeleted()->find($newValue['fk_category']);
+                    if ($newCatData) {
+                        $newCategory = $newCatData['name'].' ('.$newCatData['description'].')';
+                    }
+                }
+
+                $changeTypeId = $changeTypeModel->getChangeTypeId('category');
+
+                $changeData = [
+                    'fk_change_author' => session()->get('user_id'),
+                    'fk_person_concerned' => $id,
+                    'fk_change_type' => $changeTypeId,
+                    'value_old' => $oldCategory,
+                    'value_new' => $newCategory,
+                ];
+                $changeModel->insert($changeData);
+            }
+
+            // Log member other informations change
+            if ($oldValue['birth'] != $newValue['birth']|| $oldValue['profession'] != $newValue['profession'] ||
+                $oldValue['godfathers'] != $newValue['godfathers'] ||
+                $oldValue['comments'] != $newValue['comments']) {
+
+                $oldInformations = '';
+                $newInformations = '';
+
+                if ($oldValue['birth'] != $newValue['birth']) {
+                    $oldInformations .= lang('members_lang.field_birth').': '.$oldValue['birth']."\n";
+                    $newInformations .= lang('members_lang.field_birth').': '.$newValue['birth']."\n";
+                }
+                if ($oldValue['profession'] != $newValue['profession']) {
+                    $oldInformations .= lang('members_lang.field_profession').': '.$oldValue['profession']."\n";
+                    $newInformations .= lang('members_lang.field_profession').': '.$newValue['profession']."\n";
+                }
+                if ($oldValue['godfathers'] != $newValue['godfathers']) {
+                    $oldInformations .= lang('members_lang.field_godfathers').': '.$oldValue['godfathers']."\n";
+                    $newInformations .= lang('members_lang.field_godfathers').': '.$newValue['godfathers']."\n";
+                }
+                if ($oldValue['comments'] != $newValue['comments']) {
+                    $oldInformations .= lang('members_lang.field_comments').': '.$oldValue['comments']."\n";
+                    $newInformations .= lang('members_lang.field_comments').': '.$newValue['comments']."\n";
+                }
+
+                $changeTypeId = $changeTypeModel->getChangeTypeId('other_informations');
+
+                $changeData = [
+                    'fk_change_author' => session()->get('user_id'),
+                    'fk_person_concerned' => $id,
+                    'fk_change_type' => $changeTypeId,
+                    'value_old' => $oldInformations,
+                    'value_new' => $newInformations,
+                ];
+
                 $changeModel->insert($changeData);
             }
         }
