@@ -11,6 +11,8 @@ namespace Access\Models;
 
 use CodeIgniter\Model;
 use Members\Models\PersonModel;
+use Members\Models\ChangeTypeModel;
+use Members\Models\ChangeModel;
 use Access\Models\AccessLevelModel;
 
 class AccessModel extends Model {
@@ -25,10 +27,15 @@ class AccessModel extends Model {
     // Callbacks
     protected $afterFind = ['appendPerson', 'appendAccessLevel'];
     protected $beforeInsert = ['hashPassword', 'unsetPerson', 'unsetAccessLevel'];
+    protected $afterInsert = ['logCreate'];
     protected $beforeUpdate = ['hashPassword', 'unsetPerson', 'unsetAccessLevel'];
+    protected $beforeDelete = ['keepOldValues'];
+    protected $afterDelete = ['logDelete'];
+
+    // Variables used in callbacks
+    private $oldValues = [];
 
     // Declare variables for validation
-
     protected $validationRules;
     protected $validationMessages;
 
@@ -179,5 +186,86 @@ class AccessModel extends Model {
             return $data;
         }
     }
+
+    /**
+     * Callback method to store old values before update
+     */
+    protected function keepOldValues(array $data) {
+
+        // Store old values
+        foreach ($data['id'] as $id) {
+            $this->oldValues[$id] = $this->find($id);
+        }
+        
+        return $data;
+    }
+
+    /**
+     * Callback method to log the creation of a new access
+     */
+    protected function logCreate(array $data) {
+        // Do not log the changes if the importation flag is set
+        if (isset($_SESSION['importation']) && $_SESSION['importation'] == true) {
+            return $data;
+        }
+
+        $personModel = new PersonModel();
+        $accessLevelModel = new AccessLevelModel();
+        $changeTypeModel = new ChangeTypeModel();
+        $changeModel = new ChangeModel();
+
+        if ($data['id'] != 0) {
+            $newAccess = $data['data'];
+            $person = $personModel->find($newAccess['fk_person']);
+            $accessLevel = $accessLevelModel->find($newAccess['fk_access_level']);
+
+            $changeTypeId = $changeTypeModel->getChangeTypeId('access');
+            
+            $changeData = [
+                'fk_change_author' => session()->get('user_id'),
+                'fk_person_concerned' => $person['id'],
+                'fk_change_type' => $changeTypeId,
+                'value_old' => lang('access_lang.no_access'),
+                'value_new' => $accessLevel['name'],
+            ];
+            $changeModel->insert($changeData);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Callback method to log the deletion of an access
+     */
+    protected function logDelete(array $data) {
+        // Do not log the changes if the importation flag is set
+        if (isset($_SESSION['importation']) && $_SESSION['importation'] == true) {
+            return $data;
+        }
+
+        $personModel = new PersonModel();
+        $accessLevelModel = new AccessLevelModel();
+        $changeTypeModel = new ChangeTypeModel();
+        $changeModel = new ChangeModel();
+
+        foreach ($data['id'] as $id) {
+            $oldAccess = $this->oldValues[$id];
+            $person = $personModel->find($oldAccess['fk_person']);
+            $accessLevel = $accessLevelModel->find($oldAccess['fk_access_level']);
+
+            $changeTypeId = $changeTypeModel->getChangeTypeId('access');
+            
+            $changeData = [
+                'fk_change_author' => session()->get('user_id'),
+                'fk_person_concerned' => $person['id'],
+                'fk_change_type' => $changeTypeId,
+                'value_old' => $accessLevel['name'],
+                'value_new' => lang('access_lang.no_access'),
+            ];
+            $changeModel->insert($changeData);
+        }
+
+        return $data;
+    }  
 }
 ?>

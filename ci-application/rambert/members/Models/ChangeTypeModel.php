@@ -41,7 +41,7 @@ class ChangeTypeModel extends Model {
                 return 6;
             case 'other_informations':
                 return 7;
-            case 'password':
+            case 'access':
                 return 8;
             case 'contribution':
                 return 9;

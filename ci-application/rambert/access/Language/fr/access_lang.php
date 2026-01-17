@@ -58,6 +58,8 @@ return[
 
 // Other texts
 'access'                            => 'Droits d\'accès',
+'new_access'                        => 'Nouveau droit d\'accès',
+'no_access'                         => 'Aucun droit d\'accès',
 'access_delete'                     => 'Désactiver ou supprimer ces droits d\'accès',
 'access_reactivate'                 => 'Réactiver ces droits d\'accès',
 'access_disabled_info'              => 'Ces droits d\'accès sont désactivés. Vous pouvez les réactiver en cliquant sur le lien correspondant.',

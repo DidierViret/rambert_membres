@@ -187,7 +187,6 @@ class PersonModel extends Model {
                 'fk_change_author' => session()->get('user_id'),
                 'fk_person_concerned' => $data['id'],
                 'fk_change_type' => $changeTypeId,
-                'field' => lang('members_lang.field_membership_start'),
                 'value_old' => '',
                 'value_new' => $newPerson['last_name'].' '.$newPerson['first_name']."\n".
                                lang('members_lang.field_membership_start').': '.$newPerson['membership_start']."\n".
@@ -400,8 +399,11 @@ class PersonModel extends Model {
                 'fk_change_type' => $changeTypeId,
                 
                 // Concatenate the membership end date and reason in a single string
-                'value_old' => '',
-                'value_new' => (!empty($oldValue['membership_end']) ? $oldValue['membership_end'].' - '.$oldValue['membership_end_reason'] : ''),
+                'value_old' => $oldValue['last_name'].' '.$oldValue['first_name']."\n".
+                               lang('members_lang.field_membership_start').': '.$oldValue['membership_start'],
+                'value_new' => (!empty($oldValue['membership_end']) ? lang('members_lang.field_membership_end').": ".$oldValue['membership_end']. "\n".
+                                                                      $oldValue['membership_end_reason']
+                                                                    : ''),
             ];
             $changeModel->insert($changeData);
         }
