@@ -157,7 +157,7 @@ class PersonModel extends Model {
 
         // Store old values
         foreach ($data['id'] as $id) {
-            $this->oldValues[$id] = $this->find($id);
+            $this->oldValues[$id] = $this->withDeleted()->find($id);
         }
         
         return $data;
