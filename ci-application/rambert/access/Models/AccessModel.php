@@ -28,7 +28,8 @@ class AccessModel extends Model {
     protected $afterFind = ['appendPerson', 'appendAccessLevel'];
     protected $beforeInsert = ['hashPassword', 'unsetPerson', 'unsetAccessLevel'];
     protected $afterInsert = ['logCreate'];
-    protected $beforeUpdate = ['hashPassword', 'unsetPerson', 'unsetAccessLevel'];
+    protected $beforeUpdate = ['hashPassword', 'unsetPerson', 'unsetAccessLevel', 'keepOldValues'];
+    protected $afterUpdate = ['logUpdate'];
     protected $beforeDelete = ['keepOldValues'];
     protected $afterDelete = ['logDelete'];
 
@@ -229,6 +230,76 @@ class AccessModel extends Model {
                 'value_new' => $accessLevel['name'],
             ];
             $changeModel->insert($changeData);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Callback method to log the update of an access
+     */
+    protected function logUpdate(array $data) {
+        // Do not log the changes if the importation flag is set
+        if (isset($_SESSION['importation']) && $_SESSION['importation'] == true) {
+            return $data;
+        }
+
+        $personModel = new PersonModel();
+        $accessLevelModel = new AccessLevelModel();
+        $changeTypeModel = new ChangeTypeModel();
+        $changeModel = new ChangeModel();
+
+        foreach ($data['id'] as $id) {
+            $oldAccess = $this->oldValues[$id];
+            $newAccess = $this->find($id);
+            $person = $personModel->find($newAccess['fk_person']);
+            $accessLevel = $accessLevelModel->find($newAccess['fk_access_level']);
+
+            $changeTypeId = $changeTypeModel->getChangeTypeId('access');
+
+            // If the access level has changed, log it
+            if ($oldAccess['fk_access_level'] != $newAccess['fk_access_level']) {
+                // Get the old access level name
+                if (!empty($oldAccess['fk_access_level'])) {
+                    // There is an old access level, get its name
+                    $oldAccessLevelName = $accessLevelModel->find($oldAccess['fk_access_level'])['name'];
+                } else {
+                    // There is no old access level, get its name from the model
+                    $oldAccessLevelName = lang('access_lang.no_access');
+                }
+
+                // Get the new access level name
+                if (!empty($newAccess['fk_access_level'])) {
+                    // There is a new access level, get its name
+                    $newAccessLevelName = $accessLevelModel->find($newAccess['fk_access_level'])['name'];
+                } else {
+                    // There is no new access level, get its name from the model
+                    $newAccessLevelName = lang('access_lang.no_access');
+                }
+
+                // Log the change
+                $changeData = [
+                    'fk_change_author' => session()->get('user_id'),
+                    'fk_person_concerned' => $person['id'],
+                    'fk_change_type' => $changeTypeId,
+                    'value_old' => $oldAccessLevelName,
+                    'value_new' => $newAccessLevelName,
+                ];
+                $changeModel->insert($changeData);
+            }
+
+            // if the password has changed, log it
+            if ($oldAccess['password'] != $newAccess['password']) {
+
+                $changeData = [
+                    'fk_change_author' => session()->get('user_id'),
+                    'fk_person_concerned' => $person['id'],
+                    'fk_change_type' => $changeTypeId,
+                    'value_old' => lang('access_lang.old_password'),
+                    'value_new' => lang('access_lang.new_password'),
+                ];
+                $changeModel->insert($changeData); 
+            }
         }
 
         return $data;
