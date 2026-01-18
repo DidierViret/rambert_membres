@@ -82,6 +82,9 @@ class AccessModel extends Model {
         $builder->select('access.id, person.last_name, person.first_name, person.email, access_level.name AS access_level_name');
         $builder->join('access_level', 'access.fk_access_level = access_level.id');
         $builder->join('person', 'access.fk_person = person.id');
+        if (!$withDeleted) {
+            $builder->where('access.date_delete IS NULL');
+        }
         $builder->orderBy("$orderBy", "$direction");
         $query = $builder->get();
         
