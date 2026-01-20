@@ -532,4 +532,43 @@ class MembersAdmin extends BaseController
         // Redirect to the contributions list page
         return redirect()->to(base_url('/contributions/'.$personId));
     }
+
+    /**
+     * Display the list of changes
+     */
+    public function changesList() {
+        // Check if the user has the right to access this page
+        if($this->session->get('access_level') < $this->accessLevel) {
+            throw AccessDeniedException::forPageAccessDenied();
+        }
+
+        $data['list_title'] = lang('members_lang.title_changes_list');
+
+        // Get the list of changes
+        $data['items'] = $this->changeModel->getOrdered();
+
+        // Prepare the changes list
+        foreach($data['items'] as &$change) {
+            // Format the change date
+            $change['change_date'] = date('d.m.Y H:i:s', strtotime($change['date']));
+            // Get the author name
+            $change['author_name'] = ($change['author'] ? $change['author']['last_name']."\n".$change['author']['first_name'] : '');
+            // Get the concerned person name
+            $change['person_name'] = ($change['person_concerned'] ? $change['person_concerned']['last_name']."\n".$change['person_concerned']['first_name'] : '');
+            // Get the change type name
+            $change['change_type_name'] = ($change['change_type'] ? $change['change_type']['name'] : '');
+        }
+
+        $data['columns'] = ['change_date' => 'Date',
+                            'author_name' => 'Auteur',
+                            'person_name' => 'Personne concernée',
+                            'change_type_name' => 'Type de changement',
+                            'value_old' => 'Ancienne valeur',
+                            'value_new' => 'Nouvelle valeur'];
+        $data['primary_key_field']  = 'id';
+        $data['show_delete_button'] = false;
+        $data['show_update_button'] = false;
+        return $this->display_view('Common\items_list', $data);
+    }
 }
+?>

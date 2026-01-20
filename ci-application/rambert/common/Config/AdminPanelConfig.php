@@ -15,6 +15,7 @@ class AdminPanelConfig extends \CodeIgniter\Config\BaseConfig
      *  Syntax : ['label'=>'tab label','pageLink'=>'tab link']
     */
     public $tabs=[
+        ['label'=>'members_lang.changes', 'pageLink'=>'changes'],
         ['label'=>'access_lang.title_access_list', 'pageLink'=>'access'],
     ];
 }

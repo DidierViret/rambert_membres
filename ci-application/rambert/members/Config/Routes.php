@@ -28,4 +28,7 @@ $routes->get('contribution/delete/(:num)', '\Members\Controllers\MembersAdmin::c
 $routes->post('contribution/delete/(:num)', '\Members\Controllers\MembersAdmin::contributionDelete/$1');
 $routes->get('contribution/create/(:num)', '\Members\Controllers\MembersAdmin::contributionCreate/$1');
 $routes->post('contribution/save/(:num)', '\Members\Controllers\MembersAdmin::contributionSave/$1');
+
+// Changes routes
+$routes->get('changes', '\Members\Controllers\MembersAdmin::changesList');
 ?>

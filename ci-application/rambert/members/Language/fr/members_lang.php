@@ -11,6 +11,7 @@ return[
 // Pages titles
 'title_new_person'                  => 'Nouvelle personne',
 'title_person_membership_end'       => 'Désinscription d\'un membre',
+'title_changes_list'                => 'Historique des modifications',
 
 // Subtitles
 'subtitle_person_informations'      => 'Informations personnelles',
@@ -89,5 +90,6 @@ return[
 'since'                             => 'Depuis',
 'no_subscription'                   => 'Pas d\'inscription',
 'no_access_level'                   => 'Pas d\'accès',
+'changes'                           => 'Modifications',
 
 ];
