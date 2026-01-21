@@ -9,7 +9,9 @@
 
 return[
 // Pages titles
-'title_'                            => '',
+'title_new_person'                  => 'Nouvelle personne',
+'title_person_membership_end'       => 'Désinscription d\'un membre',
+'title_changes_list'                => 'Historique des modifications',
 
 // Subtitles
 'subtitle_person_informations'      => 'Informations personnelles',
@@ -33,7 +35,7 @@ return[
 'field_profession'                  => 'Profession',
 'field_godfathers'                  => 'Parrains / Marraines',
 'field_membership_start'            => 'Entrée au club',
-'field_membership_end'              => 'Sortie du club',
+'field_membership_end'              => 'Année de sortie du club',
 'field_membership_end_reason'       => 'Raison de la sortie',
 'field_home_address'                => 'Adresse du foyer',
 'field_address_title'               => 'Titre(s)',
@@ -57,6 +59,12 @@ return[
 'col_shipments'                     => 'Envois postaux',
 'col_newsletter_subscriptions'      => 'Inscriptions newsletter',
 'col_access_levels'                 => 'Accès au fichier des membres',
+'col_date'                          => 'Date',
+'col_author'                        => 'Auteur',
+'col_person_concerned'              => 'Personne concernée',
+'col_change_type'                   => 'Type de modification',
+'col_old_value'                     => 'Ancienne valeur',
+'col_new_value'                     => 'Nouvelle valeur',
 
 // Buttons
 'btn_save'                          => 'Enregistrer',
@@ -64,12 +72,21 @@ return[
 'btn_cancel'                        => 'Annuler',
 'btn_add'                           => 'Ajouter',
 'btn_delete'                        => 'Supprimer',
+'btn_manage_contributions'          => 'Gérer les contributions',
+'btn_add_home'                      => 'Nouveau foyer',
+'btn_add_person'                    => 'Nouvelle personne',
+
+// Warning messages
+'msg_contribution_confirm_delete'   => 'Voulez-vous vraiment supprimer cette contribution ?',
+'msg_person_membership_end'         => 'Vous allez enregistrer la désinscription de ce membre.<br>Merci d\'indiquer l\'année et le motif de sa sortie du club.',
+'msg_person_confirm_delete'         => 'Voulez-vous vraiment supprimer cette personne ? ',
+'msg_warning_new_home'              => 'Vous êtes en train de créer un nouveau foyer. Si vous souhaitez ajouter une personne à un foyer existant,
+                                        veuillez annuler cette opération et afficher le foyer concerné pour y ajouter une personne.',
 
 // Error messages
 'msg_error_valid_email'             => 'Veuillez entrer une adresse e-mail valide',
 'msg_error_email_length'            => 'L\'adresse e-mail ne doit pas dépasser 150 caractères',
 'msg_error_no_data_to_display'      => 'Il n\'y a pas de données à afficher',
-'msg_contribution_confirm_delete'   => 'Voulez-vous vraiment supprimer cette contribution ?',
 
 // Error code messages
 'code_error_401'                    => '401 - Non autorisé',
@@ -79,5 +96,6 @@ return[
 'since'                             => 'Depuis',
 'no_subscription'                   => 'Pas d\'inscription',
 'no_access_level'                   => 'Pas d\'accès',
+'changes'                           => 'Modifications',
 
 ];

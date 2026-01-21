@@ -64,7 +64,7 @@ class HomeModel extends Model
 
         // Store old values
         foreach ($data['id'] as $id) {
-            $this->oldValues[$id] = $this->find($id);
+            $this->oldValues[$id] = $this->withDeleted()->find($id);
         }
         
         return $data;
@@ -102,7 +102,6 @@ class HomeModel extends Model
                         'fk_change_author' => session()->get('user_id'),
                         'fk_person_concerned' => $person['id'],
                         'fk_change_type' => $changeTypeId,
-                        'field' => lang('members_lang.field_home_address'),
                         'value_old' => $oldAddress,
                         'value_new' => $newAddress,
                     ];

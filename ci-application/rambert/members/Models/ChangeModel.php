@@ -94,5 +94,29 @@ class ChangeModel extends Model {
         }
         return $data;
     }
+
+    /**
+     * Get an array of all changes ordered by a field.
+     * 
+     * @param string $orderBy : name of the field to use to sort the contributions
+     * @param string $direction : ASC, DESC or RANDOM, the direction of the sorting
+     * 
+     * @return : An array of changes with all attributes, ordered by the mentioned field
+     */
+    public function getOrdered(string $orderBy = 'date', string $direction = 'DESC') {
+        $builder = $this->builder();
+        $builder->select('*');
+        $builder->orderBy("$orderBy", "$direction");
+
+        $query = $builder->get();
+        $changes = $query->getResult('array');
+        foreach($changes as &$change) {
+            $change['change_type'] = $this->changeTypeModel->withDeleted()->find($change['fk_change_type']);
+            $change['author'] = $this->personModel->withDeleted()->find($change['fk_change_author']);
+            $change['person_concerned'] = $this->personModel->withDeleted()->find($change['fk_person_concerned']);
+        }
+
+        return $changes;
+    }
 }
 ?>

@@ -43,6 +43,14 @@ class PersonModel extends Model {
 
     // Callbacks
     protected $afterFind = ['appendHome', 'appendCategory'];
+    protected $afterInsert = ['logCreate'];
+    protected $beforeUpdate = ['keepOldValues'];
+    protected $afterUpdate = ['logUpdate'];
+    protected $beforeDelete = ['keepOldValues'];
+    protected $afterDelete = ['logDelete'];
+
+    // Variables used in callbacks
+    private $oldValues = [];
 
     public function initialize()
     {
@@ -140,6 +148,267 @@ class PersonModel extends Model {
 
         $query = $builder->get();
         return $query->getResult('array');
+    }
+
+    /**
+     * Callback method to store old values before update
+     */
+    protected function keepOldValues(array $data) {
+
+        // Store old values
+        foreach ($data['id'] as $id) {
+            $this->oldValues[$id] = $this->withDeleted()->find($id);
+        }
+        
+        return $data;
+    }
+
+    /**
+     * Callback method to log the creation of a new person
+     */
+    protected function logCreate(array $data) {
+        // Do not log the changes if the importation flag is set
+        if (isset($_SESSION['importation']) && $_SESSION['importation'] == true) {
+            return $data;
+        }
+
+        $personModel = new PersonModel();
+        $homeModel = new HomeModel();
+        $changeTypeModel = new ChangeTypeModel();
+        $changeModel = new ChangeModel();
+
+        if ($data['id'] != 0) {
+            $newPerson = $data['data'];
+            $home = $homeModel->find($newPerson['fk_home']);
+
+            $changeTypeId = $changeTypeModel->getChangeTypeId('membership_start');
+            
+            $changeData = [
+                'fk_change_author' => session()->get('user_id'),
+                'fk_person_concerned' => $data['id'],
+                'fk_change_type' => $changeTypeId,
+                'value_old' => '',
+                'value_new' => $newPerson['last_name'].' '.$newPerson['first_name']."\n".
+                               lang('members_lang.field_membership_start').': '.$newPerson['membership_start']."\n".
+                               ($home ? $home['address_line_1']."\n".
+                                        $home['address_line_2']."\n".
+                                        $home['postal_code'].' '.$home['city']
+                                      : ''),
+            ];
+            $changeModel->insert($changeData);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Callback method to log updates made to a person
+     */
+    protected function logUpdate(array $data) {
+        // Do not log the changes if the importation flag is set
+        if (isset($_SESSION['importation']) && $_SESSION['importation'] == true) {
+            return $data;
+        }
+
+        $personModel = new PersonModel();
+        $changeTypeModel = new ChangeTypeModel();
+        $changeModel = new ChangeModel();
+        $categoryModel = new CategoryModel();
+        
+        foreach ($data['id'] as $id) {
+            $oldValue = $this->oldValues[$id];
+            $newValue = $this->find($id);
+
+            // Log the membership end if the person was soft deleted
+            if (empty($oldValue['date_delete']) && !empty($newValue['date_delete'])) {
+                $changeTypeId = $changeTypeModel->getChangeTypeId('membership_end');
+                
+                $changeData = [
+                    'fk_change_author' => session()->get('user_id'),
+                    'fk_person_concerned' => $id,
+                    'fk_change_type' => $changeTypeId,
+                    
+                    // Concatenate the membership end date and reason in a single string
+                    'value_old' => (!empty($oldValue['membership_end']) ? $oldValue['membership_end'].' - '.$oldValue['membership_end_reason'] : ''),
+                    'value_new' => (!empty($newValue['membership_end']) ? $newValue['membership_end'].' - '.$newValue['membership_end_reason'] : ''),
+                ];
+                $changeModel->insert($changeData);
+            }
+
+            // (Re)log the membership start if the soft delete status has been removed
+            if (!empty($oldValue['date_delete']) && empty($newValue['date_delete'])) {
+                $changeTypeId = $changeTypeModel->getChangeTypeId('membership_start');
+                
+                $changeData = [
+                    'fk_change_author' => session()->get('user_id'),
+                    'fk_person_concerned' => $id,
+                    'fk_change_type' => $changeTypeId,
+                    'value_old' => (!empty($oldValue['membership_end']) ? $oldValue['membership_end'].' - '.$oldValue['membership_end_reason'] : ''),
+                    'value_new' => $newValue['last_name'].' '.$newValue['first_name']."\n".
+                                   lang('members_lang.field_membership_start').': '.$newValue['membership_start']."\n".
+                                   ($home ? $home['address_line_1']."\n".
+                                            $home['address_line_2']."\n".
+                                            $home['postal_code'].' '.$home['city']
+                                          : ''),
+                ];
+                $changeModel->insert($changeData);
+            }
+
+            // Log member name change
+            if ($oldValue['first_name'] != $newValue['first_name'] || $oldValue['last_name'] != $newValue['last_name']) {
+                $changeTypeId = $changeTypeModel->getChangeTypeId('name');
+
+                $changeData = [
+                    'fk_change_author' => session()->get('user_id'),
+                    'fk_person_concerned' => $id,
+                    'fk_change_type' => $changeTypeId,
+                    'value_old' => $oldValue['last_name'].' '.$oldValue['first_name'],
+                    'value_new' => $newValue['last_name'].' '.$newValue['first_name'],
+                ];
+
+                $changeModel->insert($changeData);
+            }
+
+            // Log member email or phone change
+            if ($oldValue['email'] != $newValue['email']|| $oldValue['phone_1'] != $newValue['phone_1'] ||
+                $oldValue['phone_2'] != $newValue['phone_2']) {
+                
+                $oldContact = '';
+                $newContact = '';
+
+                if ($oldValue['email'] != $newValue['email']) {
+                    $oldContact .= lang('members_lang.field_email').': '.$oldValue['email']."\n";
+                    $newContact .= lang('members_lang.field_email').': '.$newValue['email']."\n";
+                }
+                if ($oldValue['phone_1'] != $newValue['phone_1']) {
+                    $oldContact .= lang('members_lang.field_phone_1').': '.$oldValue['phone_1']."\n";
+                    $newContact .= lang('members_lang.field_phone_1').': '.$newValue['phone_1']."\n";
+                }
+                if ($oldValue['phone_2'] != $newValue['phone_2']) {
+                    $oldContact .= lang('members_lang.field_phone_2').': '.$oldValue['phone_2']."\n";
+                    $newContact .= lang('members_lang.field_phone_2').': '.$newValue['phone_2']."\n";
+                }
+
+                $changeTypeId = $changeTypeModel->getChangeTypeId('contact_informations');
+
+                $changeData = [
+                    'fk_change_author' => session()->get('user_id'),
+                    'fk_person_concerned' => $id,
+                    'fk_change_type' => $changeTypeId,
+                    'value_old' => $oldContact,
+                    'value_new' => $newContact,
+                ];
+
+                $changeModel->insert($changeData);
+            }
+
+            // Log member category change
+            if ($oldValue['fk_category'] != $newValue['fk_category']) {
+                $oldCategory = '';
+                $newCategory = '';
+
+                if (!empty($oldValue['fk_category'])) {
+                    $oldCatData = $categoryModel->withDeleted()->find($oldValue['fk_category']);
+                    if ($oldCatData) {
+                        $oldCategory = $oldCatData['name'].' ('.$oldCatData['description'].')';
+                    }
+                }
+
+                if (!empty($newValue['fk_category'])) {
+                    $newCatData = $categoryModel->withDeleted()->find($newValue['fk_category']);
+                    if ($newCatData) {
+                        $newCategory = $newCatData['name'].' ('.$newCatData['description'].')';
+                    }
+                }
+
+                $changeTypeId = $changeTypeModel->getChangeTypeId('category');
+
+                $changeData = [
+                    'fk_change_author' => session()->get('user_id'),
+                    'fk_person_concerned' => $id,
+                    'fk_change_type' => $changeTypeId,
+                    'value_old' => $oldCategory,
+                    'value_new' => $newCategory,
+                ];
+                $changeModel->insert($changeData);
+            }
+
+            // Log member other informations change
+            if ($oldValue['birth'] != $newValue['birth']|| $oldValue['profession'] != $newValue['profession'] ||
+                $oldValue['godfathers'] != $newValue['godfathers'] ||
+                $oldValue['comments'] != $newValue['comments']) {
+
+                $oldInformations = '';
+                $newInformations = '';
+
+                if ($oldValue['birth'] != $newValue['birth']) {
+                    $oldInformations .= lang('members_lang.field_birth').': '.$oldValue['birth']."\n";
+                    $newInformations .= lang('members_lang.field_birth').': '.$newValue['birth']."\n";
+                }
+                if ($oldValue['profession'] != $newValue['profession']) {
+                    $oldInformations .= lang('members_lang.field_profession').': '.$oldValue['profession']."\n";
+                    $newInformations .= lang('members_lang.field_profession').': '.$newValue['profession']."\n";
+                }
+                if ($oldValue['godfathers'] != $newValue['godfathers']) {
+                    $oldInformations .= lang('members_lang.field_godfathers').': '.$oldValue['godfathers']."\n";
+                    $newInformations .= lang('members_lang.field_godfathers').': '.$newValue['godfathers']."\n";
+                }
+                if ($oldValue['comments'] != $newValue['comments']) {
+                    $oldInformations .= lang('members_lang.field_comments').': '.$oldValue['comments']."\n";
+                    $newInformations .= lang('members_lang.field_comments').': '.$newValue['comments']."\n";
+                }
+
+                $changeTypeId = $changeTypeModel->getChangeTypeId('other_informations');
+
+                $changeData = [
+                    'fk_change_author' => session()->get('user_id'),
+                    'fk_person_concerned' => $id,
+                    'fk_change_type' => $changeTypeId,
+                    'value_old' => $oldInformations,
+                    'value_new' => $newInformations,
+                ];
+
+                $changeModel->insert($changeData);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Callback method to log the deletion of a person
+     */
+    protected function logDelete(array $data) {
+        // Do not log the changes if the importation flag is set
+        if (isset($_SESSION['importation']) && $_SESSION['importation'] == true) {
+            return $data;
+        }
+
+        $changeTypeModel = new ChangeTypeModel();
+        $changeModel = new ChangeModel();
+
+        foreach ($data['id'] as $id) {
+            $oldValue = $this->oldValues[$id];
+
+            // Log the membership end
+            $changeTypeId = $changeTypeModel->getChangeTypeId('membership_end');
+            
+            $changeData = [
+                'fk_change_author' => session()->get('user_id'),
+                'fk_person_concerned' => $id,
+                'fk_change_type' => $changeTypeId,
+                
+                // Concatenate the membership end date and reason in a single string
+                'value_old' => $oldValue['last_name'].' '.$oldValue['first_name']."\n".
+                               lang('members_lang.field_membership_start').': '.$oldValue['membership_start'],
+                'value_new' => (!empty($oldValue['membership_end']) ? lang('members_lang.field_membership_end').": ".$oldValue['membership_end']. "\n".
+                                                                      $oldValue['membership_end_reason']
+                                                                    : ''),
+            ];
+            $changeModel->insert($changeData);
+        }
+
+        return $data;
     }
 }
 ?>

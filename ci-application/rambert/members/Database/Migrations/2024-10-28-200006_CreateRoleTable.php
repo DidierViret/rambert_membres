@@ -43,10 +43,6 @@ class CreateRoleTable extends Migration
         $this->forge->addForeignKey('fk_team', 'team', 'id', 'RESTRICT', 'RESTRICT');
 
         $this->forge->createTable('role');
-
-        // Insert entries in newly created table
-        $seeder = \Config\Database::seeder();
-        $seeder->call('\Members\Database\Seeds\RoleSeeder');
     }
 
     public function down()

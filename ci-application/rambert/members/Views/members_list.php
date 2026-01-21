@@ -1,3 +1,15 @@
+<div id="admin_buttons" class="container" >
+    <!-- Display action buttons for managers and admins -->
+    <?php if ($_SESSION['access_level'] >= config('\Access\Config\AccessConfig')->access_lvl_manager): ?>
+        <div class="row mb-2">
+            <div class="col-12">
+                <a href="<?= base_url('home/create') ?>" class="btn btn-outline-primary"><i class="bi bi-plus-lg"></i> <?= lang('members_lang.btn_add_home') ?></a>
+            </div>
+        </div>
+    <?php endif; ?>
+</div>
+
+<!-- Display the members list -->
 <div class="container" >
     <div id="list_persons" >
         <?php if (!empty($persons)): ?>

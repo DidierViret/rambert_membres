@@ -2,10 +2,10 @@
     <div id="home_details" class="row">
         <?php if (!empty($home)): ?>
             <div class="col-lg-5 col-md-7 mb-4">
-                <!-- Display home update button for managers and admins -->
+                <!-- Display home action buttons for managers and admins -->
                 <?php if ($_SESSION['access_level'] >= config('\Access\Config\AccessConfig')->access_lvl_manager): ?>
                     <div class="mb-2">
-                        <a href="<?= base_url('home/update/'.$home['id']) ?>" class="btn btn-outline-primary"><?= lang('members_lang.btn_update') ?></a>
+                        <a href="<?= base_url('home/update/'.$home['id']) ?>" class="btn btn-outline-primary"><i class="bi bi-pencil" style="font-size: 20px;"></i></a>
                     </div>
                 <?php endif; ?>
 
@@ -34,6 +34,13 @@
             </div>
 
             <div class="col-lg-7 col-md-5">
+                <!-- Display add person button for managers and admins -->
+                <?php if ($_SESSION['access_level'] >= config('\Access\Config\AccessConfig')->access_lvl_manager): ?>
+                    <div class="mb-2">
+                        <a href="<?= base_url('person/create/'.$home['id']) ?>" class="btn btn-outline-primary"><i class="bi bi-plus-lg"></i> <?= lang('members_lang.btn_add_person') ?></a>
+                    </div>
+                <?php endif; ?>
+
                 <!-- Display the list of persons living in the home -->
                 <?php foreach ($persons as $person): ?>
                     <?= view('Members\person_update_button', ['person' => $person]); ?>

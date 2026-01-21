@@ -51,10 +51,32 @@ class MembersAdmin extends BaseController
     }
 
     /**
+     * Display a form to create a home
+     */
+    public function homeCreate() {
+        // Check if the user has the right to access this page
+        if($this->session->get('access_level') < $this->accessLevel) {
+            throw AccessDeniedException::forPageAccessDenied();
+        }
+
+        $data['home'] = [];
+        $data['persons'] = [];
+
+        return $this->display_view('Members\home_form', $data);
+    }
+
+        
+
+    /**
      * Display a form to update a home
      */
     public function homeUpdate($id)
     {
+        // Check if the user has the right to access this page
+        if($this->session->get('access_level') < $this->accessLevel) {
+            throw AccessDeniedException::forPageAccessDenied();
+        }
+
         $data['home'] = $this->homeModel->find($id);
         $data['persons'] = $this->personModel->where('fk_home', $id)->findAll();
 
@@ -77,7 +99,6 @@ class MembersAdmin extends BaseController
         // Get the home informations
         if($id > 0) {
             $home['id'] = $id;
-            $home_old = $this->homeModel->find($id);
         } else {
             $home[] = [];
         }
@@ -86,6 +107,8 @@ class MembersAdmin extends BaseController
         if($id == 0) {
             // Create the home
             $id = $this->homeModel->insert($home);
+            // Redirect to the person creation form
+            return redirect()->to('/person/create/'.$id);
         } else {
             // Update the home
             $this->homeModel->update($id, $home);
@@ -96,6 +119,28 @@ class MembersAdmin extends BaseController
     }
 
     /**
+     * Display a form to create a person
+     */
+    public function personCreate($homeId) {
+        $data['home'] = $this->homeModel->find($homeId);
+        $data['persons'] = $this->personModel->where('fk_home', $homeId)->findAll();
+
+        // Add an empty person with ID 0
+        $data['persons'][] = ['id' => 0, 'fk_home' => $homeId];
+        $data['person_to_update'] = 0;
+
+        // Get access levels and categories for the dropdowns
+        $data['access_levels'] = $this->accessLevelModel->find();
+        $data['categories'] = $this->categoryModel->findAll();
+
+        foreach($data['persons'] as &$person) {
+            $this->get_person_informations($person);
+        }
+
+        return $this->display_view('Members\home_person_form', $data);
+    }
+
+    /**
      * Display a form to update a person
      */
     public function personUpdate($id) {
@@ -103,6 +148,8 @@ class MembersAdmin extends BaseController
         $data['home'] = $this->homeModel->find($homeId);
         $data['persons'] = $this->personModel->where('fk_home', $homeId)->findAll();
         $data['person_to_update'] = $id;
+
+        // Get access levels and categories for the dropdowns
         $data['access_levels'] = $this->accessLevelModel->find();
         $data['categories'] = $this->categoryModel->findAll();
 
@@ -122,63 +169,113 @@ class MembersAdmin extends BaseController
             throw AccessDeniedException::forPageAccessDenied();
         }
 
-        // Get the person informations
-        if($id > 0) {
-            // Person allready exists, update her informations
-            $person = $this->request->getPost();
-            $personOld = $this->personModel->find($id);
-
-        } else {
-            $person[] = [];
-        }
-
-
-        
+        // Get the person's informations
+        $person = $this->request->getPost();
         if($id == 0) {
-            // Create the person
-            //$id = $this->personModel->insert($person);
-        } else {
-            // Update the person's access levels
-            if($this->session->get('access_level') >= config('\Access\Config\AccessConfig')->access_lvl_admin) {
-                $this->updatePersonAccesslevel($id, $person['access_level']);
-            }
-            unset($person['access_level']);
-
-            // Update the person's newsletter subscriptions
-            if(empty($person['newsletters'])) {
-                $this->newsletterSubscriptionModel->where('fk_person', $id)->delete();
-            } else {
-                // Get the current subscriptions
-                $subscriptions = $this->newsletterSubscriptionModel->where('fk_person', $id)->findAll();
-                foreach($subscriptions as $subscription) {
-                    // Check if the subscription is still valid
-                    if(!in_array($subscription['fk_newsletter'], $person['newsletters'])) {
-                        // Delete the subscription
-                        $this->newsletterSubscriptionModel->delete($subscription['id']);
-                    }
-                }
-
-                // Add the new subscriptions
-                foreach($person['newsletters'] as $newsletter) {
-                    // Check if the subscription already exists
-                    $subscription = $this->newsletterSubscriptionModel->where(['fk_person' => $id, 'fk_newsletter' => $newsletter])->findAll();
-                    if(empty($subscription)) {
-                        // Add the subscription
-                        $data = [
-                            'fk_person' => $id,
-                            'fk_newsletter' => $newsletter,
-                        ];
-                        $this->newsletterSubscriptionModel->insert($data);
-                    }
-                }
-            }
-
-            // Update the person
-            $this->personModel->update($id, $person);
+            // Create a new person
+            unset($person['id']);
+            $id = $this->personModel->insert($person);
         }
+
+        // Update the person's access levels
+        if($this->session->get('access_level') >= config('\Access\Config\AccessConfig')->access_lvl_admin) {
+            $this->updatePersonAccesslevel($id, $person['access_level']);
+        }
+        unset($person['access_level']);
+
+        // Update the person's newsletter subscriptions
+        if(empty($person['newsletters'])) {
+            $this->newsletterSubscriptionModel->where('fk_person', $id)->delete();
+        } else {
+            // Get the current subscriptions
+            $subscriptions = $this->newsletterSubscriptionModel->where('fk_person', $id)->findAll();
+            foreach($subscriptions as $subscription) {
+                // Check if the subscription is still valid
+                if(!in_array($subscription['fk_newsletter'], $person['newsletters'])) {
+                    // Delete the subscription
+                    $this->newsletterSubscriptionModel->delete($subscription['id']);
+                }
+            }
+
+            // Add the new subscriptions
+            foreach($person['newsletters'] as $newsletter) {
+                // Check if the subscription already exists
+                $subscription = $this->newsletterSubscriptionModel->where(['fk_person' => $id, 'fk_newsletter' => $newsletter])->findAll();
+                if(empty($subscription)) {
+                    // Add the subscription
+                    $data = [
+                        'fk_person' => $id,
+                        'fk_newsletter' => $newsletter,
+                    ];
+                    $this->newsletterSubscriptionModel->insert($data);
+                }
+            }
+        }
+
+        // Update the person
+        $this->personModel->update($id, $person);
 
         // Redirect to the person's home details page
         return redirect()->to('/home/'.$person['fk_home']);
+    }
+
+    /**
+     * Display a confirmation message before deleting a person
+     */
+    public function personConfirmDelete($id = 0) {
+        // Check if the user has the right to access this page
+        if($this->session->get('access_level') < $this->accessLevel) {
+            throw AccessDeniedException::forPageAccessDenied();
+        }
+
+        // Get the person's informations
+        $person = $this->personModel->find($id);
+        $homeId = $person['fk_home'];
+
+        // Display the confirmation form
+        $data['title'] = lang('members_lang.title_person_membership_end')." : ".$person['last_name'].' '.$person['first_name'];
+        $data['message'] = lang('members_lang.msg_person_membership_end');
+        $data['url_yes'] = base_url('/person/delete/'.$id);
+        $data['url_no'] = base_url('/home/'.$homeId);
+
+        return $this->display_view('Members\person_confirm_delete', $data);
+    }
+
+    /**
+     * Delete a person
+     */
+    public function personDelete($id = 0) {
+        // Check if the user has the right to access this page
+        if($this->session->get('access_level') < $this->accessLevel) {
+            throw AccessDeniedException::forPageAccessDenied();
+        }
+
+        // Get the person's informations
+        $person = $this->personModel->find($id);
+        $homeId = $person['fk_home'];
+
+        // Set the membership end date and reason
+        $data = [
+            'membership_end' => $membership_end = $this->request->getPost('membership_end'),
+            'membership_end_reason' => $this->request->getPost('membership_end_reason'),
+        ];
+        $this->personModel->update($id, $data);
+
+        // Soft delete the person
+        $this->personModel->delete($id);
+
+        // If the home has no more persons, soft delete the home too
+        $persons = $this->personModel->where('fk_home', $homeId)->findAll();
+        if(empty($persons)) {
+            $this->homeModel->delete($homeId);
+
+            // Redirect to the homepage
+            return redirect()->to(base_url());
+        } else {
+            // Redirect to the person's home details page
+            return redirect()->to('/home/'.$homeId);
+        }
+        
     }
 
     /**
@@ -435,4 +532,43 @@ class MembersAdmin extends BaseController
         // Redirect to the contributions list page
         return redirect()->to(base_url('/contributions/'.$personId));
     }
+
+    /**
+     * Display the list of changes
+     */
+    public function changesList() {
+        // Check if the user has the right to access this page
+        if($this->session->get('access_level') < $this->accessLevel) {
+            throw AccessDeniedException::forPageAccessDenied();
+        }
+
+        $data['list_title'] = lang('members_lang.title_changes_list');
+
+        // Get the list of changes
+        $data['items'] = $this->changeModel->getOrdered();
+
+        // Prepare the changes list
+        foreach($data['items'] as &$change) {
+            // Format the change date
+            $change['change_date'] = date('d.m.Y H:i:s', strtotime($change['date']));
+            // Get the author name
+            $change['author_name'] = ($change['author'] ? $change['author']['last_name']."\n".$change['author']['first_name'] : '');
+            // Get the concerned person name
+            $change['person_name'] = ($change['person_concerned'] ? $change['person_concerned']['last_name']."\n".$change['person_concerned']['first_name'] : '');
+            // Get the change type name
+            $change['change_type_name'] = ($change['change_type'] ? $change['change_type']['name'] : '');
+        }
+
+        $data['columns'] = ['change_date' => lang('members_lang.col_date'),
+                            'author_name' => lang('members_lang.col_author'),
+                            'person_name' => lang('members_lang.col_person_concerned'),
+                            'change_type_name' => lang('members_lang.col_change_type'),
+                            'value_old' => lang('members_lang.col_old_value'),
+                            'value_new' => lang('members_lang.col_new_value')];
+        $data['primary_key_field']  = 'id';
+        $data['show_delete_button'] = false;
+        $data['show_update_button'] = false;
+        return $this->display_view('Common\items_list', $data);
+    }
 }
+?>
