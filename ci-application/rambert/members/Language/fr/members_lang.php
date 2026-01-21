@@ -59,6 +59,12 @@ return[
 'col_shipments'                     => 'Envois postaux',
 'col_newsletter_subscriptions'      => 'Inscriptions newsletter',
 'col_access_levels'                 => 'Accès au fichier des membres',
+'col_date'                          => 'Date',
+'col_author'                        => 'Auteur',
+'col_person_concerned'              => 'Personne concernée',
+'col_change_type'                   => 'Type de modification',
+'col_old_value'                     => 'Ancienne valeur',
+'col_new_value'                     => 'Nouvelle valeur',
 
 // Buttons
 'btn_save'                          => 'Enregistrer',

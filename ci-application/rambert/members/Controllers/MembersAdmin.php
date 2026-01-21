@@ -559,12 +559,12 @@ class MembersAdmin extends BaseController
             $change['change_type_name'] = ($change['change_type'] ? $change['change_type']['name'] : '');
         }
 
-        $data['columns'] = ['change_date' => 'Date',
-                            'author_name' => 'Auteur',
-                            'person_name' => 'Personne concernée',
-                            'change_type_name' => 'Type de changement',
-                            'value_old' => 'Ancienne valeur',
-                            'value_new' => 'Nouvelle valeur'];
+        $data['columns'] = ['change_date' => lang('members_lang.col_date'),
+                            'author_name' => lang('members_lang.col_author'),
+                            'person_name' => lang('members_lang.col_person_concerned'),
+                            'change_type_name' => lang('members_lang.col_change_type'),
+                            'value_old' => lang('members_lang.col_old_value'),
+                            'value_new' => lang('members_lang.col_new_value')];
         $data['primary_key_field']  = 'id';
         $data['show_delete_button'] = false;
         $data['show_update_button'] = false;

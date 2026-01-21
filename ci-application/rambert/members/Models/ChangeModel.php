@@ -111,9 +111,9 @@ class ChangeModel extends Model {
         $query = $builder->get();
         $changes = $query->getResult('array');
         foreach($changes as &$change) {
-            $change['change_type'] = $this->changeTypeModel->find($change['fk_change_type']);
-            $change['author'] = $this->personModel->find($change['fk_change_author']);
-            $change['person_concerned'] = $this->personModel->find($change['fk_person_concerned']);
+            $change['change_type'] = $this->changeTypeModel->withDeleted()->find($change['fk_change_type']);
+            $change['author'] = $this->personModel->withDeleted()->find($change['fk_change_author']);
+            $change['person_concerned'] = $this->personModel->withDeleted()->find($change['fk_person_concerned']);
         }
 
         return $changes;
