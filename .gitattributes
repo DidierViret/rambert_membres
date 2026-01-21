@@ -4,3 +4,5 @@
 /phpunit.xml.dist export-ignore
 /documentation/ export-ignore
 /tests/ export-ignore
+/docker/ export-ignore
+/docker-compose.yml export-ignore
