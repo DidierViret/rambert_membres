@@ -146,6 +146,13 @@ abstract class BaseController extends Controller
             }
         }
 
+        // Add navigation menu to the view if the current url is a navigation menu url
+        foreach (config('\Common\Config\NavMenuConfig')->tabs as $tab){
+            if (strstr(current_url(),$tab['pageLink'])) {
+                $viewToDisplay .= view('\Common\nav_menu');
+            }
+        }
+
         if (is_array($view_parts)) {
             // Add multiple parts to the view
             foreach ($view_parts as $view_part) {

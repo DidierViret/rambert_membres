@@ -42,7 +42,7 @@ class Members extends BaseController
 
     public function index()
     {
-        return $this->membersList();
+        return redirect()->to('/members');
     }
 
     /**

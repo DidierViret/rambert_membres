@@ -22,6 +22,10 @@ return[
 'subtitle_contribution_update'      => 'Modification d\'une contribution',
 'subtitle_contribution_create'      => 'Ajout d\'une contribution',
 
+// Menu tabs
+'tab_members_list'                  => 'Liste membres',
+'tab_changes'                       => 'Historique',
+
 // Forms fields
 'field_title'                       => 'Titre',
 'field_last_name'                   => 'Nom',
