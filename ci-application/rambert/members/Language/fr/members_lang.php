@@ -53,6 +53,7 @@ return[
 'field_role'                        => 'Fonction',
 'field_contribution_start'          => 'Année de début',
 'field_contribution_end'            => 'Année de fin',
+'placeholder_text_filter'           => 'Rechercher par nom, prénom ou e-mail',
 
 // Lists columns
 'col_other_home_members'            => 'Autres membres du foyer',

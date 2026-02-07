@@ -135,6 +135,7 @@ class PersonModel extends Model {
      * @param bool $withDeleted : A boolean to include or not the soft deleted persons
      * @param string $orderBy : name of the field to use to sort the persons
      * @param string $direction : ASC, DESC or RANDOM, the direction of the sorting
+     * @param string $where : a where clause to filter the persons
      * 
      * @return : An array of persons with all attributes, ordered by the mentioned field
      */
@@ -145,6 +146,52 @@ class PersonModel extends Model {
         if(!$withDeleted) {
             $builder->where('date_delete IS NULL');
         }
+
+        $query = $builder->get();
+        return $query->getResult('array');
+    }
+
+    /**
+     * Get an array of persons filtered by theyre lastname
+     * 
+     * @param string $lastname : the lastname to filter by
+     * @param bool $withDeleted : A boolean to include or not the soft deleted persons
+     * 
+     * @return : An array of persons with all attributes, filtered by the lastname
+     */
+    public function getByLastname(string $lastname, bool $withDeleted = false) {
+        $builder = $this->builder();
+        $builder->select('*');
+        $builder->orderBy("last_name", "ASC");
+        if(!$withDeleted) {
+            $builder->where('date_delete IS NULL');
+        }
+        $builder->like('last_name', $lastname);
+
+        $query = $builder->get();
+        return $query->getResult('array');
+    }
+
+    /**
+     * Get an array of persons filtered by text corresponding to theyre
+     * lastname, firstname or email.
+     * 
+     * @param string $text : the text to search for
+     * @param bool $withDeleted : A boolean to include or not the soft deleted persons
+     * 
+     * @return : An array of persons with all attributes, filtered by the text
+     */
+    public function getByText(string $text, bool $withDeleted = false) {
+        $builder = $this->builder();
+        $builder->select('*');
+        if(!$withDeleted) {
+            $builder->where('date_delete IS NULL');
+        }
+        $builder->groupStart()
+                ->like('last_name', $text)
+                ->orLike('first_name', $text)
+                ->orLike('email', $text)
+                ->groupEnd();
 
         $query = $builder->get();
         return $query->getResult('array');
