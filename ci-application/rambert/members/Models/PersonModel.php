@@ -152,48 +152,29 @@ class PersonModel extends Model {
     }
 
     /**
-     * Get an array of persons filtered by theyre lastname
+     * Get an array of persons filtered by text corresponding to theyre lastname, firstname or email.
      * 
-     * @param string $lastname : the lastname to filter by
-     * @param bool $withDeleted : A boolean to include or not the soft deleted persons
-     * 
-     * @return : An array of persons with all attributes, filtered by the lastname
-     */
-    public function getByLastname(string $lastname, bool $withDeleted = false) {
-        $builder = $this->builder();
-        $builder->select('*');
-        $builder->orderBy("last_name", "ASC");
-        if(!$withDeleted) {
-            $builder->where('date_delete IS NULL');
-        }
-        $builder->like('last_name', $lastname);
-
-        $query = $builder->get();
-        return $query->getResult('array');
-    }
-
-    /**
-     * Get an array of persons filtered by text corresponding to theyre
-     * lastname, firstname or email.
      * 
      * @param string $text : the text to search for
      * @param bool $withDeleted : A boolean to include or not the soft deleted persons
      * 
-     * @return : An array of persons with all attributes, filtered by the text
+     * @return : An array of persons with all attributes, filtered by the text.
      */
     public function getByText(string $text, bool $withDeleted = false) {
         $builder = $this->builder();
         $builder->select('*');
+        $builder->orderBy("last_name, first_name", "ASC");
         if(!$withDeleted) {
             $builder->where('date_delete IS NULL');
         }
         $builder->groupStart()
-                ->like('last_name', $text)
-                ->orLike('first_name', $text)
-                ->orLike('email', $text)
-                ->groupEnd();
+            ->like('last_name', $text)
+            ->orLike('first_name', $text)
+            ->orLike('email', $text)
+            ->groupEnd();
 
         $query = $builder->get();
+
         return $query->getResult('array');
     }
 

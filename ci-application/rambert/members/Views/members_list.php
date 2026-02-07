@@ -106,13 +106,22 @@
         <?php endif; ?>
     </div>
 </div>
+
 <!-- Javascript to filter members list after filter change -->
 <script>
     $(document).ready(function() {
         $('#text_filter').on('keyup', function() {
-            
+            var text_filter = $(this).val().toLowerCase();
+            var get_url = '<?= base_url(); ?>members?tf='+text_filter;
+
+            // call membersList controller method to update data content
+            $.get(get_url, data => {
                 $('#list_persons').empty();
 
+                // replace the content of the list_persons div with the filtered data
+                //$('#list_persons').html($(data).find('#list_persons').html());
+                $('#list_persons')[0].innerHTML = $(data).find('#list_persons')[0].innerHTML;
+            });
         });
     });
 </script>
