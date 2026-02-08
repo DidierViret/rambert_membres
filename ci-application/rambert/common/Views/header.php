@@ -35,11 +35,7 @@
     <link rel="stylesheet" href="<?= base_url("css/rambert_bootstrap.min.css"); ?>" />
     <!-- Bootstrap icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-    <!-- Bootstrap javascript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-
-    <!-- JQuery -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
+    <!-- Bootsrap and jQuery javascript are included in the footer.php file -->
 
     <!-- Application styles -->
     <link rel="stylesheet" href="<?= base_url("css/MY_styles.css"); ?>" />

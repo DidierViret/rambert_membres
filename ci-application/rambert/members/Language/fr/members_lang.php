@@ -11,6 +11,7 @@ return[
 // Pages titles
 'title_new_person'                  => 'Nouvelle personne',
 'title_person_membership_end'       => 'Désinscription d\'un membre',
+'title_export_lists'                => 'Listes et exportations',
 'title_changes_list'                => 'Historique des modifications',
 
 // Subtitles
@@ -23,7 +24,8 @@ return[
 'subtitle_contribution_create'      => 'Ajout d\'une contribution',
 
 // Menu tabs
-'tab_members_list'                  => 'Liste membres',
+'tab_members_list'                  => 'Membres',
+'tab_export_lists'                  => 'Listes',
 'tab_changes'                       => 'Historique',
 
 // Forms fields
@@ -54,6 +56,7 @@ return[
 'field_contribution_start'          => 'Année de début',
 'field_contribution_end'            => 'Année de fin',
 'placeholder_text_filter'           => 'Rechercher par nom, prénom ou e-mail',
+'field_export_list_type'            => 'Type de liste',
 
 // Lists columns
 'col_other_home_members'            => 'Autres membres du foyer',
@@ -80,6 +83,10 @@ return[
 'btn_manage_contributions'          => 'Gérer les contributions',
 'btn_add_home'                      => 'Nouveau foyer',
 'btn_add_person'                    => 'Nouvelle personne',
+'btn_export_excel'                  => 'Exporter fichier',
+
+// Export lists
+'export_list_type_postal_send'      => 'Envois postaux',
 
 // Warning messages
 'msg_contribution_confirm_delete'   => 'Voulez-vous vraiment supprimer cette contribution ?',
