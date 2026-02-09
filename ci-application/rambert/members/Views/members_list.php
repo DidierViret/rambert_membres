@@ -119,8 +119,7 @@
                 $('#list_persons').empty();
 
                 // replace the content of the list_persons div with the filtered data
-                //$('#list_persons').html($(data).find('#list_persons').html());
-                $('#list_persons')[0].innerHTML = $(data).find('#list_persons')[0].innerHTML;
+                $('#list_persons').html($(data).find('#list_persons').html());
             });
         });
     });
