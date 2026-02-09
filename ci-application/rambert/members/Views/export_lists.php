@@ -19,8 +19,12 @@
         <div class="col-8">
             <div class="form-group">
                 <select class="form-control" id="list-type">
-                    <option value="postal-send"><?=lang('members_lang.export_list_type_postal_send')?></option>
-                    <option>2</option>
+                    <option value="postal-send" <?php if (isset($list_type) && $list_type == 'postal-send') echo 'selected'; ?>>
+                        <?=lang('members_lang.export_list_type_postal_send')?>
+                    </option>
+                    <option value="newsletter-addresses" <?php if (isset($list_type) && $list_type == 'newsletter-addresses') echo 'selected'; ?>>
+                        <?=lang('members_lang.export_list_type_newsletter_addresses')?>
+                    </option>
                     <option>3</option>
                     <option>4</option>
                     <option>5</option>

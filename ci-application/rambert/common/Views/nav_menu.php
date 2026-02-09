@@ -21,7 +21,7 @@
 </div>
 <script defer>
     document.querySelectorAll('.navmenu').forEach((nav)=>{
-        if (nav.href.includes(window.location)){
+        if (nav.href.includes(window.location.pathname)){
             nav.classList.add('active')
         }
         else{

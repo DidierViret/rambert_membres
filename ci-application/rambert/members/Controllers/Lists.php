@@ -33,11 +33,49 @@ class Lists extends BaseController
     }
 
     public function index() {
-        return $this->display_view('Members\Views\export_lists');
+        $listType = $this->request->getGet('list-type');
+
+        // If no list type is provided, default to 'postal-send'
+        if ($listType === null) {
+            $listType = 'postal-send';
+        }
+
+        $data['list_type'] = $listType;
+
+        switch($listType) {
+            case 'postal-send':
+                $data['data'] = $this->getDataPostalSend();
+                break;
+            case 'newsletter-addresses':
+                $data['data'] = $this->getDataNewsletterAddresses();
+                break;
+            default:
+                // Handle unknown list types
+                return $this->response->setStatusCode(404)->setBody('List type not supported');
+        }
+
+        return $this->display_view('Members\Views\export_lists', $data);
     }
 
-    public function listPostalSend()
+    public function getDataPostalSend()
     {
-        
+        $data['columns'] = ['test1', 'test2'];
+        $data['rows'] = [
+            ['value1', 'value2'],
+            ['value3', 'value4']
+        ];
+
+        return $data;
+    }
+
+    public function getDataNewsletterAddresses()
+    {
+        $data['columns'] = ['test1', 'test2'];
+        $data['rows'] = [
+            ['value5', 'value6'],
+            ['value7', 'value8']
+        ];
+
+        return $data;
     }
 }

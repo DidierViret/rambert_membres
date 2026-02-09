@@ -87,6 +87,7 @@ return[
 
 // Export lists
 'export_list_type_postal_send'      => 'Envois postaux',
+'export_list_type_newsletter_addresses' => 'Adresses newsletter',
 
 // Warning messages
 'msg_contribution_confirm_delete'   => 'Voulez-vous vraiment supprimer cette contribution ?',
