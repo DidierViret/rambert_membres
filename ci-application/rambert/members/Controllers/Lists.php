@@ -33,11 +33,11 @@ class Lists extends BaseController
     }
 
     public function index() {
-        return redirect()->to('/lists/postal-send');
+        return $this->display_view('Members\Views\export_lists');
     }
 
     public function listPostalSend()
     {
-        return $this->display_view('Members\Views\export_list_header');
+        
     }
 }
