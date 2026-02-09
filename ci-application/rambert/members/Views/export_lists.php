@@ -8,35 +8,14 @@
  */
 ?>
 
-<div id="export-list-header" class="container pb-4">
-    <div class="row mb-2">
-        <div class="text-left col-12">
-            <!-- Display list title if defined defined -->
-            <?= isset($list_title) ? '<h3>'.esc($list_title).'</h3>' : '' ?>
-        </div>
-        <div class="col-sm-6 text-left">
-            <!-- Display the "create" button if url_create is defined -->
-            <?php if(isset($url_create)): ?>
-                <a class="btn btn-primary" href="<?= site_url(esc($url_create)) ?>"><?= esc($btn_create_label) ?></a>
-            <?php endif ?>
-        </div>
-        <div class="col-sm-6 text-right">
-            <!-- Display the "with_deleted" checkbox if with_deleted and url_getView variables are defined -->
-            <?php if (isset($with_deleted) && isset($url_getView)): ?>
-                <label class="form-check-label" for="toggle_deleted">
-                    <?= lang($display_deleted_label); ?>
-                </label>
-                <?= form_checkbox('toggle_deleted', '', $with_deleted, ['id' => 'toggle_deleted']); ?>
-            <?php endif ?>
-        </div>
-    </div>
-    <div class="row mb-2">
+<div class="container pb-4">
+    <div id="export-list-header" class="row mb-2">
         <!-- Title -->
         <div class="text-left col-12">
             <h3><?= lang('members_lang.title_export_lists') ?></h3>
         </div>
 
-        <!-- List choice and export button -->
+        <!-- Dropdown to select list type -->
         <div class="col-8">
             <div class="form-group">
                 <select class="form-control" id="list-type">
@@ -48,8 +27,61 @@
                 </select>
             </div>
         </div>
+
+        <!-- Export button -->
         <div class="col-4 text-right">
             <input type="button" class="btn btn-outline-success" value="<?=lang('members_lang.btn_export_excel')?>" >
         </div>
     </div>
+
+    
+    <div id="export-list-content" class="table-responsive">
+        <?php if(isset($data) && !empty($data)): ?>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <!-- Get columns headers -->
+                        <?php foreach ($data['columns'] as $column): ?>
+                            <th scope="col"><?= $column ?></th>
+                        <?php endforeach ?>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- One table row for each entry -->
+                    <?php foreach ($data['rows'] as $row): ?>
+                    <tr>
+                        <!-- Display row's properties wich should correspond to "columns" -->
+                        <?php foreach ($data['columns'] as $columnKey => $column): ?>
+                            <td><?= esc($row[$columnKey]) ?></td>
+                        <?php endforeach ?>
+                    </tr>
+                    <?php endforeach ?>
+                </tbody>
+            </table>
+        
+        <?php else: ?>
+            <!-- No data -->
+            <div class="alert alert-info" role="alert">
+                <?= lang('members_lang.msg_error_no_data_to_display') ?>
+            </div>
+        <?php endif ?>
+    </div>
 </div>
+
+<!-- Javascript to load informations corresponding to the selected list type -->
+<script>
+    $(document).ready(function() {
+        $('#list-type').on('change', function() {
+            var list_type = $(this).val();
+            var get_url = '<?= base_url(); ?>lists?list-type='+list_type;
+
+            // call Lists controller method to update data content
+            $.get(get_url, data => {
+                $('#export-list-content').empty();
+
+                // replace the content of the export-list-content div with the new datas
+                $('#export-list-content').html($(data).find('#export-list-content').html());
+            });
+        });
+    });
+</script>
