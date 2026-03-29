@@ -49,6 +49,15 @@ class Lists extends BaseController
             case 'newsletter-addresses':
                 $data['data'] = $this->getDataNewsletterAddresses();
                 break;
+            case 'no-email-address':
+                $data['data'] = $this->getDataNoEmailAddress();
+                break;
+            case 'all-members':
+                $data['data'] = $this->getDataAllMembers();
+                break;
+            case 'all-members-with-soft-deleted':
+                $data['data'] = $this->getDataAllMembersWithSoftDeleted();
+                break;
             default:
                 // Handle unknown list types
                 return $this->response->setStatusCode(404)->setBody('List type not supported');
@@ -57,13 +66,37 @@ class Lists extends BaseController
         return $this->display_view('Members\Views\export_lists', $data);
     }
 
+    /**
+     * Get all datas needed for postal sends
+     * (can be used to send bulletins or other postal communications)
+     */
     public function getDataPostalSend()
     {
-        $data['columns'] = ['test1', 'test2'];
-        $data['rows'] = [
-            ['value1', 'value2'],
-            ['value3', 'value4']
-        ];
+        $homes = $this->homeModel->findAll();
+        $data = [];
+        
+        if(!empty($homes)) {
+            $data['columns'] = [lang('members_lang.field_address_title'),
+                                lang('members_lang.field_address_name'),
+                                lang('members_lang.field_address_line_1'),
+                                lang('members_lang.field_address_line_2'),
+                                lang('members_lang.field_postal_code'),
+                                lang('members_lang.field_city'),
+                                lang('members_lang.field_nb_bulletins')
+                            ];
+
+            foreach($homes as $home) {
+                $data['rows'][] = [
+                    $home['address_title'],
+                    $home['address_name'],
+                    $home['address_line_1'],
+                    $home['address_line_2'],
+                    $home['postal_code'],
+                    $home['city'],
+                    $home['nb_bulletins']
+                ];
+            }
+        }
 
         return $data;
     }
