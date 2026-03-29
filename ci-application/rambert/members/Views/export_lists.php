@@ -25,9 +25,15 @@
                     <option value="newsletter-addresses" <?php if (isset($list_type) && $list_type == 'newsletter-addresses') echo 'selected'; ?>>
                         <?=lang('members_lang.export_list_type_newsletter_addresses')?>
                     </option>
-                    <option>3</option>
-                    <option>4</option>
-                    <option>5</option>
+                    <option value="no-email-address" <?php if (isset($list_type) && $list_type == 'no-email-address') echo 'selected'; ?>>
+                        <?=lang('members_lang.export_list_type_no_email_address')?>
+                    </option>
+                    <option value="all-members" <?php if (isset($list_type) && $list_type == 'all-members') echo 'selected'; ?>>
+                        <?=lang('members_lang.export_list_type_all_members')?>
+                    </option>
+                    <option value="all-members-with-soft-deleted" <?php if (isset($list_type) && $list_type == 'all-members-with-soft-deleted') echo 'selected'; ?>>
+                        <?=lang('members_lang.export_list_type_all_members_with_soft_deleted')?>
+                    </option>
                 </select>
             </div>
         </div>
