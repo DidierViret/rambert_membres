@@ -12,6 +12,9 @@ use Access\Models\AccessModel;
 use Members\Models\PersonModel;
 use Members\Models\HomeModel;
 
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
 class Lists extends BaseController
 {
     /**
@@ -32,6 +35,9 @@ class Lists extends BaseController
         $this->homeModel = new HomeModel();
     }
 
+    /**
+     * Display the list of members based on the specified list type
+     */
     public function index() {
         $listType = $this->request->getGet('list-type');
 
@@ -41,29 +47,87 @@ class Lists extends BaseController
         }
 
         $data['list_type'] = $listType;
+        $data['data'] = $this->getData($listType);
 
+        return $this->display_view('Members\Views\export_lists', $data);
+    }
+
+    /**
+     * Export in Excel file the list of members based on the specified list type
+     */
+    public function exportExcel()
+    {
+        // Get data corresponding to the specified list type
+        $listType = $this->request->getGet('list-type');
+        $data = $this->getData($listType);
+
+        // Prepare a spreadsheet
+        $file_name = 'data.xlsx';
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Add column headers in the spreadsheet's first line
+        $currentColumn = 1;
+        foreach($data['columns'] as $column) {
+            $sheet->setCellValue([$currentColumn, 1], $column);
+            $currentColumn++;
+        }
+
+        // Add datas in the spreadsheet
+        $currentRow = 2;
+        foreach($data['rows'] as $rowColumns) {
+            $currentColumn = 1;
+            foreach($rowColumns as $value) {
+                $sheet->setCellValue([$currentColumn, $currentRow], $value);
+                $currentColumn++;
+            }
+            $currentRow++;
+        }
+
+        // Write and save the xlsx document
+        $writer = new Xlsx($spreadsheet);
+		$writer->save($file_name);
+
+		header("Content-Type: application/vnd.ms-excel");
+		header('Content-Disposition: attachment; filename="' . basename($file_name) . '"');
+		header('Expires: 0');
+		header('Cache-Control: must-revalidate');
+		header('Pragma: public');
+		header('Content-Length:' . filesize($file_name));
+		flush();
+
+		readfile($file_name);
+
+		exit;
+    }
+
+    /**
+     * Get data required for a specific list type
+     */
+    private function getData($listType)
+    {
         switch($listType) {
             case 'postal-send':
-                $data['data'] = $this->getDataPostalSend();
+                $data = $this->getDataPostalSend();
                 break;
             case 'newsletter-addresses':
-                $data['data'] = $this->getDataNewsletterAddresses();
+                $data = $this->getDataNewsletterAddresses();
                 break;
             case 'no-email-address':
-                $data['data'] = $this->getDataNoEmailAddress();
+                $data = $this->getDataNoEmailAddress();
                 break;
             case 'all-members':
-                $data['data'] = $this->getDataAllMembers();
+                $data = $this->getDataAllMembers();
                 break;
             case 'all-members-with-soft-deleted':
-                $data['data'] = $this->getDataAllMembersWithSoftDeleted();
+                $data = $this->getDataAllMembersWithSoftDeleted();
                 break;
             default:
                 // Handle unknown list types
                 return $this->response->setStatusCode(404)->setBody('List type not supported');
         }
 
-        return $this->display_view('Members\Views\export_lists', $data);
+        return $data;
     }
 
     /**

@@ -83,7 +83,7 @@ return[
 'btn_manage_contributions'          => 'Gérer les contributions',
 'btn_add_home'                      => 'Nouveau foyer',
 'btn_add_person'                    => 'Nouvelle personne',
-'btn_export_excel'                  => 'Exporter fichier',
+'btn_export_excel'                  => 'Fichier Excel',
 
 // Export lists
 'export_list_type_postal_send'                   => 'Adresses pour envois postaux',

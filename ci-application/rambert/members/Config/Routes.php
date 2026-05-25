@@ -32,6 +32,7 @@ $routes->post('contribution/save/(:num)', '\Members\Controllers\MembersAdmin::co
 // Lists routes
 $routes->get('lists', '\Members\Controllers\Lists::index');
 $routes->get('lists/postal-send', '\Members\Controllers\Lists::listPostalSend');
+$routes->get('lists/export-excel', '\Members\Controllers\Lists::exportExcel');
 
 // Changes routes
 $routes->get('changes', '\Members\Controllers\MembersAdmin::changesList');

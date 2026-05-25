@@ -40,7 +40,7 @@
 
         <!-- Export button -->
         <div class="col-4 text-right">
-            <input type="button" class="btn btn-outline-success" value="<?=lang('members_lang.btn_export_excel')?>" >
+            <input id="export-excel" type="button" class="btn btn-outline-success" value="<?=lang('members_lang.btn_export_excel')?>" >
         </div>
     </div>
 
@@ -92,6 +92,13 @@
                 // replace the content of the export-list-content div with the new datas
                 $('#export-list-content').html($(data).find('#export-list-content').html());
             });
+        });
+
+        $('#export-excel').on('click', function() {
+            var list_type = $('#list-type').val();
+            var export_url = '<?= base_url(); ?>lists/export-excel?list-type='+list_type;
+
+            window.location.href = export_url;
         });
     });
 </script>
