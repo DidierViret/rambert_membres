@@ -11,12 +11,18 @@ use Access\Exceptions\AccessDeniedException;
 use Access\Models\AccessModel;
 use Members\Models\PersonModel;
 use Members\Models\HomeModel;
+use Members\Models\CategoryModel;
+use Members\Models\NewsletterSubscriptionModel;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Lists extends BaseController
 {
+    // TODO replace this constant for use with a set of different newsletter
+    // So far we only manage one type of newsletter
+    private $fk_newsletter = 1;
+
     /**
      * Constructor
      */
@@ -33,6 +39,8 @@ class Lists extends BaseController
         $this->personModel = new PersonModel();
         $this->accessModel = new AccessModel();
         $this->homeModel = new HomeModel();
+        $this->categoryModel = new CategoryModel();
+        $this->newsletterSubscriptionModel = new NewsletterSubscriptionModel();
     }
 
     /**
@@ -111,7 +119,7 @@ class Lists extends BaseController
                 $data = $this->getDataPostalSend();
                 break;
             case 'newsletter-addresses':
-                $data = $this->getDataNewsletterAddresses();
+                $data = $this->getDataNewsletterAddresses($this->fk_newsletter);
                 break;
             case 'no-email-address':
                 $data = $this->getDataNoEmailAddress();
@@ -134,7 +142,7 @@ class Lists extends BaseController
      * Get all datas needed for postal sends
      * (can be used to send bulletins or other postal communications)
      */
-    public function getDataPostalSend()
+    private function getDataPostalSend()
     {
         $homes = $this->homeModel->findAll();
         $data = [];
@@ -165,13 +173,162 @@ class Lists extends BaseController
         return $data;
     }
 
-    public function getDataNewsletterAddresses()
+    /**
+     * Get needed data for a list of all persons who have subscribed to a newsletter
+     * Persons who don't have a known e-mail address can contain a fake
+     * e-mail address with "pas-de-courriel" text in it.
+     * These are not listed.
+     */
+    private function getDataNewsletterAddresses(int $newsletterId)
     {
-        $data['columns'] = ['test1', 'test2'];
-        $data['rows'] = [
-            ['value5', 'value6'],
-            ['value7', 'value8']
-        ];
+        $subscriptions = $this->newsletterSubscriptionModel->where('fk_newsletter', $newsletterId)->findAll();
+        $data = [];
+        
+        if(!empty($subscriptions)) {
+            $data['columns'] = [lang('members_lang.field_last_name'),
+                                lang('members_lang.field_first_name'),
+                                lang('members_lang.field_email')
+                            ];
+
+            foreach($subscriptions as $subscription) {
+                $person = $subscription['person'];
+                if (!empty($person['email']) && !str_contains($person['email'], 'pas-de-courriel')) {
+                    $data['rows'][] = [
+                        $person['last_name'],
+                        $person['first_name'],
+                        $person['email']
+                    ];
+                }
+            }
+        }
+        return $data;
+    }
+
+    /**
+     * Get needed data for a list of all persons who don't have a known e-mail address
+     * Persons who don't have a known e-mail address can contain a fake
+     * e-mail address with "pas-de-courriel" text in it.
+     * These are listed as they don't have a known valid address.
+     */
+    private function getDataNoEmailAddress()
+    {
+        $persons = $this->personModel->getOrdered(false, "last_name", "ASC");
+        $data = [];
+        
+        if(!empty($persons)) {
+            $data['columns'] = [lang('members_lang.field_last_name'),
+                                lang('members_lang.field_first_name'),
+                                lang('members_lang.field_home_address')
+                            ];
+
+            foreach($persons as $person) {
+                if (empty($person['email']) || str_contains($person['email'], 'pas-de-courriel')) {
+                    $home = $this->homeModel->find($person['fk_home']);
+                    $data['rows'][] = [
+                        $person['last_name'],
+                        $person['first_name'],
+                        $home['address_name'].", ".$home['address_line_1']." ".$home['address_line_2'].", ".$home['postal_code']." ".$home['city']
+                    ];
+                }
+            }
+        }
+        return $data;
+    }
+
+    private function getDataAllMembers()
+    {
+        $persons = $this->personModel->getOrdered(false, "last_name", "ASC");
+        $data = [];
+        
+        if(!empty($persons)) {
+            $data['columns'] = [lang('members_lang.field_title'),
+                                lang('members_lang.field_last_name'),
+                                lang('members_lang.field_first_name'),
+                                lang('members_lang.field_address_line_1'),
+                                lang('members_lang.field_address_line_2'),
+                                lang('members_lang.field_postal_code'),
+                                lang('members_lang.field_city'),
+                                lang('members_lang.field_phone_1'),
+                                lang('members_lang.field_phone_2'),
+                                lang('members_lang.field_email'),
+                                lang('members_lang.field_category'),
+                                lang('members_lang.field_birth'),
+                                lang('members_lang.field_membership_start'),
+                                lang('members_lang.field_comments')
+                            ];
+
+            foreach($persons as $person) {
+                $home = $this->homeModel->find($person['fk_home']);
+                $category = $this->categoryModel->find($person['fk_category']);
+                $data['rows'][] = [
+                    $person['title'],
+                    $person['last_name'],
+                    $person['first_name'],
+                    $home['address_line_1'],
+                    $home['address_line_2'],
+                    $home['postal_code'],
+                    $home['city'],
+                    $person['phone_1'],
+                    $person['phone_2'],
+                    $person['email'],
+                    $category['name'],
+                    $person['birth'],
+                    $person['membership_start'],
+                    $person['comments']
+                ];
+            }
+        }
+
+        return $data;
+    }
+
+    private function getDataAllMembersWithSoftDeleted()
+    {
+        $persons = $this->personModel->getOrdered(true, "last_name", "ASC");
+        $data = [];
+        
+        if(!empty($persons)) {
+            $data['columns'] = [lang('members_lang.field_title'),
+                                lang('members_lang.field_last_name'),
+                                lang('members_lang.field_first_name'),
+                                lang('members_lang.field_address_line_1'),
+                                lang('members_lang.field_address_line_2'),
+                                lang('members_lang.field_postal_code'),
+                                lang('members_lang.field_city'),
+                                lang('members_lang.field_phone_1'),
+                                lang('members_lang.field_phone_2'),
+                                lang('members_lang.field_email'),
+                                lang('members_lang.field_category'),
+                                lang('members_lang.field_birth'),
+                                lang('members_lang.field_membership_start'),
+                                lang('members_lang.field_membership_end'),
+                                lang('members_lang.field_membership_end_reason'),
+                                lang('members_lang.field_comments')
+                            ];
+
+            foreach($persons as $person) {
+                $home = $this->homeModel->withDeleted()->find($person['fk_home']);
+                $category = $this->categoryModel->find($person['fk_category']);
+                $data['rows'][] = [
+                    $person['title'],
+                    $person['last_name'],
+                    $person['first_name'],
+                    $home['address_line_1'],
+                    $home['address_line_2'],
+                    $home['postal_code'],
+                    $home['city'],
+                    $person['phone_1'],
+                    $person['phone_2'],
+                    $person['email'],
+                    $category['name'],
+                    $person['birth'],
+                    $person['membership_start'],
+                    $person['membership_end'],
+                    $person['membership_end_reason'],
+                    $person['comments']
+                ];
+            }
+        }
 
         return $data;
     }
