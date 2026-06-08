@@ -16,6 +16,7 @@ class NavMenuConfig extends \CodeIgniter\Config\BaseConfig
     */
     public $tabs=[
         ['label'=>'members_lang.tab_members_list', 'pageLink'=>'members'],
+        ['label'=>'members_lang.tab_export_lists', 'pageLink'=>'lists'],
         ['label'=>'members_lang.tab_changes', 'pageLink'=>'changes'],
     ];
 }

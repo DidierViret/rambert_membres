@@ -1,3 +1,12 @@
+<div id="filters" class="container" >
+    <!-- Display filters -->
+    <div class="row mb-2">
+        <div class="col-12">
+            <input type="text" id="text_filter" class="form-control" placeholder="<?= lang('members_lang.placeholder_text_filter') ?>">
+        </div>
+    </div>
+</div>
+
 <div id="admin_buttons" class="container" >
     <!-- Display action buttons for managers and admins -->
     <?php if ($_SESSION['access_level'] >= config('\Access\Config\AccessConfig')->access_lvl_manager): ?>
@@ -97,3 +106,21 @@
         <?php endif; ?>
     </div>
 </div>
+
+<!-- Javascript to filter members list after filter change -->
+<script>
+    $(document).ready(function() {
+        $('#text_filter').on('keyup', function() {
+            var text_filter = $(this).val().toLowerCase();
+            var get_url = '<?= base_url(); ?>members?tf='+text_filter;
+
+            // call membersList controller method to update data content
+            $.get(get_url, data => {
+                $('#list_persons').empty();
+
+                // replace the content of the list_persons div with the filtered data
+                $('#list_persons').html($(data).find('#list_persons').html());
+            });
+        });
+    });
+</script>

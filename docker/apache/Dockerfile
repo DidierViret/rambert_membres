@@ -1,4 +1,4 @@
-FROM php:8.1-apache
+FROM php:8.3-apache
 
 # Copier le script
 COPY entrypoint.sh /entrypoint.sh
