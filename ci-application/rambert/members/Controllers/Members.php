@@ -52,10 +52,16 @@ class Members extends BaseController
     {
         // Get the persons to display
         $text_filter = $this->request->getGet('tf');
+
+        // Member status filter : active (default), deleted or all
+        $member_status = $this->request->getGet('ms');
+        $withDeleted = ($member_status == 'all');
+        $onlyDeleted = ($member_status == 'deleted');
+
         if(!empty($text_filter)) {
-            $data['persons'] = $this->personModel->getByText($text_filter);
+            $data['persons'] = $this->personModel->getByText($text_filter, $withDeleted, $onlyDeleted);
         } else {
-            $data['persons'] = $this->personModel->getOrdered(false, 'last_name', 'ASC');
+            $data['persons'] = $this->personModel->getOrdered('last_name', 'ASC', $withDeleted, $onlyDeleted);
         }
 
         // Append all needed informations for the list to display
@@ -67,11 +73,11 @@ class Members extends BaseController
                     $person['access_levels'][] = $access['access_level'];
                 }
 
-                // Category informations
-                $person['category'] = $this->categoryModel->find($person['fk_category']);
+                // Category informations (include soft deleted categories for old members)
+                $person['category'] = $this->categoryModel->withDeleted()->find($person['fk_category']);
 
-                // Home informations
-                $person['home'] = $this->homeModel->find($person['fk_home']);
+                // Home informations (include soft deleted homes for old members)
+                $person['home'] = $this->homeModel->withDeleted()->find($person['fk_home']);
 
                 // Other home members informations
                 $homeMembers = $this->personModel->where('fk_home', $person['fk_home'])->findAll();

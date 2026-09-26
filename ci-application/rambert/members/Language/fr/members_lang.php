@@ -57,6 +57,9 @@ return[
 'field_contribution_end'            => 'Année de fin',
 'placeholder_text_filter'           => 'Rechercher par nom, prénom ou e-mail',
 'field_export_list_type'            => 'Type de liste',
+'field_active'                      => 'Actifs',
+'field_deleted'                     => 'Démissionnaires',
+'field_all'                         => 'Tous',
 
 // Lists columns
 'col_other_home_members'            => 'Autres membres du foyer',

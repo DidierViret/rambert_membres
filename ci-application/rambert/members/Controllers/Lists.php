@@ -212,7 +212,7 @@ class Lists extends BaseController
      */
     private function getDataNoEmailAddress()
     {
-        $persons = $this->personModel->getOrdered(false, "last_name", "ASC");
+        $persons = $this->personModel->getOrdered("last_name", "ASC", false, false);
         $data = [];
         
         if(!empty($persons)) {
@@ -237,7 +237,7 @@ class Lists extends BaseController
 
     private function getDataAllMembers()
     {
-        $persons = $this->personModel->getOrdered(false, "last_name", "ASC");
+        $persons = $this->personModel->getOrdered("last_name", "ASC", false, false);
         $data = [];
         
         if(!empty($persons)) {
@@ -284,7 +284,7 @@ class Lists extends BaseController
 
     private function getDataAllMembersWithSoftDeleted()
     {
-        $persons = $this->personModel->getOrdered(true, "last_name", "ASC");
+        $persons = $this->personModel->getOrdered("last_name", "ASC", true, false);
         $data = [];
         
         if(!empty($persons)) {
