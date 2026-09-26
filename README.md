@@ -56,7 +56,7 @@ Au préalable, le gestionnaire de librairies PHP "Composer" doit être installé
 Même si les extensions PHP nécessaires sont prévue pour être installées dans le container Docker apache, il est possible que Composer signale des extensions PHP manquantes dans le système hôte. Pour éviter ce blocage, il faut les installer et/ou les activer dans l'installation PHP du système hôte. Les extensions nécessaires pour CodeIgniter sont décrites ici : https://www.codeigniter.com/user_guide/intro/requirements.html.
 
 Dans un terminal :
-```bash
+```
 cd ci-application
 composer install
 ```
@@ -64,13 +64,13 @@ composer install
 ## Montage et démarrage des containers
 
 Pour permettre la création du réseau de containers dans une version LIVE de Linux, il faut d'abord créer le réseau manuellement (pas nécessaire si Docker tourne sur un système d'exploitation installé):
-```bash
+```
 sudo systemctl start docker
 sudo docker network create --driver bridge app-network
 ```
 
 Montage et démarrage des containers :
-```bash
+```
 docker compose build
 docker compose up
 ```
@@ -78,7 +78,7 @@ docker compose up
 ## Création de la structure de la base de données
 Une fois que les containers sont démarrés, entrer dans la ligne de commande du container apache pour générer la structure de la base de données.
 
-```bash
+```
 docker exec -it <container name> sh
 php spark migrate --all
 ```
