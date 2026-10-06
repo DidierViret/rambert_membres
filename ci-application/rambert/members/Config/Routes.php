@@ -14,6 +14,7 @@ $routes->get('person/create/(:num)', '\Members\Controllers\MembersAdmin::personC
 $routes->post('person/save/(:num)', '\Members\Controllers\MembersAdmin::personSave/$1');
 $routes->get('person/delete/(:num)', '\Members\Controllers\MembersAdmin::personConfirmDelete/$1');
 $routes->post('person/delete/(:num)', '\Members\Controllers\MembersAdmin::personDelete/$1');
+$routes->get('person/restore/(:num)', '\Members\Controllers\MembersAdmin::personConfirmRestore/$1');
 $routes->post('person/restore/(:num)', '\Members\Controllers\MembersAdmin::personRestore/$1');
 
 // Home routes

@@ -289,6 +289,34 @@ class MembersAdmin extends BaseController
     }
 
     /**
+     * Display a confirmation message before restoring a person
+     */
+    public function personConfirmRestore($id = 0) {
+        // Check if the user has the right to access this page
+        if($this->session->get('access_level') < $this->accessLevel) {
+            throw AccessDeniedException::forPageAccessDenied();
+        }
+
+        // Get the person's informations, including soft deleted persons
+        $person = $this->personModel->withDeleted()->find($id);
+        if(empty($person)) {
+            return redirect()->to(base_url());
+        }
+        // Only archived persons can be restored
+        if(empty($person['date_delete'])) {
+            return redirect()->to('/home/'.$person['fk_home']);
+        }
+
+        // Display the confirmation form
+        $data['title'] = lang('members_lang.title_person_restore')." : ".$person['last_name'].' '.$person['first_name'];
+        $data['message'] = lang('members_lang.msg_person_confirm_restore');
+        $data['url_yes'] = base_url('/person/restore/'.$id);
+        $data['url_no'] = base_url('/home/'.$person['fk_home']);
+
+        return $this->display_view('Members\person_confirm_restore', $data);
+    }
+
+    /**
      * Restore a soft deleted person (and its home if it was soft deleted too)
      */
     public function personRestore($id = 0) {
