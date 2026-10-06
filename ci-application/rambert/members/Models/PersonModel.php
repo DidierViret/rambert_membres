@@ -248,6 +248,7 @@ class PersonModel extends Model {
         $changeTypeModel = new ChangeTypeModel();
         $changeModel = new ChangeModel();
         $categoryModel = new CategoryModel();
+        $homeModel = new HomeModel();
         
         foreach ($data['id'] as $id) {
             $oldValue = $this->oldValues[$id];
@@ -271,13 +272,16 @@ class PersonModel extends Model {
 
             // (Re)log the membership start if the soft delete status has been removed
             if (!empty($oldValue['date_delete']) && empty($newValue['date_delete'])) {
+                $home = $homeModel->find($newValue['fk_home']);
                 $changeTypeId = $changeTypeModel->getChangeTypeId('membership_start');
                 
                 $changeData = [
                     'fk_change_author' => session()->get('user_id'),
                     'fk_person_concerned' => $id,
                     'fk_change_type' => $changeTypeId,
-                    'value_old' => (!empty($oldValue['membership_end']) ? $oldValue['membership_end'].' - '.$oldValue['membership_end_reason'] : ''),
+                    'value_old' => (!empty($oldValue['membership_end']) ? lang('members_lang.log_readmission_after_membership_end').": ".$oldValue['membership_end']."\n".
+                                                                          $oldValue['membership_end_reason']
+                                                                        : ''),
                     'value_new' => $newValue['last_name'].' '.$newValue['first_name']."\n".
                                    lang('members_lang.field_membership_start').': '.$newValue['membership_start']."\n".
                                    ($home ? $home['address_line_1']."\n".

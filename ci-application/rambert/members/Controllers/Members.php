@@ -103,8 +103,9 @@ class Members extends BaseController
      */
     public function homeDetails($id)
     {
-        $data['home'] = $this->homeModel->find($id);
-        $data['persons'] = $this->personModel->where('fk_home', $id)->findAll();
+        // Include soft deleted homes and persons so that archived ones can still be displayed
+        $data['home'] = $this->homeModel->withDeleted()->find($id);
+        $data['persons'] = $this->personModel->withDeleted()->where('fk_home', $id)->findAll();
 
         foreach($data['persons'] as &$person) {
              // Access levels informations

@@ -11,6 +11,7 @@ return[
 // Pages titles
 'title_new_person'                  => 'Nouvelle personne',
 'title_person_membership_end'       => 'Désinscription d\'un membre',
+'title_person_restore'              => 'Réadmission d\'un membre',
 'title_export_lists'                => 'Listes et exportations',
 'title_changes_list'                => 'Historique des modifications',
 
@@ -59,6 +60,7 @@ return[
 'field_export_list_type'            => 'Type de liste',
 'field_active'                      => 'Actifs',
 'field_deleted'                     => 'Démissionnaires',
+'field_resigned'                    => 'Démissionnaire',
 'field_all'                         => 'Tous',
 
 // Lists columns
@@ -83,6 +85,8 @@ return[
 'btn_cancel'                        => 'Annuler',
 'btn_add'                           => 'Ajouter',
 'btn_delete'                        => 'Supprimer',
+'btn_restore'                       => 'Réactiver',
+'btn_membership_end'                => 'Désinscription',
 'btn_manage_contributions'          => 'Gérer les contributions',
 'btn_add_home'                      => 'Nouveau foyer',
 'btn_add_person'                    => 'Nouvelle personne',
@@ -98,6 +102,7 @@ return[
 // Warning messages
 'msg_contribution_confirm_delete'   => 'Voulez-vous vraiment supprimer cette contribution ?',
 'msg_person_membership_end'         => 'Vous allez enregistrer la désinscription de ce membre.<br>Merci d\'indiquer l\'année et le motif de sa sortie du club.',
+'msg_person_confirm_restore'        => 'Voulez-vous vraiment réadmettre ce membre ?<br>Son année et son motif de sortie du club seront effacés.',
 'msg_person_confirm_delete'         => 'Voulez-vous vraiment supprimer cette personne ? ',
 'msg_warning_new_home'              => 'Vous êtes en train de créer un nouveau foyer. Si vous souhaitez ajouter une personne à un foyer existant,
                                         veuillez annuler cette opération et afficher le foyer concerné pour y ajouter une personne.',
@@ -116,5 +121,6 @@ return[
 'no_subscription'                   => 'Pas d\'inscription',
 'no_access_level'                   => 'Pas d\'accès',
 'changes'                           => 'Modifications',
+'log_readmission_after_membership_end' => 'Réadmission après une démission',
 
 ];
