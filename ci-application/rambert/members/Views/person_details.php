@@ -1,4 +1,4 @@
-<div class="person row bg-light border-bottom border-primary pt-2 pb-2 mb-4">
+<div class="person row bg-light pt-2 pb-2 mb-4 <?= (!empty($person['date_delete'])) ? 'border border-danger' : 'border-bottom border-primary' ?>">
 
     <!-- If the person has access rights, display a badge for each access_level -->
     <?php if (!empty($person['access_levels'])): ?>

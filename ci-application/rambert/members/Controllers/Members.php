@@ -103,8 +103,22 @@ class Members extends BaseController
      */
     public function homeDetails($id)
     {
-        $data['home'] = $this->homeModel->find($id);
-        $data['persons'] = $this->personModel->where('fk_home', $id)->findAll();
+        // Member status filter : active (default) or all
+        $member_status = $this->request->getGet('ms');
+
+        // Include soft deleted homes so that archived homes can still be displayed
+        $data['home'] = $this->homeModel->withDeleted()->find($id);
+        $data['persons'] = $this->personModel->withDeleted($member_status == 'all')->where('fk_home', $id)->findAll();
+
+        // If no filter is given and all persons of the home are archived, display all persons by default
+        if(empty($member_status) && empty($data['persons'])) {
+            $data['persons'] = $this->personModel->withDeleted()->where('fk_home', $id)->findAll();
+            if(!empty($data['persons'])) {
+                // If there are still no persons, it means the home is empty and we can keep the default filter (active)
+                $member_status = 'all';
+            }
+        }
+        $data['member_status'] = ($member_status == 'all') ? 'all' : 'active';
 
         foreach($data['persons'] as &$person) {
              // Access levels informations
