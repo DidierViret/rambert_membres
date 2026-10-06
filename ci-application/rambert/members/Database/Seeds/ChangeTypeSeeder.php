@@ -67,8 +67,8 @@ class ChangeTypeSeeder extends Seeder
             ],
             [
                 'id'            => 8,
-                'name'          => 'Changement de mot de passe',
-                'description'   => 'Modification du mot de passe d\'un membre',
+                'name'          => 'Changement des droits d\'accès',
+                'description'   => 'Modification des droits d\'accès d\'un membre',
                 'date_creation' => '2024-10-28 19:59:08',
                 'date_modification' => null,
                 'date_delete'   => null,

@@ -169,43 +169,22 @@ class Admin extends BaseController
 
     /**
      * Method called to delete access rights
-     *
-     * @return : The newly created or modified access object
      */
-    public function deleteAccess(int $accessId, ?int $action = 0): string|Response {
-        $access = $this->accessModel->withDeleted()->find($accessId);
-
-        // No access rights corresponding to the given id
-        if (empty($access)) {
-            return redirect()->to('access');
+    public function deleteAccess($id = 0) {
+        // Check if the user has the right to access this page
+        if($this->session->get('access_level') < $this->accessLevel) {
+            throw AccessDeniedException::forPageAccessDenied();
         }
 
-        switch($action) {
-            case 0: // Display confirmation
-                $data = array(
-                    'access' => $access,
-                    'title' => lang('access_lang.title_access_delete')
-                );
-                return $this->display_view('\User\admin\delete_user', $data);
-                break;
-
-            case 1: // Disable (soft delete) access rights
-                if ($_SESSION['access_id'] != $accessId) {
-                    $this->accessModel->delete($accessId, FALSE);
-                }
-                return redirect()->to('access');
-                break;
-
-            case 2: // Hard delete access rights
-                if ($_SESSION['access_id'] != $accessId) {
-                    $this->accessModel->delete($accessId, TRUE);
-                }
-                return redirect()->to('access');
-                break;
-
-            default: // Do nothing
-                return redirect()->to('access');
+        // Get the access rights
+        $access = $this->accessModel->withDeleted()->find($id);
+        if (!empty($access)) {
+            // Access rights found, delete them
+            $this->accessModel->delete($id);
         }
+
+        // Redirect to the access list
+        return redirect()->to('access');
     }
 
     /**

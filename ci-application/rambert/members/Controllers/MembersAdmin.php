@@ -264,8 +264,18 @@ class MembersAdmin extends BaseController
         // Soft delete the person
         $this->personModel->delete($id);
 
-        // Redirect to the person's home details page
-        return redirect()->to('/home/'.$homeId);
+        // If the home has no more persons, soft delete the home too
+        $persons = $this->personModel->where('fk_home', $homeId)->findAll();
+        if(empty($persons)) {
+            $this->homeModel->delete($homeId);
+
+            // Redirect to the homepage
+            return redirect()->to(base_url());
+        } else {
+            // Redirect to the person's home details page
+            return redirect()->to('/home/'.$homeId);
+        }
+        
     }
 
     /**
@@ -522,4 +532,43 @@ class MembersAdmin extends BaseController
         // Redirect to the contributions list page
         return redirect()->to(base_url('/contributions/'.$personId));
     }
+
+    /**
+     * Display the list of changes
+     */
+    public function changesList() {
+        // Check if the user has the right to access this page
+        if($this->session->get('access_level') < $this->accessLevel) {
+            throw AccessDeniedException::forPageAccessDenied();
+        }
+
+        $data['list_title'] = lang('members_lang.title_changes_list');
+
+        // Get the list of changes
+        $data['items'] = $this->changeModel->getOrdered();
+
+        // Prepare the changes list
+        foreach($data['items'] as &$change) {
+            // Format the change date
+            $change['change_date'] = date('d.m.Y H:i:s', strtotime($change['date']));
+            // Get the author name
+            $change['author_name'] = ($change['author'] ? $change['author']['last_name']."\n".$change['author']['first_name'] : '');
+            // Get the concerned person name
+            $change['person_name'] = ($change['person_concerned'] ? $change['person_concerned']['last_name']."\n".$change['person_concerned']['first_name'] : '');
+            // Get the change type name
+            $change['change_type_name'] = ($change['change_type'] ? $change['change_type']['name'] : '');
+        }
+
+        $data['columns'] = ['change_date' => lang('members_lang.col_date'),
+                            'author_name' => lang('members_lang.col_author'),
+                            'person_name' => lang('members_lang.col_person_concerned'),
+                            'change_type_name' => lang('members_lang.col_change_type'),
+                            'value_old' => lang('members_lang.col_old_value'),
+                            'value_new' => lang('members_lang.col_new_value')];
+        $data['primary_key_field']  = 'id';
+        $data['show_delete_button'] = false;
+        $data['show_update_button'] = false;
+        return $this->display_view('Common\items_list', $data);
+    }
 }
+?>

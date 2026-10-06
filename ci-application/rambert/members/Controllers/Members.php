@@ -42,7 +42,7 @@ class Members extends BaseController
 
     public function index()
     {
-        return $this->membersList();
+        return redirect()->to('/members');
     }
 
     /**
@@ -51,34 +51,47 @@ class Members extends BaseController
     public function membersList()
     {
         // Get the persons to display
-        $data['persons'] = $this->personModel->getOrdered(false, 'last_name', 'ASC');
+        $text_filter = $this->request->getGet('tf');
+
+        // Member status filter : active (default), deleted or all
+        $member_status = $this->request->getGet('ms');
+        $withDeleted = ($member_status == 'all');
+        $onlyDeleted = ($member_status == 'deleted');
+
+        if(!empty($text_filter)) {
+            $data['persons'] = $this->personModel->getByText($text_filter, $withDeleted, $onlyDeleted);
+        } else {
+            $data['persons'] = $this->personModel->getOrdered('last_name', 'ASC', $withDeleted, $onlyDeleted);
+        }
 
         // Append all needed informations for the list to display
-        foreach($data['persons'] as &$person) {
-            // Access levels informations
-            $accesses = $this->accessModel->where('fk_person', $person['id'])->findAll();
-            foreach($accesses as $access) {
-                $person['access_levels'][] = $access['access_level'];
-            }
-
-            // Category informations
-            $person['category'] = $this->categoryModel->find($person['fk_category']);
-
-            // Home informations
-            $person['home'] = $this->homeModel->find($person['fk_home']);
-
-            // Other home members informations
-            $homeMembers = $this->personModel->where('fk_home', $person['fk_home'])->findAll();
-            foreach($homeMembers as $homeMember) {
-                if($homeMember['id'] != $person['id']) {
-                    $person['other_home_members'][] = $homeMember;
+        if(!empty($data['persons'])) {
+            foreach($data['persons'] as &$person) {
+                // Access levels informations
+                $accesses = $this->accessModel->where('fk_person', $person['id'])->findAll();
+                foreach($accesses as $access) {
+                    $person['access_levels'][] = $access['access_level'];
                 }
-            }
 
-            // Current contributions informations
-            $contributions = $this->contributionModel->where(['fk_person' => $person['id'], 'date_end' => null])->findAll();
-            foreach($contributions as $contribution) {
-                $person['roles'][] = $contribution['role'];
+                // Category informations (include soft deleted categories for old members)
+                $person['category'] = $this->categoryModel->withDeleted()->find($person['fk_category']);
+
+                // Home informations (include soft deleted homes for old members)
+                $person['home'] = $this->homeModel->withDeleted()->find($person['fk_home']);
+
+                // Other home members informations
+                $homeMembers = $this->personModel->where('fk_home', $person['fk_home'])->findAll();
+                foreach($homeMembers as $homeMember) {
+                    if($homeMember['id'] != $person['id']) {
+                        $person['other_home_members'][] = $homeMember;
+                    }
+                }
+
+                // Current contributions informations
+                $contributions = $this->contributionModel->where(['fk_person' => $person['id'], 'date_end' => null])->findAll();
+                foreach($contributions as $contribution) {
+                    $person['roles'][] = $contribution['role'];
+                }
             }
         }
 

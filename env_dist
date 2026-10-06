@@ -2,6 +2,6 @@
 # Docker environment variables
 #--------------------------------------------------------------------
 # DB_ROOT_PASSWORD = root_password
-# DB_NAME = stock_db
-# DB_USER = stock_user
-# DB_PASSWORD = stock_password
+# DB_NAME = rambert_db
+# DB_USER = rambert_user
+# DB_PASSWORD = rambert_password

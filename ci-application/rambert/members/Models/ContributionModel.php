@@ -22,6 +22,15 @@ class ContributionModel extends Model {
 
     // Callbacks
     protected $afterFind = ['appendPerson', 'appendRole'];
+    protected $afterInsert = ['logCreate'];
+    protected $beforeUpdate = ['keepOldValues'];
+    protected $afterUpdate = ['logUpdate'];
+    protected $beforeDelete = ['keepOldValues'];
+    protected $afterDelete = ['logDelete'];
+
+    // Variables used in callbacks
+    private $oldValues = [];
+
 
     public function initialize()
     {
@@ -99,6 +108,132 @@ class ContributionModel extends Model {
         }
 
         return $contributions;
+    }
+
+    /**
+     * Callback method to store old values before update
+     */
+    protected function keepOldValues(array $data) {
+
+        // Store old values
+        foreach ($data['id'] as $id) {
+            $this->oldValues[$id] = $this->withDeleted()->find($id);
+        }
+        
+        return $data;
+    }
+
+    /**
+     * Callback method to log the creation of a new person
+     */
+    protected function logCreate(array $data) {
+        // Do not log the changes if the importation flag is set
+        if (isset($_SESSION['importation']) && $_SESSION['importation'] == true) {
+            return $data;
+        }
+
+        $roleModel = new RoleModel();
+        $teamModel = new TeamModel();
+        $changeTypeModel = new ChangeTypeModel();
+        $changeModel = new ChangeModel();
+
+        if ($data['id'] != 0) {
+            $newContribution = $data['data'];
+            $role = $roleModel->find($newContribution['fk_role']);
+            $team = $teamModel->find($role['fk_team']);
+
+            $changeTypeId = $changeTypeModel->getChangeTypeId('contribution');
+            
+            $changeData = [
+                'fk_change_author' => session()->get('user_id'),
+                'fk_person_concerned' => $newContribution['fk_person'],
+                'fk_change_type' => $changeTypeId,
+                'value_old' => '',
+                'value_new' => ($team ? $team['name'].' : ' : '').$role['name']."\n".
+                               ($newContribution['date_begin'] ? date('Y', strtotime($newContribution['date_begin'])) : '?')." - ".
+                               ($newContribution['date_end'] ? date('Y', strtotime($newContribution['date_end'])) : '?'),
+            ];
+            $changeModel->insert($changeData);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Callback method to log updates made to a contribution
+     */
+    protected function logUpdate(array $data) {
+        // Do not log the changes if the importation flag is set
+        if (isset($_SESSION['importation']) && $_SESSION['importation'] == true) {
+            return $data;
+        }
+
+        $roleModel = new RoleModel();
+        $teamModel = new TeamModel();
+        $changeTypeModel = new ChangeTypeModel();
+        $changeModel = new ChangeModel();
+
+        foreach ($data['id'] as $index => $id) {
+            $oldContribution = $this->oldValues[$id];
+            $newContribution = $this->find($id);
+            $oldRole = $roleModel->find($oldContribution['fk_role']);
+            $newRole = $roleModel->find($newContribution['fk_role']);
+            $oldTeam = $teamModel->find($oldRole['fk_team']);
+            $newTeam = $teamModel->find($newRole['fk_team']);
+
+            $changeTypeId = $changeTypeModel->getChangeTypeId('contribution');
+            
+            $changeData = [
+                'fk_change_author' => session()->get('user_id'),
+                'fk_person_concerned' => $newContribution['fk_person'],
+                'fk_change_type' => $changeTypeId,
+                'value_old' => ($oldTeam ? $oldTeam['name'].' : ' : '').$oldRole['name']."\n".
+                               ($oldContribution['date_begin'] ? date('Y', strtotime($oldContribution['date_begin'])) : '?')." - ".
+                               ($oldContribution['date_end'] ? date('Y', strtotime($oldContribution['date_end'])) : '?'),
+                'value_new' => ($newTeam ? $newTeam['name'].' : ' : '').$newRole['name']."\n".
+                               ($newContribution['date_begin'] ? date('Y', strtotime($newContribution['date_begin'])) : '?')." - ".
+                               ($newContribution['date_end'] ? date('Y', strtotime($newContribution['date_end'])) : '?'),
+            ];
+            $changeModel->insert($changeData);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Callback method to log a contribution deletion
+     */
+    protected function logDelete(array $data) {
+        // Do not log the changes if the importation flag is set
+        if (isset($_SESSION['importation']) && $_SESSION['importation'] == true) {
+            return $data;
+        }
+
+        $roleModel = new RoleModel();
+        $teamModel = new TeamModel();
+        $changeTypeModel = new ChangeTypeModel();
+        $changeModel = new ChangeModel();
+
+        foreach ($data['id'] as $index => $id) {
+            $oldContribution = $this->oldValues[$id];
+            $oldRole = $roleModel->find($oldContribution['fk_role']);
+            $oldTeam = $teamModel->find($oldRole['fk_team']);
+
+            $changeTypeId = $changeTypeModel->getChangeTypeId('contribution');
+            
+            $changeData = [
+                'fk_change_author' => session()->get('user_id'),
+                'fk_person_concerned' => $oldContribution['fk_person'],
+                'fk_change_type' => $changeTypeId,
+                'value_old' => ($oldTeam ? $oldTeam['name'].' : ' : '').$oldRole['name']."\n".
+                               ($oldContribution['date_begin'] ? date('Y', strtotime($oldContribution['date_begin'])) : '?')." - ".
+                               ($oldContribution['date_end'] ? date('Y', strtotime($oldContribution['date_end'])) : '?'),
+                'value_new' => '',
+            ];
+            $changeModel->insert($changeData);
+        }
+
+        return $data;
     }
 }
 ?>

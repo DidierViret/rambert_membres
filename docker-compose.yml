@@ -6,6 +6,8 @@ services:
       - "80:80"
     volumes:
       - ./ci-application:/var/www/html
+    entrypoint: ["/entrypoint.sh"]
+    command: ["apache2-foreground"]
     depends_on:
       - mariadb
     networks:

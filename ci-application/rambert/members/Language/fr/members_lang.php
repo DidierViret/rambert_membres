@@ -11,6 +11,8 @@ return[
 // Pages titles
 'title_new_person'                  => 'Nouvelle personne',
 'title_person_membership_end'       => 'Désinscription d\'un membre',
+'title_export_lists'                => 'Listes et exportations',
+'title_changes_list'                => 'Historique des modifications',
 
 // Subtitles
 'subtitle_person_informations'      => 'Informations personnelles',
@@ -20,6 +22,11 @@ return[
 'subtitle_contributions_list'       => 'Liste des contributions',
 'subtitle_contribution_update'      => 'Modification d\'une contribution',
 'subtitle_contribution_create'      => 'Ajout d\'une contribution',
+
+// Menu tabs
+'tab_members_list'                  => 'Membres',
+'tab_export_lists'                  => 'Listes',
+'tab_changes'                       => 'Historique',
 
 // Forms fields
 'field_title'                       => 'Titre',
@@ -48,6 +55,11 @@ return[
 'field_role'                        => 'Fonction',
 'field_contribution_start'          => 'Année de début',
 'field_contribution_end'            => 'Année de fin',
+'placeholder_text_filter'           => 'Rechercher par nom, prénom ou e-mail',
+'field_export_list_type'            => 'Type de liste',
+'field_active'                      => 'Actifs',
+'field_deleted'                     => 'Démissionnaires',
+'field_all'                         => 'Tous',
 
 // Lists columns
 'col_other_home_members'            => 'Autres membres du foyer',
@@ -58,6 +70,12 @@ return[
 'col_shipments'                     => 'Envois postaux',
 'col_newsletter_subscriptions'      => 'Inscriptions newsletter',
 'col_access_levels'                 => 'Accès au fichier des membres',
+'col_date'                          => 'Date',
+'col_author'                        => 'Auteur',
+'col_person_concerned'              => 'Personne concernée',
+'col_change_type'                   => 'Type de modification',
+'col_old_value'                     => 'Ancienne valeur',
+'col_new_value'                     => 'Nouvelle valeur',
 
 // Buttons
 'btn_save'                          => 'Enregistrer',
@@ -68,6 +86,14 @@ return[
 'btn_manage_contributions'          => 'Gérer les contributions',
 'btn_add_home'                      => 'Nouveau foyer',
 'btn_add_person'                    => 'Nouvelle personne',
+'btn_export_excel'                  => 'Fichier Excel',
+
+// Export lists
+'export_list_type_postal_send'                   => 'Adresses pour envois postaux',
+'export_list_type_newsletter_addresses'          => 'Adresses pour envois newsletter',
+'export_list_type_no_email_address'              => 'Membres sans adresse e-mail',
+'export_list_type_all_members'                   => 'Tous les membres',
+'export_list_type_all_members_with_soft_deleted' => 'Tous les membres (y compris démissionnaires)',
 
 // Warning messages
 'msg_contribution_confirm_delete'   => 'Voulez-vous vraiment supprimer cette contribution ?',
@@ -89,5 +115,6 @@ return[
 'since'                             => 'Depuis',
 'no_subscription'                   => 'Pas d\'inscription',
 'no_access_level'                   => 'Pas d\'accès',
+'changes'                           => 'Modifications',
 
 ];

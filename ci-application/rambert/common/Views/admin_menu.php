@@ -10,7 +10,7 @@
  */
 ?>
 
-<div id="admin-menu" class="container">
+<div id="admin-menu" class="container pb-4">
     <div class="row">
         <div class="col">
             <?php foreach (config('\Common\Config\AdminPanelConfig')->tabs as $tab){?>

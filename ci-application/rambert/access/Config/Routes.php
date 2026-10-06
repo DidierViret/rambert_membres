@@ -16,6 +16,7 @@ $routes->post('change_my_password','\Access\Controllers\Access::change_my_passwo
 
 // Admin routes
 $routes->get('access', '\Access\Controllers\Admin::listAccess');
+$routes->post('access/list/(:any)', '\Access\Controllers\Admin::listAccess/$1');
 $routes->get('access/create', '\Access\Controllers\Admin::createAccess');
 $routes->post('access/save', '\Access\Controllers\Admin::saveAccess');
 $routes->get('access/update/(:num)', '\Access\Controllers\Admin::updateAccess/$1');
