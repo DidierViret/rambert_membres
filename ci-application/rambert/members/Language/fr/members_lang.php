@@ -59,6 +59,7 @@ return[
 'field_export_list_type'            => 'Type de liste',
 'field_active'                      => 'Actifs',
 'field_deleted'                     => 'Démissionnaires',
+'field_resigned'                    => 'Démissionnaire',
 'field_all'                         => 'Tous',
 
 // Lists columns
