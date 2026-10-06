@@ -144,7 +144,16 @@ class MembersAdmin extends BaseController
      * Display a form to update a person
      */
     public function personUpdate($id) {
-        $homeId = $this->personModel->find($id)['fk_home'];
+        // Archived persons can't be updated, they must be restored first
+        $personToUpdate = $this->personModel->withDeleted()->find($id);
+        if(empty($personToUpdate)) {
+            return redirect()->to(base_url());
+        }
+        if(!empty($personToUpdate['date_delete'])) {
+            return redirect()->to('/home/'.$personToUpdate['fk_home']);
+        }
+
+        $homeId = $personToUpdate['fk_home'];
         $data['home'] = $this->homeModel->find($homeId);
         $data['persons'] = $this->personModel->where('fk_home', $homeId)->findAll();
         $data['person_to_update'] = $id;
@@ -167,6 +176,17 @@ class MembersAdmin extends BaseController
         // Check if the user has the right to access this page
         if($this->session->get('access_level') < $this->accessLevel) {
             throw AccessDeniedException::forPageAccessDenied();
+        }
+
+        // Archived persons can't be updated, they must be restored first
+        if($id != 0) {
+            $personToUpdate = $this->personModel->withDeleted()->find($id);
+            if(empty($personToUpdate)) {
+                return redirect()->to(base_url());
+            }
+            if(!empty($personToUpdate['date_delete'])) {
+                return redirect()->to('/home/'.$personToUpdate['fk_home']);
+            }
         }
 
         // Get the person's informations
@@ -276,6 +296,41 @@ class MembersAdmin extends BaseController
             return redirect()->to('/home/'.$homeId);
         }
         
+    }
+
+    /**
+     * Restore a soft deleted person (and its home if it was soft deleted too)
+     */
+    public function personRestore($id = 0) {
+        // Check if the user has the right to access this page
+        if($this->session->get('access_level') < $this->accessLevel) {
+            throw AccessDeniedException::forPageAccessDenied();
+        }
+
+        // Get the person's informations, including soft deleted persons
+        $person = $this->personModel->withDeleted()->find($id);
+        if(empty($person)) {
+            return redirect()->to(base_url());
+        }
+        $homeId = $person['fk_home'];
+
+        // Restore the home if it was soft deleted
+        $home = $this->homeModel->withDeleted()->find($homeId);
+        if(!empty($home) && !empty($home['date_delete'])) {
+            $this->homeModel->update($homeId, ['date_delete' => null]);
+        }
+
+        // Restore the person and clear the membership end informations.
+        // The admission is logged by the logUpdate callback of PersonModel.
+        $data = [
+            'date_delete' => null,
+            'membership_end' => null,
+            'membership_end_reason' => null,
+        ];
+        $this->personModel->update($id, $data);
+
+        // Redirect to the person's home details page
+        return redirect()->to('/home/'.$homeId);
     }
 
     /**

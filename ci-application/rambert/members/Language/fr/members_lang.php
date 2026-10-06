@@ -83,6 +83,8 @@ return[
 'btn_cancel'                        => 'Annuler',
 'btn_add'                           => 'Ajouter',
 'btn_delete'                        => 'Supprimer',
+'btn_restore'                       => 'Réactiver',
+'btn_membership_end'                => 'Désinscription',
 'btn_manage_contributions'          => 'Gérer les contributions',
 'btn_add_home'                      => 'Nouveau foyer',
 'btn_add_person'                    => 'Nouvelle personne',
@@ -116,5 +118,6 @@ return[
 'no_subscription'                   => 'Pas d\'inscription',
 'no_access_level'                   => 'Pas d\'accès',
 'changes'                           => 'Modifications',
+'log_readmission_after_membership_end' => 'Réadmission après une démission',
 
 ];

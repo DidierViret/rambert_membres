@@ -5,7 +5,7 @@
                 <!-- Display home action buttons for managers and admins -->
                 <?php if ($_SESSION['access_level'] >= config('\Access\Config\AccessConfig')->access_lvl_manager): ?>
                     <div class="mb-2">
-                        <a href="<?= base_url('home/update/'.$home['id']) ?>" class="btn btn-outline-primary"><i class="bi bi-pencil" style="font-size: 20px;"></i></a>
+                        <a href="<?= base_url('home/update/'.$home['id']) ?>" class="btn btn-outline-primary" title="<?= lang('members_lang.btn_update') ?>"><i class="bi bi-pencil" style="font-size: 20px;"></i></a>
                     </div>
                 <?php endif; ?>
 
