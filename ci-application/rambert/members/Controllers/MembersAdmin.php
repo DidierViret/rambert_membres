@@ -352,20 +352,39 @@ class MembersAdmin extends BaseController
             return redirect()->to('/home/'.$homeId);
         }
 
-        // Restore the home if it was soft deleted
-        $home = $this->homeModel->withDeleted()->find($homeId);
-        if(!empty($home) && !empty($home['date_delete'])) {
-            $this->homeModel->update($homeId, ['date_delete' => null]);
+        // Restore the home and the person in a single transaction, so that
+        // the home is not restored alone if the person's restoration fails
+        $db = \Config\Database::connect();
+        $db->transBegin();
+
+        try {
+            // Restore the home if it was soft deleted
+            $homeRestored = true;
+            $home = $this->homeModel->withDeleted()->find($homeId);
+            if(!empty($home) && !empty($home['date_delete'])) {
+                $homeRestored = $this->homeModel->update($homeId, ['date_delete' => null]);
+            }
+
+            // Restore the person and clear the membership end informations.
+            // The admission is logged by the logUpdate callback of PersonModel.
+            $data = [
+                'date_delete' => null,
+                'membership_end' => null,
+                'membership_end_reason' => null,
+            ];
+            $personRestored = $homeRestored && $this->personModel->update($id, $data);
+        } catch (\Throwable $e) {
+            $db->transRollback();
+            throw $e;
         }
 
-        // Restore the person and clear the membership end informations.
-        // The admission is logged by the logUpdate callback of PersonModel.
-        $data = [
-            'date_delete' => null,
-            'membership_end' => null,
-            'membership_end_reason' => null,
-        ];
-        $this->personModel->update($id, $data);
+        // Model updates return false on validation errors, which doesn't affect transStatus()
+        if(!$personRestored || $db->transStatus() === false) {
+            $db->transRollback();
+            log_message('error', 'Restoration of person '.$id.' failed, changes have been rolled back');
+        } else {
+            $db->transCommit();
+        }
 
         // Redirect to the person's home details page
         return redirect()->to('/home/'.$homeId);
