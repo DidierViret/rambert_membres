@@ -29,6 +29,17 @@ final class AccessModelTest extends CIUnitTestCase
     // Seeds
     protected $seedOnce = true;
     protected $seed = AccessTestSeeder::class;
+
+    /**
+     * Simulate a change author, needed to log the changes made to the access table
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Seeded person used as author of the logged changes
+        $_SESSION['user_id'] = 20;
+    }
     
     /**
      * Check that the table is seeded for tests
