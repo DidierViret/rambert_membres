@@ -23,6 +23,20 @@ use Members\Models\RoleModel;
 
 class MembersAdmin extends BaseController
 {
+    // Models used in this class
+    protected $personModel;
+    protected $accessModel;
+    protected $accessLevelModel;
+    protected $homeModel;
+    protected $categoryModel;
+    protected $contributionModel;
+    protected $newsletterModel;
+    protected $newsletterSubscriptionModel;
+    protected $changeModel;
+    protected $changeTypeModel;
+    protected $teamModel;
+    protected $roleModel;
+
     /**
      * Constructor
      */

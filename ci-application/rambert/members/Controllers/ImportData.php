@@ -25,6 +25,13 @@ use Access\Models\AccessModel;
 
 class ImportData extends BaseController
 {
+    // Models used in this class
+    protected $homeModel;
+    protected $personModel;
+
+    // Connection to the Joomla database used for the importation
+    protected $dbJoomla;
+
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger): void
     {
         // Set Access level before calling parent constructor

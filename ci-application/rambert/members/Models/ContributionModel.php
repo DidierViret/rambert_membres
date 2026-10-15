@@ -13,6 +13,10 @@ use Members\Models\PersonModel;
 use Members\Models\RoleModel;
 
 class ContributionModel extends Model {
+    // Models used in this class
+    protected $personModel;
+    protected $roleModel;
+
     protected $table      = 'contribution';
     protected $primaryKey = 'id';
 

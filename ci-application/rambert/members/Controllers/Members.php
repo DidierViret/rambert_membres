@@ -18,6 +18,15 @@ use Members\Models\NewsletterSubscriptionModel;
 
 class Members extends BaseController
 {
+    // Models used in this class
+    protected $personModel;
+    protected $accessModel;
+    protected $homeModel;
+    protected $categoryModel;
+    protected $contributionModel;
+    protected $newsletterModel;
+    protected $newsletterSubscriptionModel;
+
     /**
      * Constructor
      */
