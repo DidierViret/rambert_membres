@@ -20,6 +20,9 @@ use Access\Models\AccessModel;
 
 class Access extends BaseController
 {
+    // Models used in this class
+    protected $accessModel;
+
     /**
      * Constructor
      */
