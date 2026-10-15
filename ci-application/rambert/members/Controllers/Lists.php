@@ -19,6 +19,13 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Lists extends BaseController
 {
+    // Models used in this class
+    protected $personModel;
+    protected $accessModel;
+    protected $homeModel;
+    protected $categoryModel;
+    protected $newsletterSubscriptionModel;
+
     // TODO replace this constant for use with a set of different newsletter
     // So far we only manage one type of newsletter
     private $fk_newsletter = 1;

@@ -16,6 +16,10 @@ use Members\Models\ChangeModel;
 use Access\Models\AccessLevelModel;
 
 class AccessModel extends Model {
+    // Models used in this class
+    protected $accessLevelModel;
+    protected $personModel;
+
     protected $table      = 'access';
     protected $primaryKey = 'id';
 

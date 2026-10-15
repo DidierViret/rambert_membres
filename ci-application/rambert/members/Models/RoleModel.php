@@ -12,6 +12,9 @@ use CodeIgniter\Model;
 use Members\Models\TeamModel;
 
 class RoleModel extends Model {
+    // Models used in this class
+    protected $teamModel;
+
     protected $table      = 'role';
     protected $primaryKey = 'id';
 

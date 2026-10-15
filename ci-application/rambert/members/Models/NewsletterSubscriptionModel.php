@@ -13,6 +13,10 @@ use Members\Models\PersonModel;
 use Members\Models\NewsletterModel;
 
 class NewsletterSubscriptionModel extends Model {
+    // Models used in this class
+    protected $personModel;
+    protected $newsletterModel;
+
     protected $table      = 'newsletter_subscription';
     protected $primaryKey = 'id';
 
