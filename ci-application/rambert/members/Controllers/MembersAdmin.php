@@ -77,6 +77,11 @@ class MembersAdmin extends BaseController
             throw AccessDeniedException::forPageAccessDenied();
         }
 
+        // Archived homes can't be updated
+        if($redirect = $this->redirectIfArchivedHome($id)) {
+            return $redirect;
+        }
+
         $data['home'] = $this->homeModel->find($id);
         $data['persons'] = $this->personModel->where('fk_home', $id)->findAll();
 
@@ -94,6 +99,11 @@ class MembersAdmin extends BaseController
         // Check if the user has the right to access this page
         if($this->session->get('access_level') < $this->accessLevel) {
             throw AccessDeniedException::forPageAccessDenied();
+        }
+
+        // Archived homes can't be updated
+        if($id != 0 && ($redirect = $this->redirectIfArchivedHome($id))) {
+            return $redirect;
         }
 
         // Get the home informations
@@ -122,6 +132,11 @@ class MembersAdmin extends BaseController
      * Display a form to create a person
      */
     public function personCreate($homeId) {
+        // Persons can't be added to an archived home
+        if($redirect = $this->redirectIfArchivedHome($homeId)) {
+            return $redirect;
+        }
+
         $data['home'] = $this->homeModel->find($homeId);
         $data['persons'] = $this->personModel->where('fk_home', $homeId)->findAll();
 
@@ -366,6 +381,25 @@ class MembersAdmin extends BaseController
         }
         if(!empty($person['date_delete'])) {
             return redirect()->to('/home/'.$person['fk_home']);
+        }
+        return null;
+    }
+
+    /**
+     * Check if a home is archived (soft deleted) or doesn't exist.
+     * 
+     * @param int $homeId : the id of the home to check
+     * 
+     * @return : A redirection to the home details page if the home is archived,
+     *           to the homepage if the home doesn't exist, null otherwise
+     */
+    private function redirectIfArchivedHome($homeId) {
+        $home = $this->homeModel->withDeleted()->find($homeId);
+        if(empty($home)) {
+            return redirect()->to(base_url());
+        }
+        if(!empty($home['date_delete'])) {
+            return redirect()->to('/home/'.$homeId);
         }
         return null;
     }
