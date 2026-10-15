@@ -347,6 +347,11 @@ class MembersAdmin extends BaseController
         }
         $homeId = $person['fk_home'];
 
+        // Only archived persons can be restored
+        if(empty($person['date_delete'])) {
+            return redirect()->to('/home/'.$homeId);
+        }
+
         // Restore the home if it was soft deleted
         $home = $this->homeModel->withDeleted()->find($homeId);
         if(!empty($home) && !empty($home['date_delete'])) {
