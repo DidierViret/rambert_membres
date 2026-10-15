@@ -85,7 +85,7 @@ return[
 'btn_cancel'                        => 'Annuler',
 'btn_add'                           => 'Ajouter',
 'btn_delete'                        => 'Supprimer',
-'btn_restore'                       => 'Réactiver',
+'btn_restore_membership'            => 'Réadmettre',
 'btn_membership_end'                => 'Désinscription',
 'btn_manage_contributions'          => 'Gérer les contributions',
 'btn_add_home'                      => 'Nouveau foyer',
