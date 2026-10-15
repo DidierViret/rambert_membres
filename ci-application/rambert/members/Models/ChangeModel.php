@@ -13,6 +13,10 @@ use Members\Models\ChangeTypeModel;
 use Members\Models\PersonModel;
 
 class ChangeModel extends Model {
+    // Models used in this class
+    protected $personModel;
+    protected $changeTypeModel;
+
     protected $table      = 'change';
     protected $primaryKey = 'id';
 

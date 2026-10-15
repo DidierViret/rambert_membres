@@ -56,7 +56,7 @@ Au préalable, le gestionnaire de librairies PHP "Composer" doit être installé
 Même si les extensions PHP nécessaires sont prévue pour être installées dans le container Docker apache, il est possible que Composer signale des extensions PHP manquantes dans le système hôte. Pour éviter ce blocage, il faut les installer et/ou les activer dans l'installation PHP du système hôte. Les extensions nécessaires pour CodeIgniter sont décrites ici : https://www.codeigniter.com/user_guide/intro/requirements.html.
 
 Dans un terminal :
-```bash
+```
 cd ci-application
 composer install
 ```
@@ -64,13 +64,13 @@ composer install
 ## Montage et démarrage des containers
 
 Pour permettre la création du réseau de containers dans une version LIVE de Linux, il faut d'abord créer le réseau manuellement (pas nécessaire si Docker tourne sur un système d'exploitation installé):
-```bash
+```
 sudo systemctl start docker
 sudo docker network create --driver bridge app-network
 ```
 
 Montage et démarrage des containers :
-```bash
+```
 docker compose build
 docker compose up
 ```
@@ -78,7 +78,27 @@ docker compose up
 ## Création de la structure de la base de données
 Une fois que les containers sont démarrés, entrer dans la ligne de commande du container apache pour générer la structure de la base de données.
 
-```bash
+```
 docker exec -it <container name> sh
 php spark migrate --all
+```
+
+## Exécution des tests
+Les tests PHPUnit utilisent la base de données "rambert_test_db" du container MariaDB, créée par le script "docker/mariadb/init.sql". Ils sont lancés depuis le système hôte, qui accède à MariaDB par le port 3306. L'extension PHP "mysqli" doit être installée sur le système hôte.
+
+Les paramètres de connexion sont définis dans le fichier ".env" du dossier "ci-application" :
+```
+database.tests.hostname = 127.0.0.1
+database.tests.database = rambert_test_db
+database.tests.username = rambert_test_user
+database.tests.password = rambert_test_password
+database.tests.DBDriver = MySQLi
+database.tests.DBPrefix =
+database.tests.port = 3306
+```
+
+Avec les containers démarrés, dans un terminal :
+```
+cd ci-application
+vendor/bin/phpunit
 ```

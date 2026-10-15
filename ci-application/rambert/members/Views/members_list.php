@@ -11,8 +11,19 @@
     <!-- Display action buttons for managers and admins -->
     <?php if ($_SESSION['access_level'] >= config('\Access\Config\AccessConfig')->access_lvl_manager): ?>
         <div class="row mb-2">
-            <div class="col-12">
+            <div class="col">
                 <a href="<?= base_url('home/create') ?>" class="btn btn-outline-primary"><i class="bi bi-plus-lg"></i> <?= lang('members_lang.btn_add_home') ?></a>
+            </div>
+            <div class="col-auto d-flex align-items-center">
+                <div class="form-check form-check-inline">
+                    <input type="radio" id="active" name="member_status" value="active" class="form-check-input" checked><label for="active" class="form-check-label"><?= lang('members_lang.field_active') ?></label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input type="radio" id="deleted" name="member_status" value="deleted" class="form-check-input"><label for="deleted" class="form-check-label"><?= lang('members_lang.field_deleted') ?></label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input type="radio" id="all" name="member_status" value="all" class="form-check-input"><label for="all" class="form-check-label"><?= lang('members_lang.field_all') ?></label>
+                </div>
             </div>
         </div>
     <?php endif; ?>
@@ -23,7 +34,7 @@
     <div id="list_persons" >
         <?php if (!empty($persons)): ?>
             <?php foreach ($persons as $person): ?>
-                <div id="<?= $person['id'] ?>" class="person row bg-light border-bottom border-primary pt-2 pb-2 mb-4">
+                <div id="<?= $person['id'] ?>" class="person row bg-light pt-2 pb-2 mb-4 <?= ($person['date_delete'] != null) ? 'border border-danger' : 'border-bottom border-primary' ?>">
                     <div class="col-lg-4 col-md-6">
                         <div>
                             <strong><a href="<?= 'home/'.$person['fk_home'] ?>" ><?= $person['last_name'].' '.$person['first_name'] ?></a></strong>
@@ -110,17 +121,29 @@
 <!-- Javascript to filter members list after filter change -->
 <script>
     $(document).ready(function() {
-        $('#text_filter').on('keyup', function() {
-            var text_filter = $(this).val().toLowerCase();
-            var get_url = '<?= base_url(); ?>members?tf='+text_filter;
+        var list_request = null;
+
+        function updateList() {
+            var text_filter = $('#text_filter').val().toLowerCase();
+            // member_status radios are only displayed for managers, default to active members
+            var member_status = $('input[name="member_status"]:checked').val() || 'active';
+            var get_url = '<?= base_url(); ?>members?' + $.param({tf: text_filter, ms: member_status});
+
+            // abort the previous request so that an older response can't overwrite a newer one
+            if (list_request) {
+                list_request.abort();
+            }
 
             // call membersList controller method to update data content
-            $.get(get_url, data => {
+            list_request = $.get(get_url, data => {
                 $('#list_persons').empty();
 
                 // replace the content of the list_persons div with the filtered data
                 $('#list_persons').html($(data).find('#list_persons').html());
             });
-        });
+        }
+
+        $('#text_filter').on('keyup', updateList);
+        $('input[name="member_status"]').on('change', updateList);
     });
 </script>

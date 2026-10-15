@@ -23,6 +23,20 @@ use Members\Models\RoleModel;
 
 class MembersAdmin extends BaseController
 {
+    // Models used in this class
+    protected $personModel;
+    protected $accessModel;
+    protected $accessLevelModel;
+    protected $homeModel;
+    protected $categoryModel;
+    protected $contributionModel;
+    protected $newsletterModel;
+    protected $newsletterSubscriptionModel;
+    protected $changeModel;
+    protected $changeTypeModel;
+    protected $teamModel;
+    protected $roleModel;
+
     /**
      * Constructor
      */
@@ -77,6 +91,11 @@ class MembersAdmin extends BaseController
             throw AccessDeniedException::forPageAccessDenied();
         }
 
+        // Archived homes can't be updated
+        if($redirect = $this->redirectIfArchivedHome($id)) {
+            return $redirect;
+        }
+
         $data['home'] = $this->homeModel->find($id);
         $data['persons'] = $this->personModel->where('fk_home', $id)->findAll();
 
@@ -94,6 +113,11 @@ class MembersAdmin extends BaseController
         // Check if the user has the right to access this page
         if($this->session->get('access_level') < $this->accessLevel) {
             throw AccessDeniedException::forPageAccessDenied();
+        }
+
+        // Archived homes can't be updated
+        if($id != 0 && ($redirect = $this->redirectIfArchivedHome($id))) {
+            return $redirect;
         }
 
         // Get the home informations
@@ -122,6 +146,11 @@ class MembersAdmin extends BaseController
      * Display a form to create a person
      */
     public function personCreate($homeId) {
+        // Persons can't be added to an archived home
+        if($redirect = $this->redirectIfArchivedHome($homeId)) {
+            return $redirect;
+        }
+
         $data['home'] = $this->homeModel->find($homeId);
         $data['persons'] = $this->personModel->where('fk_home', $homeId)->findAll();
 
@@ -144,6 +173,11 @@ class MembersAdmin extends BaseController
      * Display a form to update a person
      */
     public function personUpdate($id) {
+        // Archived persons can't be updated, they must be restored first
+        if($redirect = $this->redirectIfArchivedPerson($id)) {
+            return $redirect;
+        }
+
         $homeId = $this->personModel->find($id)['fk_home'];
         $data['home'] = $this->homeModel->find($homeId);
         $data['persons'] = $this->personModel->where('fk_home', $homeId)->findAll();
@@ -167,6 +201,11 @@ class MembersAdmin extends BaseController
         // Check if the user has the right to access this page
         if($this->session->get('access_level') < $this->accessLevel) {
             throw AccessDeniedException::forPageAccessDenied();
+        }
+
+        // Archived persons can't be updated, they must be restored first
+        if($id != 0 && ($redirect = $this->redirectIfArchivedPerson($id))) {
+            return $redirect;
         }
 
         // Get the person's informations
@@ -279,6 +318,131 @@ class MembersAdmin extends BaseController
     }
 
     /**
+     * Display a confirmation message before restoring a person
+     */
+    public function personConfirmRestore($id = 0) {
+        // Check if the user has the right to access this page
+        if($this->session->get('access_level') < $this->accessLevel) {
+            throw AccessDeniedException::forPageAccessDenied();
+        }
+
+        // Get the person's informations, including soft deleted persons
+        $person = $this->personModel->withDeleted()->find($id);
+        if(empty($person)) {
+            return redirect()->to(base_url());
+        }
+        // Only archived persons can be restored
+        if(empty($person['date_delete'])) {
+            return redirect()->to('/home/'.$person['fk_home']);
+        }
+
+        // Display the confirmation form
+        $data['title'] = lang('members_lang.title_person_restore')." : ".$person['last_name'].' '.$person['first_name'];
+        $data['message'] = lang('members_lang.msg_person_confirm_restore');
+        $data['url_yes'] = base_url('/person/restore/'.$id);
+        $data['url_no'] = base_url('/home/'.$person['fk_home']);
+
+        return $this->display_view('Members\person_confirm_restore', $data);
+    }
+
+    /**
+     * Restore a soft deleted person (and its home if it was soft deleted too)
+     */
+    public function personRestore($id = 0) {
+        // Check if the user has the right to access this page
+        if($this->session->get('access_level') < $this->accessLevel) {
+            throw AccessDeniedException::forPageAccessDenied();
+        }
+
+        // Get the person's informations, including soft deleted persons
+        $person = $this->personModel->withDeleted()->find($id);
+        if(empty($person)) {
+            return redirect()->to(base_url());
+        }
+        $homeId = $person['fk_home'];
+
+        // Only archived persons can be restored
+        if(empty($person['date_delete'])) {
+            return redirect()->to('/home/'.$homeId);
+        }
+
+        // Restore the home and the person in a single transaction, so that
+        // the home is not restored alone if the person's restoration fails
+        $db = \Config\Database::connect();
+        $db->transBegin();
+
+        try {
+            // Restore the home if it was soft deleted
+            $homeRestored = true;
+            $home = $this->homeModel->withDeleted()->find($homeId);
+            if(!empty($home) && !empty($home['date_delete'])) {
+                $homeRestored = $this->homeModel->update($homeId, ['date_delete' => null]);
+            }
+
+            // Restore the person and clear the membership end informations.
+            // The admission is logged by the logUpdate callback of PersonModel.
+            $data = [
+                'date_delete' => null,
+                'membership_end' => null,
+                'membership_end_reason' => null,
+            ];
+            $personRestored = $homeRestored && $this->personModel->update($id, $data);
+        } catch (\Throwable $e) {
+            $db->transRollback();
+            throw $e;
+        }
+
+        // Model updates return false on validation errors, which doesn't affect transStatus()
+        if(!$personRestored || $db->transStatus() === false) {
+            $db->transRollback();
+            log_message('error', 'Restoration of person '.$id.' failed, changes have been rolled back');
+        } else {
+            $db->transCommit();
+        }
+
+        // Redirect to the person's home details page
+        return redirect()->to('/home/'.$homeId);
+    }
+
+    /**
+     * Check if a person is archived (soft deleted) or doesn't exist.
+     * 
+     * @param int $personId : the id of the person to check
+     * 
+     * @return : A redirection to the person's home if the person is archived,
+     *           to the homepage if the person doesn't exist, null otherwise
+     */
+    private function redirectIfArchivedPerson($personId) {
+        $person = $this->personModel->withDeleted()->find($personId);
+        if(empty($person)) {
+            return redirect()->to(base_url());
+        }
+        if(!empty($person['date_delete'])) {
+            return redirect()->to('/home/'.$person['fk_home']);
+        }
+        return null;
+    }
+
+    /**
+     * Check if a home is archived (soft deleted) or doesn't exist.
+     * 
+     * @param int $homeId : the id of the home to check
+     * 
+     * @return : A redirection to the home details page if the home is archived,
+     *           to the homepage if the home doesn't exist, null otherwise
+     */
+    private function redirectIfArchivedHome($homeId) {
+        $home = $this->homeModel->withDeleted()->find($homeId);
+        if(empty($home)) {
+            return redirect()->to(base_url());
+        }
+        if(!empty($home['date_delete'])) {
+            return redirect()->to('/home/'.$homeId);
+        }
+        return null;
+    }
+
+    /**
      * Get the informations linked to a person
      */
     private function get_person_informations(&$person) {
@@ -357,6 +521,12 @@ class MembersAdmin extends BaseController
         if($this->session->get('access_level') < $this->accessLevel) {
             throw AccessDeniedException::forPageAccessDenied();
         }
+
+        // Contributions of archived persons can't be managed, they must be restored first
+        if($redirect = $this->redirectIfArchivedPerson($personId)) {
+            return $redirect;
+        }
+
         // Get the person's informations
         $person = $this->personModel->find($personId);
 
@@ -404,6 +574,11 @@ class MembersAdmin extends BaseController
             throw AccessDeniedException::forPageAccessDenied();
         }
 
+        // Contributions of archived persons can't be managed, they must be restored first
+        if($redirect = $this->redirectIfArchivedPerson($personId)) {
+            return $redirect;
+        }
+
         // Get the person's informations
         $contribution['person'] = $this->personModel->find($personId);
         if(empty($contribution['person'])) {
@@ -442,6 +617,11 @@ class MembersAdmin extends BaseController
         $contribution = $this->contributionModel->find($id);
         $data['contribution'] = $contribution;
 
+        // Contributions of archived persons can't be managed, they must be restored first
+        if($redirect = $this->redirectIfArchivedPerson($contribution['fk_person'] ?? 0)) {
+            return $redirect;
+        }
+
         // Form title
         $data['title'] = $contribution['person']['last_name']." ".$contribution['person']['first_name']." - ".lang('members_lang.subtitle_contribution_update');
 
@@ -470,6 +650,17 @@ class MembersAdmin extends BaseController
 
         // Get the contribution informations
         $contribution = $this->request->getPost();
+
+        // For an existing contribution, use the person stored in the database
+        if($id != 0) {
+            $existingContribution = $this->contributionModel->find($id);
+            $contribution['fk_person'] = $existingContribution['fk_person'] ?? 0;
+        }
+
+        // Contributions of archived persons can't be managed, they must be restored first
+        if($redirect = $this->redirectIfArchivedPerson($contribution['fk_person'] ?? 0)) {
+            return $redirect;
+        }
 
         // Convert year-only dates to MySQL format (YYYY-MM-DD)
         $contribution['date_begin'] = $contribution['date_begin'] . '-01-01';
@@ -502,6 +693,12 @@ class MembersAdmin extends BaseController
 
         // Get the contribution informations
         $contribution = $this->contributionModel->find($id);
+
+        // Contributions of archived persons can't be managed, they must be restored first
+        if($redirect = $this->redirectIfArchivedPerson($contribution['fk_person'] ?? 0)) {
+            return $redirect;
+        }
+
         $person = $this->personModel->find($contribution['fk_person']);
         $contributionTeamName = (!empty($contribution['role']['team'])) ? $contribution['role']['team']['name'] : '';
 
@@ -524,7 +721,12 @@ class MembersAdmin extends BaseController
 
         // Get the contribution informations
         $contribution = $this->contributionModel->find($id);
-        $personId = $contribution['fk_person'];
+        $personId = $contribution['fk_person'] ?? 0;
+
+        // Contributions of archived persons can't be managed, they must be restored first
+        if($redirect = $this->redirectIfArchivedPerson($personId)) {
+            return $redirect;
+        }
 
         // Delete the contribution
         $this->contributionModel->delete($id);

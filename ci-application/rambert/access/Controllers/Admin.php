@@ -22,6 +22,11 @@ use Members\Models\PersonModel;
 
 class Admin extends BaseController
 {
+    // Models used in this class
+    protected $accessModel;
+    protected $accessLevelModel;
+    protected $personModel;
+
     /**
      * Constructor
      */

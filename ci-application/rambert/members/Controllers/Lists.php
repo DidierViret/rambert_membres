@@ -19,6 +19,13 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Lists extends BaseController
 {
+    // Models used in this class
+    protected $personModel;
+    protected $accessModel;
+    protected $homeModel;
+    protected $categoryModel;
+    protected $newsletterSubscriptionModel;
+
     // TODO replace this constant for use with a set of different newsletter
     // So far we only manage one type of newsletter
     private $fk_newsletter = 1;
@@ -212,7 +219,7 @@ class Lists extends BaseController
      */
     private function getDataNoEmailAddress()
     {
-        $persons = $this->personModel->getOrdered(false, "last_name", "ASC");
+        $persons = $this->personModel->getOrdered("last_name", "ASC", false, false);
         $data = [];
         
         if(!empty($persons)) {
@@ -237,7 +244,7 @@ class Lists extends BaseController
 
     private function getDataAllMembers()
     {
-        $persons = $this->personModel->getOrdered(false, "last_name", "ASC");
+        $persons = $this->personModel->getOrdered("last_name", "ASC", false, false);
         $data = [];
         
         if(!empty($persons)) {
@@ -284,7 +291,7 @@ class Lists extends BaseController
 
     private function getDataAllMembersWithSoftDeleted()
     {
-        $persons = $this->personModel->getOrdered(true, "last_name", "ASC");
+        $persons = $this->personModel->getOrdered("last_name", "ASC", true, false);
         $data = [];
         
         if(!empty($persons)) {

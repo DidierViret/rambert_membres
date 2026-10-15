@@ -132,18 +132,21 @@ class PersonModel extends Model {
     /**
      * Get an array of persons ordered by a field.
      * 
-     * @param bool $withDeleted : A boolean to include or not the soft deleted persons
      * @param string $orderBy : name of the field to use to sort the persons
      * @param string $direction : ASC, DESC or RANDOM, the direction of the sorting
      * @param string $where : a where clause to filter the persons
+     * @param bool $withDeleted : A boolean to include or not the soft deleted persons
+     * @param bool $onlyDeleted : A boolean to get only the soft deleted persons
      * 
      * @return : An array of persons with all attributes, ordered by the mentioned field
      */
-    public function getOrdered(bool $withDeleted = false, string $orderBy = 'id', string $direction = 'ASC') {
+    public function getOrdered(string $orderBy = 'id', string $direction = 'ASC', bool $withDeleted = false, bool $onlyDeleted = false) {
         $builder = $this->builder();
         $builder->select('*');
         $builder->orderBy("$orderBy", "$direction");
-        if(!$withDeleted) {
+        if($onlyDeleted) {
+            $builder->where('date_delete IS NOT NULL');
+        } elseif(!$withDeleted) {
             $builder->where('date_delete IS NULL');
         }
 
@@ -157,14 +160,17 @@ class PersonModel extends Model {
      * 
      * @param string $text : the text to search for
      * @param bool $withDeleted : A boolean to include or not the soft deleted persons
+     * @param bool $onlyDeleted : A boolean to get only the soft deleted persons
      * 
      * @return : An array of persons with all attributes, filtered by the text.
      */
-    public function getByText(string $text, bool $withDeleted = false) {
+    public function getByText(string $text, bool $withDeleted = false, bool $onlyDeleted = false) {
         $builder = $this->builder();
         $builder->select('*');
         $builder->orderBy("last_name, first_name", "ASC");
-        if(!$withDeleted) {
+        if($onlyDeleted) {
+            $builder->where('date_delete IS NOT NULL');
+        } elseif(!$withDeleted) {
             $builder->where('date_delete IS NULL');
         }
         $builder->groupStart()
@@ -242,6 +248,7 @@ class PersonModel extends Model {
         $changeTypeModel = new ChangeTypeModel();
         $changeModel = new ChangeModel();
         $categoryModel = new CategoryModel();
+        $homeModel = new HomeModel();
         
         foreach ($data['id'] as $id) {
             $oldValue = $this->oldValues[$id];
@@ -265,13 +272,16 @@ class PersonModel extends Model {
 
             // (Re)log the membership start if the soft delete status has been removed
             if (!empty($oldValue['date_delete']) && empty($newValue['date_delete'])) {
+                $home = $homeModel->find($newValue['fk_home']);
                 $changeTypeId = $changeTypeModel->getChangeTypeId('membership_start');
                 
                 $changeData = [
                     'fk_change_author' => session()->get('user_id'),
                     'fk_person_concerned' => $id,
                     'fk_change_type' => $changeTypeId,
-                    'value_old' => (!empty($oldValue['membership_end']) ? $oldValue['membership_end'].' - '.$oldValue['membership_end_reason'] : ''),
+                    'value_old' => (!empty($oldValue['membership_end']) ? lang('members_lang.log_readmission_after_membership_end').": ".$oldValue['membership_end']."\n".
+                                                                          $oldValue['membership_end_reason']
+                                                                        : ''),
                     'value_new' => $newValue['last_name'].' '.$newValue['first_name']."\n".
                                    lang('members_lang.field_membership_start').': '.$newValue['membership_start']."\n".
                                    ($home ? $home['address_line_1']."\n".
