@@ -11,10 +11,10 @@
     <!-- Display action buttons for managers and admins -->
     <?php if ($_SESSION['access_level'] >= config('\Access\Config\AccessConfig')->access_lvl_manager): ?>
         <div class="row mb-2">
-            <div class="col">
+            <div class="col-12 col-md">
                 <a href="<?= base_url('home/create') ?>" class="btn btn-outline-primary"><i class="bi bi-plus-lg"></i> <?= lang('members_lang.btn_add_home') ?></a>
             </div>
-            <div class="col-auto d-flex align-items-center">
+            <div class="col-12 col-md-auto d-flex align-items-center mt-2 mt-md-0">
                 <div class="form-check form-check-inline">
                     <input type="radio" id="active" name="member_status" value="active" class="form-check-input" checked><label for="active" class="form-check-label"><?= lang('members_lang.field_active') ?></label>
                 </div>

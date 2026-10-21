@@ -30,7 +30,7 @@
     <link rel="icon" type="image/png" href="<?= base_url("images/favicon.png"); ?>" />
     <link rel="shortcut icon" type="image/png" href="<?= base_url("images/favicon.png"); ?>" />
 
-    <!-- Bootstrap  -->
+    <!-- Bootstrap 4 -->
     <!-- Rambert Bootstrap CSS personalized with https://bootstrap.build/app -->
     <link rel="stylesheet" href="<?= base_url("css/rambert_bootstrap.min.css"); ?>" />
     <!-- Bootstrap icons -->
