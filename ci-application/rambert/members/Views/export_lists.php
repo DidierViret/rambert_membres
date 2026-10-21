@@ -16,7 +16,7 @@
         </div>
 
         <!-- Dropdown to select list type -->
-        <div class="col-8">
+        <div class="col-12 col-md-8">
             <div class="form-group">
                 <select class="form-control" id="list-type">
                     <option value="postal-send" <?php if (isset($list_type) && $list_type == 'postal-send') echo 'selected'; ?>>
@@ -39,7 +39,7 @@
         </div>
 
         <!-- Export button -->
-        <div class="col-4 text-right">
+        <div class="col-12 col-md-4 text-md-right">
             <input id="export-excel" type="button" class="btn btn-outline-success" value="<?=lang('members_lang.btn_export_excel')?>" >
         </div>
     </div>
