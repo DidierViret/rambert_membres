@@ -636,6 +636,15 @@ class MembersAdmin extends BaseController
         // Get the list of roles
         $data['roles'] = $this->roleModel->findAll();
 
+        // Keep the current role and team available, even if they have been soft deleted
+        $role = $contribution['role'];
+        if (!empty($role['date_delete'])) {
+            $data['roles'][] = $role;
+        }
+        if (!empty($role['team']) && !array_key_exists($role['team']['id'], $data['teams'])) {
+            $data['teams'][$role['team']['id']] = $role['team']['name'];
+        }
+
         return $this->display_view('Members\contribution_form', $data);
     }
 

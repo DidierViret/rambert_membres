@@ -16,5 +16,6 @@ class AdminPanelConfig extends \CodeIgniter\Config\BaseConfig
     */
     public $tabs=[
         ['label'=>'access_lang.title_access_list', 'pageLink'=>'access'],
+        ['label'=>'members_lang.tab_teams', 'pageLink'=>'teams'],
     ];
 }

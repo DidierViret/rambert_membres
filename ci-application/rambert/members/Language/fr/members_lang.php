@@ -14,6 +14,14 @@ return[
 'title_person_restore'              => 'Réadmission d\'un membre',
 'title_export_lists'                => 'Listes et exportations',
 'title_changes_list'                => 'Historique des modifications',
+'title_teams_list'                  => 'Groupes et fonctions (utilisés pour les contributions)',
+'title_team_new'                    => 'Nouveau groupe',
+'title_team_update'                 => 'Modification d\'un groupe',
+'title_roles_list'                  => 'Fonctions du groupe',
+'title_role_new'                    => 'Nouvelle fonction',
+'title_role_update'                 => 'Modification d\'une fonction',
+'title_team_restore'                => 'Restauration d\'un groupe',
+'title_role_restore'                => 'Restauration d\'une fonction',
 
 // Subtitles
 'subtitle_person_informations'      => 'Informations personnelles',
@@ -28,6 +36,7 @@ return[
 'tab_members_list'                  => 'Membres',
 'tab_export_lists'                  => 'Listes',
 'tab_changes'                       => 'Historique',
+'tab_teams'                         => 'Groupes et fonctions',
 
 // Forms fields
 'field_title'                       => 'Titre',
@@ -78,6 +87,9 @@ return[
 'col_change_type'                   => 'Type de modification',
 'col_old_value'                     => 'Ancienne valeur',
 'col_new_value'                     => 'Nouvelle valeur',
+'col_name'                          => 'Nom',
+'col_description'                   => 'Description',
+'col_nb_contributions'              => 'Nombre de contributions',
 
 // Buttons
 'btn_save'                          => 'Enregistrer',
@@ -91,6 +103,8 @@ return[
 'btn_add_home'                      => 'Nouveau foyer',
 'btn_add_person'                    => 'Nouvelle personne',
 'btn_export_excel'                  => 'Fichier Excel',
+'btn_add_team'                      => 'Nouveau groupe',
+'btn_add_role'                      => 'Nouvelle fonction',
 
 // Export lists
 'export_list_type_postal_send'                   => 'Adresses pour envois postaux',
@@ -104,6 +118,14 @@ return[
 'msg_person_membership_end'         => 'Vous allez enregistrer la désinscription de ce membre.<br>Merci d\'indiquer l\'année et le motif de sa sortie du club.',
 'msg_person_confirm_restore'        => 'Voulez-vous vraiment réadmettre ce membre ?<br>Son année et son motif de sortie du club seront effacés.',
 'msg_person_confirm_delete'         => 'Voulez-vous vraiment supprimer cette personne ? ',
+'msg_team_confirm_delete'           => 'Voulez-vous vraiment supprimer ce groupe ?',
+'msg_role_confirm_delete'           => 'Voulez-vous vraiment supprimer cette fonction ?',
+'msg_team_roles_deleted'            => '{0, plural, =1{Sa fonction sera aussi supprimée} other{Ses # fonctions seront aussi supprimées}}. Les fonctions utilisées dans des contributions resteront visibles dans celles-ci mais ne pourront plus être attribuées.',
+'msg_role_used_in_contributions'    => 'Elle est utilisée dans {0, plural, =1{une contribution, qui la conservera} other{# contributions qui la conserveront}}, mais ne pourra plus être attribuée.',
+'msg_team_confirm_restore'          => 'Voulez-vous vraiment restaurer ce groupe ?',
+'msg_team_roles_stay_archived'      => '{0, plural, =1{Sa fonction désactivée restera désactivée} other{Ses # fonctions désactivées resteront désactivées}}, vous pourrez ensuite la ou les restaurer individuellement.',
+'msg_role_confirm_restore'          => 'Voulez-vous vraiment restaurer cette fonction ?',
+'msg_role_team_restored'            => 'Son groupe est désactivé, il sera aussi restauré.',
 'msg_warning_new_home'              => 'Vous êtes en train de créer un nouveau foyer. Si vous souhaitez ajouter une personne à un foyer existant,
                                         veuillez annuler cette opération et afficher le foyer concerné pour y ajouter une personne.',
 
@@ -111,6 +133,7 @@ return[
 'msg_error_valid_email'             => 'Veuillez entrer une adresse e-mail valide',
 'msg_error_email_length'            => 'L\'adresse e-mail ne doit pas dépasser 150 caractères',
 'msg_error_no_data_to_display'      => 'Il n\'y a pas de données à afficher',
+'msg_error_team_name_exists'        => 'Un groupe portant ce nom existe déjà, éventuellement parmi les groupes désactivés.',
 
 // Error code messages
 'code_error_401'                    => '401 - Non autorisé',
@@ -121,6 +144,8 @@ return[
 'no_subscription'                   => 'Pas d\'inscription',
 'no_access_level'                   => 'Pas d\'accès',
 'changes'                           => 'Modifications',
+'no_team'                           => 'Fonctions sans groupe',
+'archived'                          => 'désactivé',
 'log_readmission_after_membership_end' => 'Réadmission après une démission',
 
 ];

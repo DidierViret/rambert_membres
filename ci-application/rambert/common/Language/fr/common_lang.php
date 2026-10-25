@@ -16,6 +16,7 @@ return[
 
 // Buttons
 'btn_admin'                      => 'Administration',
+'btn_menu'                       => 'Menu',
 'btn_back'                       => 'Retour',
 'btn_next'                       => 'Suivant',
 'btn_cancel'                     => 'Annuler',

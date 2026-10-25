@@ -26,9 +26,24 @@ class RoleModel extends Model {
     // Callbacks
     protected $afterFind = ['appendTeam'];
 
+    // Declare variable for validation
+    protected $validationRules;
+
     public function initialize()
     {
         $this->teamModel = new TeamModel();
+
+        $this->validationRules = [
+            'fk_team' =>
+                ['label' => lang('members_lang.field_team'),
+                 'rules' => 'permit_empty|is_not_unique[team.id]'],
+            'name' =>
+                ['label' => lang('members_lang.col_name'),
+                 'rules' => 'required|max_length[100]'],
+            'description' =>
+                ['label' => lang('members_lang.col_description'),
+                 'rules' => 'permit_empty|max_length[255]'],
+        ];
     }
 
     /**
@@ -43,6 +58,9 @@ class RoleModel extends Model {
     public function getDropdown(bool $withDeleted = false, string $orderBy = 'id', string $direction = 'ASC') {
         $builder = $this->builder();
         $builder->select('id, name');
+        if (!$withDeleted) {
+            $builder->where($this->deletedField.' IS NULL');
+        }
         $builder->orderBy("$orderBy", "$direction");
         $query = $builder->get();
         
@@ -62,14 +80,14 @@ class RoleModel extends Model {
         if($data['singleton'] && !empty($data['data'])) {
             // Single item, add datas to it
             if (!empty($data['data']['fk_team'])) {
-                $data['data']['team'] = $this->teamModel->find($data['data']['fk_team']);
+                $data['data']['team'] = $this->teamModel->withDeleted()->find($data['data']['fk_team']);
             }
 
         } elseif (!empty($data['data'])) {
             // Multiple items, add datas to each of them
             foreach ($data['data'] as &$role) {
                 if (!empty($role['fk_team'])) {
-                    $role['team'] = $this->teamModel->find($role['fk_team']);
+                    $role['team'] = $this->teamModel->withDeleted()->find($role['fk_team']);
                 }
             }
         }
