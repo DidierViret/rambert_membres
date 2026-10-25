@@ -114,20 +114,47 @@ class TeamsAdminFeatureTest extends CIUnitTestCase
         $this->withSession($this->adminSession)->post('teams/save/'.$team['id'], ['name' => 'Renamed team', 'description' => '']);
         $this->seeInDatabase('team', ['id' => $team['id'], 'name' => 'Renamed team']);
 
-        // A team with roles can't be deleted
-        $roleId = $this->createRole($team['id'], 'Role');
-        $result = $this->withSession($this->adminSession)->get('teams/delete/'.$team['id']);
-        $result->assertSeeElement('#not_deletable');
-        $this->withSession($this->adminSession)->post('teams/delete/'.$team['id']);
-        $this->seeInDatabase('team', ['id' => $team['id']]);
-
-        // A team without role can be deleted
-        $this->db->table('role')->where('id', $roleId)->delete();
+        // A team with a used role is soft deleted. Its used role is soft deleted, its unused role is deleted from the database
+        $usedRole = $this->createRole($team['id'], 'Used role');
+        $unusedRole = $this->createRole($team['id'], 'Unused role');
+        $this->createContribution($usedRole);
         $result = $this->withSession($this->adminSession)->get('teams/delete/'.$team['id']);
         $result->assertSeeElement('#delete_confirmation');
+        $result->assertSee(lang('members_lang.msg_team_roles_deleted', [2]));
         $result = $this->withSession($this->adminSession)->post('teams/delete/'.$team['id']);
         $result->assertRedirectTo('teams');
-        $this->dontSeeInDatabase('team', ['id' => $team['id']]);
+        $deletedTeam = $this->db->table('team')->where('id', $team['id'])->get()->getRowArray();
+        $this->assertNotEmpty($deletedTeam['date_delete']);
+        $deletedRole = $this->db->table('role')->where('id', $usedRole)->get()->getRowArray();
+        $this->assertNotEmpty($deletedRole['date_delete']);
+        $this->dontSeeInDatabase('role', ['id' => $unusedRole]);
+        $this->assertStringNotContainsString('Renamed team', $this->withSession($this->adminSession)->get('teams')->getBody());
+
+        // A team with only soft deleted roles is soft deleted
+        $otherTeam = $this->createTeam('Other team');
+        $roleId = $this->createRole($otherTeam, 'Role');
+        $this->createContribution($roleId);
+        $this->withSession($this->adminSession)->post('teams/role/delete/'.$roleId);
+        $this->withSession($this->adminSession)->post('teams/delete/'.$otherTeam);
+        $deletedTeam = $this->db->table('team')->where('id', $otherTeam)->get()->getRowArray();
+        $this->assertNotEmpty($deletedTeam['date_delete']);
+
+        // The name of a soft deleted team can't be used again
+        $result = $this->withSession($this->adminSession)->post('teams/save/0', ['name' => 'Renamed team', 'description' => '']);
+        $result->assertSee(lang('members_lang.msg_error_team_name_exists'));
+        $this->assertEquals(1, $this->db->table('team')->where('name', 'Renamed team')->countAllResults());
+
+        // A team without any role is deleted from the database
+        $emptyTeam = $this->createTeam('Empty team');
+        $this->withSession($this->adminSession)->post('teams/delete/'.$emptyTeam);
+        $this->dontSeeInDatabase('team', ['id' => $emptyTeam]);
+
+        // A team with only unused roles is deleted from the database, with its roles
+        $unusedTeam = $this->createTeam('Unused team');
+        $unusedRole = $this->createRole($unusedTeam, 'Unused role');
+        $this->withSession($this->adminSession)->post('teams/delete/'.$unusedTeam);
+        $this->dontSeeInDatabase('role', ['id' => $unusedRole]);
+        $this->dontSeeInDatabase('team', ['id' => $unusedTeam]);
     }
 
     /**
@@ -164,18 +191,35 @@ class TeamsAdminFeatureTest extends CIUnitTestCase
         $result->assertRedirectTo('teams/0');
         $this->seeInDatabase('role', ['id' => $role['id'], 'fk_team' => null]);
 
-        // A role used in contributions can't be deleted
+        // A role used nowhere is deleted from the database
+        $unusedRole = $this->createRole($teamA, 'Unused role');
+        $result = $this->withSession($this->adminSession)->get('teams/role/delete/'.$unusedRole);
+        $result->assertDontSee(lang('members_lang.msg_role_used_in_contributions', [1]));
+        $result = $this->withSession($this->adminSession)->post('teams/role/delete/'.$unusedRole);
+        $result->assertRedirectTo('teams/'.$teamA);
+        $this->dontSeeInDatabase('role', ['id' => $unusedRole]);
+
+        // A role used in contributions can be deleted, after a confirmation telling it is used
+        $this->withSession($this->adminSession)->post('teams/role/save/'.$role['id'], ['fk_team' => $teamA, 'name' => 'New role', 'description' => '']);
         $contributionId = $this->createContribution($role['id']);
         $result = $this->withSession($this->adminSession)->get('teams/role/delete/'.$role['id']);
-        $result->assertSeeElement('#not_deletable');
-        $this->withSession($this->adminSession)->post('teams/role/delete/'.$role['id']);
-        $this->seeInDatabase('role', ['id' => $role['id']]);
-
-        // A role without contribution can be deleted
-        $this->db->table('contribution')->where('id', $contributionId)->delete();
+        $result->assertSeeElement('#delete_confirmation');
+        $result->assertSee(lang('members_lang.msg_role_used_in_contributions', [1]));
         $result = $this->withSession($this->adminSession)->post('teams/role/delete/'.$role['id']);
-        $result->assertRedirectTo('teams/0');
-        $this->dontSeeInDatabase('role', ['id' => $role['id']]);
+        $result->assertRedirectTo('teams/'.$teamA);
+
+        // The role is soft deleted and disappears from the team's roles
+        $deletedRole = $this->db->table('role')->where('id', $role['id'])->get()->getRowArray();
+        $this->assertNotEmpty($deletedRole['date_delete']);
+        $this->assertStringNotContainsString('New role', $this->withSession($this->adminSession)->get('teams/'.$teamA)->getBody());
+
+        // The contribution keeps its role, in the contributions list and in the contribution form
+        $contribution = $this->db->table('contribution')->where('id', $contributionId)->get()->getRowArray();
+        $result = $this->withSession($this->adminSession)->get('contributions/'.$contribution['fk_person']);
+        $result->assertSee('Team A : New role');
+        $result = $this->withSession($this->adminSession)->get('contribution/update/'.$contributionId);
+        $result->assertOK();
+        $result->assertSee('"name":"New role"');
     }
 
     private function createTeam(string $name): int

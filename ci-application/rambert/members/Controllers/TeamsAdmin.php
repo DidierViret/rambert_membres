@@ -150,8 +150,7 @@ class TeamsAdmin extends BaseController
     }
 
     /**
-     * Display a confirmation message for the deletion of a team,
-     * or an information message if the team can't be deleted
+     * Display a confirmation message for the deletion of a team
      */
     public function teamConfirmDelete($id = 0) {
         $team = $this->teamModel->find($id);
@@ -159,17 +158,12 @@ class TeamsAdmin extends BaseController
             return redirect()->to('/teams');
         }
 
-        // A team linked to roles can't be deleted
-        $nbRoles = $this->roleModel->withDeleted()->where('fk_team', $id)->countAllResults();
-        if ($nbRoles > 0) {
-            $data['message'] = lang('members_lang.msg_team_not_deletable', [$nbRoles])."<br><strong>".esc($team['name'])."</strong>";
-            $data['url_back'] = base_url('/teams/'.$id);
-
-            return $this->display_view('Members\not_deletable', $data);
-        }
-
-        // Confirmation message
+        // Confirmation message, telling that the active roles of the team will be deleted too
         $data['message'] = lang('members_lang.msg_team_confirm_delete')."<br><strong>".esc($team['name'])."</strong>";
+        $nbRoles = $this->roleModel->where('fk_team', $id)->countAllResults();
+        if ($nbRoles > 0) {
+            $data['message'] .= "<br>".lang('members_lang.msg_team_roles_deleted', [$nbRoles]);
+        }
         $data['url_yes'] = base_url('/teams/delete/'.$id);
         $data['url_no'] = base_url('/teams/'.$id);
 
@@ -177,13 +171,31 @@ class TeamsAdmin extends BaseController
     }
 
     /**
-     * Delete a team, if it is not linked to any role
+     * Delete a team and its active roles. Like a single role deletion, the roles used
+     * in contributions are soft deleted and the unused roles are deleted from the database.
+     * The team is soft deleted if it is still linked to soft deleted roles, so that
+     * the contributions history keeps its name. Else it is deleted from the database.
      */
     public function teamDelete($id = 0) {
-        $nbRoles = $this->roleModel->withDeleted()->where('fk_team', $id)->countAllResults();
-        if ($nbRoles == 0) {
-            $this->teamModel->delete($id, true);
+        $team = $this->teamModel->find($id);
+        if (empty($team)) {
+            return redirect()->to('/teams');
         }
+
+        // Delete the roles and the team in a single transaction,
+        // so that the team is not deleted alone if the roles' deletion fails
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        foreach ($this->roleModel->where('fk_team', $id)->findAll() as $role) {
+            $nbContributions = $this->contributionModel->where('fk_role', $role['id'])->countAllResults();
+            $this->roleModel->delete($role['id'], ($nbContributions == 0));
+        }
+
+        $nbDeletedRoles = $this->roleModel->onlyDeleted()->where('fk_team', $id)->countAllResults();
+        $this->teamModel->delete($id, ($nbDeletedRoles == 0));
+
+        $db->transComplete();
 
         return redirect()->to('/teams');
     }
@@ -265,17 +277,12 @@ class TeamsAdmin extends BaseController
         $roleName = (!empty($role['team']) ? $role['team']['name'].' : ' : '').$role['name'];
         $urlTeam = base_url('/teams/'.($role['fk_team'] ?? 0));
 
-        // A role linked to contributions can't be deleted
+        // Confirmation message, telling that the contributions using this role will keep it
+        $data['message'] = lang('members_lang.msg_role_confirm_delete')."<br><strong>".esc($roleName)."</strong>";
         $nbContributions = $this->contributionModel->where('fk_role', $id)->countAllResults();
         if ($nbContributions > 0) {
-            $data['message'] = lang('members_lang.msg_role_not_deletable', [$nbContributions])."<br><strong>".esc($roleName)."</strong>";
-            $data['url_back'] = $urlTeam;
-
-            return $this->display_view('Members\not_deletable', $data);
+            $data['message'] .= "<br>".lang('members_lang.msg_role_used_in_contributions', [$nbContributions]);
         }
-
-        // Confirmation message
-        $data['message'] = lang('members_lang.msg_role_confirm_delete')."<br><strong>".esc($roleName)."</strong>";
         $data['url_yes'] = base_url('/teams/role/delete/'.$id);
         $data['url_no'] = $urlTeam;
 
@@ -283,7 +290,8 @@ class TeamsAdmin extends BaseController
     }
 
     /**
-     * Delete a role, if it is not linked to any contribution
+     * Delete a role. A role used in contributions is soft deleted, so that
+     * the contributions keep it. An unused role is deleted from the database.
      */
     public function roleDelete($id = 0) {
         $role = $this->roleModel->find($id);
@@ -292,9 +300,7 @@ class TeamsAdmin extends BaseController
         }
 
         $nbContributions = $this->contributionModel->where('fk_role', $id)->countAllResults();
-        if ($nbContributions == 0) {
-            $this->roleModel->delete($id, true);
-        }
+        $this->roleModel->delete($id, ($nbContributions == 0));
 
         return redirect()->to('/teams/'.($role['fk_team'] ?? 0));
     }

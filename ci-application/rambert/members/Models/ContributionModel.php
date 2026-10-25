@@ -72,14 +72,14 @@ class ContributionModel extends Model {
         if($data['singleton'] && !empty($data['data'])) {
             // Single item, add datas to it
             if(!empty($data['data']['fk_role'])) {
-                $data['data']['role'] = $this->roleModel->find($data['data']['fk_role']);
+                $data['data']['role'] = $this->roleModel->withDeleted()->find($data['data']['fk_role']);
             }
 
         } elseif (!empty($data['data'])) {
             // Multiple items, add datas to each of them
             foreach ($data['data'] as &$contribution) {
                 if(!empty($contribution['fk_role'])) {
-                    $contribution['role'] = $this->roleModel->find($contribution['fk_role']);
+                    $contribution['role'] = $this->roleModel->withDeleted()->find($contribution['fk_role']);
                 }
             }
         }
@@ -108,7 +108,7 @@ class ContributionModel extends Model {
         $query = $builder->get();
         $contributions = $query->getResult('array');
         foreach($contributions as &$contribution) {
-            $contribution['role'] = $this->roleModel->find($contribution['fk_role']);
+            $contribution['role'] = $this->roleModel->withDeleted()->find($contribution['fk_role']);
         }
 
         return $contributions;
@@ -143,8 +143,8 @@ class ContributionModel extends Model {
 
         if ($data['id'] != 0) {
             $newContribution = $data['data'];
-            $role = $roleModel->find($newContribution['fk_role']);
-            $team = $teamModel->find($role['fk_team']);
+            $role = $roleModel->withDeleted()->find($newContribution['fk_role']);
+            $team = $role['fk_team'] ? $teamModel->withDeleted()->find($role['fk_team']) : null;
 
             $changeTypeId = $changeTypeModel->getChangeTypeId('contribution');
             
@@ -180,10 +180,10 @@ class ContributionModel extends Model {
         foreach ($data['id'] as $index => $id) {
             $oldContribution = $this->oldValues[$id];
             $newContribution = $this->find($id);
-            $oldRole = $roleModel->find($oldContribution['fk_role']);
-            $newRole = $roleModel->find($newContribution['fk_role']);
-            $oldTeam = $teamModel->find($oldRole['fk_team']);
-            $newTeam = $teamModel->find($newRole['fk_team']);
+            $oldRole = $roleModel->withDeleted()->find($oldContribution['fk_role']);
+            $newRole = $roleModel->withDeleted()->find($newContribution['fk_role']);
+            $oldTeam = $oldRole['fk_team'] ? $teamModel->withDeleted()->find($oldRole['fk_team']) : null;
+            $newTeam = $newRole['fk_team'] ? $teamModel->withDeleted()->find($newRole['fk_team']) : null;
 
             $changeTypeId = $changeTypeModel->getChangeTypeId('contribution');
             
@@ -220,8 +220,8 @@ class ContributionModel extends Model {
 
         foreach ($data['id'] as $index => $id) {
             $oldContribution = $this->oldValues[$id];
-            $oldRole = $roleModel->find($oldContribution['fk_role']);
-            $oldTeam = $teamModel->find($oldRole['fk_team']);
+            $oldRole = $roleModel->withDeleted()->find($oldContribution['fk_role']);
+            $oldTeam = $oldRole['fk_team'] ? $teamModel->withDeleted()->find($oldRole['fk_team']) : null;
 
             $changeTypeId = $changeTypeModel->getChangeTypeId('contribution');
             

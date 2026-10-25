@@ -118,8 +118,8 @@ return[
 'msg_person_confirm_delete'         => 'Voulez-vous vraiment supprimer cette personne ? ',
 'msg_team_confirm_delete'           => 'Voulez-vous vraiment supprimer ce groupe ?',
 'msg_role_confirm_delete'           => 'Voulez-vous vraiment supprimer cette fonction ?',
-'msg_team_not_deletable'            => 'Ce groupe ne peut pas être supprimé car {0, plural, =1{une fonction lui est liée} other{# fonctions lui sont liées}}. Veuillez d\'abord supprimer ces fonctions ou les attribuer à un autre groupe.',
-'msg_role_not_deletable'            => 'Cette fonction ne peut pas être supprimée car elle est utilisée dans {0, plural, =1{une contribution} other{# contributions}}.',
+'msg_team_roles_deleted'            => '{0, plural, =1{Sa fonction sera aussi supprimée} other{Ses # fonctions seront aussi supprimées}}. Les fonctions utilisées dans des contributions resteront visibles dans celles-ci mais ne pourront plus être attribuées.',
+'msg_role_used_in_contributions'    => 'Elle est utilisée dans {0, plural, =1{une contribution, qui la conservera} other{# contributions qui la conserveront}}, mais ne pourra plus être attribuée.',
 'msg_warning_new_home'              => 'Vous êtes en train de créer un nouveau foyer. Si vous souhaitez ajouter une personne à un foyer existant,
                                         veuillez annuler cette opération et afficher le foyer concerné pour y ajouter une personne.',
 
@@ -127,7 +127,7 @@ return[
 'msg_error_valid_email'             => 'Veuillez entrer une adresse e-mail valide',
 'msg_error_email_length'            => 'L\'adresse e-mail ne doit pas dépasser 150 caractères',
 'msg_error_no_data_to_display'      => 'Il n\'y a pas de données à afficher',
-'msg_error_team_name_exists'        => 'Un groupe portant ce nom existe déjà',
+'msg_error_team_name_exists'        => 'Un groupe portant ce nom existe déjà, éventuellement parmi les groupes archivés.',
 
 // Error code messages
 'code_error_401'                    => '401 - Non autorisé',

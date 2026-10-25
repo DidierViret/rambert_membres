@@ -27,6 +27,7 @@ class TeamModel extends Model {
      * Called just after the Model's constructor
      */
     protected function initialize() {
+        // Team names must be unique, including soft deleted teams
         $this->validationRules = [
             'id' => [
                 'rules' => 'permit_empty|is_natural'
@@ -57,6 +58,9 @@ class TeamModel extends Model {
     public function getDropdown(bool $withDeleted = false, string $orderBy = 'id', string $direction = 'ASC') {
         $builder = $this->builder();
         $builder->select('id, name');
+        if (!$withDeleted) {
+            $builder->where($this->deletedField.' IS NULL');
+        }
         $builder->orderBy("$orderBy", "$direction");
         $query = $builder->get();
 
