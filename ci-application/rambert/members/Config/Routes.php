@@ -38,4 +38,18 @@ $routes->get('lists/export-excel', '\Members\Controllers\Lists::exportExcel');
 
 // Changes routes
 $routes->get('changes', '\Members\Controllers\MembersAdmin::changesList');
+
+// Teams and roles routes
+$routes->get('teams', '\Members\Controllers\TeamsAdmin::teamsAdmin');
+$routes->get('teams/(:num)', '\Members\Controllers\TeamsAdmin::teamsAdmin/$1');
+$routes->get('teams/create', '\Members\Controllers\TeamsAdmin::teamCreate');
+$routes->get('teams/update/(:num)', '\Members\Controllers\TeamsAdmin::teamUpdate/$1');
+$routes->post('teams/save/(:num)', '\Members\Controllers\TeamsAdmin::teamSave/$1');
+$routes->get('teams/delete/(:num)', '\Members\Controllers\TeamsAdmin::teamConfirmDelete/$1');
+$routes->post('teams/delete/(:num)', '\Members\Controllers\TeamsAdmin::teamDelete/$1');
+$routes->get('teams/role/create/(:num)', '\Members\Controllers\TeamsAdmin::roleCreate/$1');
+$routes->get('teams/role/update/(:num)', '\Members\Controllers\TeamsAdmin::roleUpdate/$1');
+$routes->post('teams/role/save/(:num)', '\Members\Controllers\TeamsAdmin::roleSave/$1');
+$routes->get('teams/role/delete/(:num)', '\Members\Controllers\TeamsAdmin::roleConfirmDelete/$1');
+$routes->post('teams/role/delete/(:num)', '\Members\Controllers\TeamsAdmin::roleDelete/$1');
 ?>

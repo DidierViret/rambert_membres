@@ -19,6 +19,32 @@ class TeamModel extends Model {
     protected $useSoftDeletes = true;
     protected $deletedField  = 'date_delete';
 
+    // Declare variables for validation
+    protected $validationRules;
+    protected $validationMessages;
+
+    /**
+     * Called just after the Model's constructor
+     */
+    protected function initialize() {
+        $this->validationRules = [
+            'id' => [
+                'rules' => 'permit_empty|is_natural'
+            ],
+            'name' =>
+                ['label' => lang('members_lang.col_name'),
+                 'rules' => 'required|max_length[100]|is_unique[team.name,id,{id}]'],
+            'description' =>
+                ['label' => lang('members_lang.col_description'),
+                 'rules' => 'permit_empty|max_length[255]'],
+        ];
+
+        $this->validationMessages = [
+            'name' =>
+                ['is_unique' => lang('members_lang.msg_error_team_name_exists')],
+        ];
+    }
+
     /**
      * Get an array of teams to display them in a dropdown. Add an empty value at the beginning of the list.
      * 

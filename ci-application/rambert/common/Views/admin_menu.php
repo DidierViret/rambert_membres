@@ -21,7 +21,8 @@
 </div>
 <script defer>
     document.querySelectorAll('.adminnav').forEach((nav)=>{
-        if (nav.href.includes(window.location)){
+        // Tab is active if the current page is the tab's page or one of its sub-pages
+        if (window.location.href === nav.href || window.location.href.startsWith(nav.href + '/')){
             nav.classList.add('active')
         }
         else{

@@ -26,9 +26,24 @@ class RoleModel extends Model {
     // Callbacks
     protected $afterFind = ['appendTeam'];
 
+    // Declare variable for validation
+    protected $validationRules;
+
     public function initialize()
     {
         $this->teamModel = new TeamModel();
+
+        $this->validationRules = [
+            'fk_team' =>
+                ['label' => lang('members_lang.field_team'),
+                 'rules' => 'permit_empty|is_not_unique[team.id]'],
+            'name' =>
+                ['label' => lang('members_lang.col_name'),
+                 'rules' => 'required|max_length[100]'],
+            'description' =>
+                ['label' => lang('members_lang.col_description'),
+                 'rules' => 'permit_empty|max_length[255]'],
+        ];
     }
 
     /**
