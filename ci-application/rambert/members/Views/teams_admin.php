@@ -11,10 +11,14 @@ helper('form');
 ?>
 
 <div class="container" >
-    <div class="team row bg-light border-bottom border-primary pt-2 pb-2 mb-4">
-        <div class="col-12 mb-2">
+    <!-- Page title -->
+    <div class="row mb-2">
+        <div class="col-12">
             <h3><?= lang('members_lang.title_teams_list') ?></h3>
         </div>
+    </div>
+
+    <div class="team row bg-light border-bottom border-primary pt-2 pb-2 mb-4">
 
         <!-- Team selection -->
         <div class="col-md-6 mb-2">

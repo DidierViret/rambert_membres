@@ -14,7 +14,7 @@ return[
 'title_person_restore'              => 'Réadmission d\'un membre',
 'title_export_lists'                => 'Listes et exportations',
 'title_changes_list'                => 'Historique des modifications',
-'title_teams_list'                  => 'Groupes et fonctions',
+'title_teams_list'                  => 'Groupes et fonctions (utilisés pour les contributions)',
 'title_team_new'                    => 'Nouveau groupe',
 'title_team_update'                 => 'Modification d\'un groupe',
 'title_roles_list'                  => 'Fonctions du groupe',
