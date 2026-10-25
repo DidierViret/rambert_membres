@@ -47,9 +47,13 @@ $routes->get('teams/update/(:num)', '\Members\Controllers\TeamsAdmin::teamUpdate
 $routes->post('teams/save/(:num)', '\Members\Controllers\TeamsAdmin::teamSave/$1');
 $routes->get('teams/delete/(:num)', '\Members\Controllers\TeamsAdmin::teamConfirmDelete/$1');
 $routes->post('teams/delete/(:num)', '\Members\Controllers\TeamsAdmin::teamDelete/$1');
+$routes->get('teams/restore/(:num)', '\Members\Controllers\TeamsAdmin::teamConfirmRestore/$1');
+$routes->post('teams/restore/(:num)', '\Members\Controllers\TeamsAdmin::teamRestore/$1');
 $routes->get('teams/role/create/(:num)', '\Members\Controllers\TeamsAdmin::roleCreate/$1');
 $routes->get('teams/role/update/(:num)', '\Members\Controllers\TeamsAdmin::roleUpdate/$1');
 $routes->post('teams/role/save/(:num)', '\Members\Controllers\TeamsAdmin::roleSave/$1');
 $routes->get('teams/role/delete/(:num)', '\Members\Controllers\TeamsAdmin::roleConfirmDelete/$1');
 $routes->post('teams/role/delete/(:num)', '\Members\Controllers\TeamsAdmin::roleDelete/$1');
+$routes->get('teams/role/restore/(:num)', '\Members\Controllers\TeamsAdmin::roleConfirmRestore/$1');
+$routes->post('teams/role/restore/(:num)', '\Members\Controllers\TeamsAdmin::roleRestore/$1');
 ?>

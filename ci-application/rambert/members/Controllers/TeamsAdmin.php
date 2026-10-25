@@ -48,22 +48,32 @@ class TeamsAdmin extends BaseController
      * Display the selected team with the list of its roles.
      * The team id 0 is used for the roles which are not linked to any team.
      *
+     * The archived roles of the selected team are always displayed.
+     * The archived teams are displayed in the dropdown if the "with_archived" GET parameter is set.
+     *
      * @param int $teamId : The id of the selected team. If null, the roles without team are selected.
      */
     public function teamsAdmin($teamId = null) {
-        // Teams dropdown, with the roles without team at the beginning, then the teams ordered by name
-        $teams = $this->teamModel->orderBy('name', 'ASC')->findAll();
-        $data['teams'] = [0 => lang('members_lang.no_team')] + array_column($teams, 'name', 'id');
-
         // Select the roles without team by default
         if (is_null($teamId)) {
             $teamId = 0;
         }
-        if (!array_key_exists($teamId, $data['teams'])) {
+
+        $data['team'] = ($teamId == 0) ? null : $this->teamModel->withDeleted()->find($teamId);
+        if ($teamId != 0 && empty($data['team'])) {
             return redirect()->to('/teams');
         }
 
-        $data['team'] = ($teamId == 0) ? null : $this->teamModel->find($teamId);
+        // An archived team can only be selected if the archived teams are displayed
+        $withArchived = !empty($this->request->getGet('with_archived')) || !empty($data['team']['date_delete']);
+        $data['with_archived'] = $withArchived;
+
+        // Teams dropdown, with the roles without team at the beginning, then the teams ordered by name
+        $data['teams'] = [0 => lang('members_lang.no_team')];
+        $teams = $this->teamModel->withDeleted($withArchived)->orderBy('name', 'ASC')->findAll();
+        foreach ($teams as $team) {
+            $data['teams'][$team['id']] = $team['name'].(empty($team['date_delete']) ? '' : ' ('.lang('members_lang.archived').')');
+        }
 
         // Roles of the selected team
         $data['list_title'] = lang('members_lang.title_roles_list');
@@ -73,7 +83,10 @@ class TeamsAdmin extends BaseController
                             'nb_contributions' => lang('members_lang.col_nb_contributions'),
         ];
 
-        $data['items'] = $this->roleModel->where('fk_team', ($teamId == 0) ? null : $teamId)
+        // Active roles first, then the archived roles
+        $data['items'] = $this->roleModel->withDeleted()
+                                         ->where('fk_team', ($teamId == 0) ? null : $teamId)
+                                         ->orderBy('date_delete IS NOT NULL', 'ASC', false)
                                          ->orderBy('name', 'ASC')
                                          ->findAll();
         foreach ($data['items'] as &$role) {
@@ -82,9 +95,16 @@ class TeamsAdmin extends BaseController
 
         $data['primary_key_field']  = 'id';
         $data['btn_create_label']   = lang('members_lang.btn_add_role');
+        $data['deleted_field']      = 'date_delete';
+        $data['deleted_read_only']  = true;
         $data['url_update']         = 'teams/role/update/';
         $data['url_delete']         = 'teams/role/delete/';
-        $data['url_create']         = 'teams/role/create/'.$teamId;
+        $data['url_restore']        = 'teams/role/restore/';
+
+        // No role can be added to an archived team
+        if (empty($data['team']['date_delete'])) {
+            $data['url_create'] = 'teams/role/create/'.$teamId;
+        }
 
         return $this->display_view(['Members\teams_admin', 'Common\items_list'], $data);
     }
@@ -303,6 +323,90 @@ class TeamsAdmin extends BaseController
         $this->roleModel->delete($id, ($nbContributions == 0));
 
         return redirect()->to('/teams/'.($role['fk_team'] ?? 0));
+    }
+
+    /**
+     * Display a confirmation message for the restoration of an archived team
+     */
+    public function teamConfirmRestore($id = 0) {
+        $team = $this->teamModel->onlyDeleted()->find($id);
+        if (empty($team)) {
+            return redirect()->to('/teams');
+        }
+
+        // Confirmation message, telling that the archived roles of the team won't be restored
+        $data['title'] = lang('members_lang.title_team_restore');
+        $data['message'] = lang('members_lang.msg_team_confirm_restore')."<br><strong>".esc($team['name'])."</strong>";
+        $nbRoles = $this->roleModel->onlyDeleted()->where('fk_team', $id)->countAllResults();
+        if ($nbRoles > 0) {
+            $data['message'] .= "<br>".lang('members_lang.msg_team_roles_stay_archived', [$nbRoles]);
+        }
+        $data['url_yes'] = base_url('/teams/restore/'.$id);
+        $data['url_no'] = base_url('/teams/'.$id.'?with_archived=1');
+
+        return $this->display_view('Common\confirm_restore', $data);
+    }
+
+    /**
+     * Restore an archived team. Its archived roles stay archived,
+     * they can be restored individually.
+     */
+    public function teamRestore($id = 0) {
+        $team = $this->teamModel->onlyDeleted()->find($id);
+        if (empty($team)) {
+            return redirect()->to('/teams');
+        }
+
+        $this->teamModel->update($id, ['date_delete' => null]);
+
+        return redirect()->to('/teams/'.$id.'?with_archived=1');
+    }
+
+    /**
+     * Display a confirmation message for the restoration of an archived role
+     */
+    public function roleConfirmRestore($id = 0) {
+        $role = $this->roleModel->onlyDeleted()->find($id);
+        if (empty($role)) {
+            return redirect()->to('/teams');
+        }
+
+        $roleName = (!empty($role['team']) ? $role['team']['name'].' : ' : '').$role['name'];
+
+        // Confirmation message, telling that the archived team of the role will be restored too
+        $data['title'] = lang('members_lang.title_role_restore');
+        $data['message'] = lang('members_lang.msg_role_confirm_restore')."<br><strong>".esc($roleName)."</strong>";
+        if (!empty($role['team']['date_delete'])) {
+            $data['message'] .= "<br>".lang('members_lang.msg_role_team_restored');
+        }
+        $data['url_yes'] = base_url('/teams/role/restore/'.$id);
+        $data['url_no'] = base_url('/teams/'.($role['fk_team'] ?? 0).'?with_archived=1');
+
+        return $this->display_view('Common\confirm_restore', $data);
+    }
+
+    /**
+     * Restore an archived role, and its team if it is archived too
+     */
+    public function roleRestore($id = 0) {
+        $role = $this->roleModel->onlyDeleted()->find($id);
+        if (empty($role)) {
+            return redirect()->to('/teams');
+        }
+
+        // Restore the team and the role in a single transaction,
+        // so that the team is not restored alone if the role's restoration fails
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        if (!empty($role['team']['date_delete'])) {
+            $this->teamModel->update($role['fk_team'], ['date_delete' => null]);
+        }
+        $this->roleModel->update($id, ['date_delete' => null]);
+
+        $db->transComplete();
+
+        return redirect()->to('/teams/'.($role['fk_team'] ?? 0).'?with_archived=1');
     }
 }
 ?>

@@ -208,10 +208,10 @@ class TeamsAdminFeatureTest extends CIUnitTestCase
         $result = $this->withSession($this->adminSession)->post('teams/role/delete/'.$role['id']);
         $result->assertRedirectTo('teams/'.$teamA);
 
-        // The role is soft deleted and disappears from the team's roles
+        // The role is soft deleted and stays in the team's roles as an archived role
         $deletedRole = $this->db->table('role')->where('id', $role['id'])->get()->getRowArray();
         $this->assertNotEmpty($deletedRole['date_delete']);
-        $this->assertStringNotContainsString('New role', $this->withSession($this->adminSession)->get('teams/'.$teamA)->getBody());
+        $this->assertStringContainsString('teams/role/restore/'.$role['id'], $this->withSession($this->adminSession)->get('teams/'.$teamA)->getBody());
 
         // The contribution keeps its role, in the contributions list and in the contribution form
         $contribution = $this->db->table('contribution')->where('id', $contributionId)->get()->getRowArray();
@@ -222,15 +222,84 @@ class TeamsAdminFeatureTest extends CIUnitTestCase
         $result->assertSee('"name":"New role"');
     }
 
-    private function createTeam(string $name): int
+    /**
+     * Display the archived teams and roles, and restore them
+     */
+    public function testArchivesDisplayAndRestore()
     {
-        $this->db->table('team')->insert(['name' => $name]);
+        $activeTeam = $this->createTeam('Active team');
+        $archivedTeam = $this->createTeam('Archived team', true);
+        $this->createRole($activeTeam, 'Active role');
+        $archivedRole = $this->createRole($activeTeam, 'Archived role', true);
+        $roleOfArchivedTeam = $this->createRole($archivedTeam, 'Role of archived team', true);
+        $otherRoleOfArchivedTeam = $this->createRole($archivedTeam, 'Other role of archived team', true);
+
+        // Archived teams are hidden by default, the archived roles of the selected team are always displayed
+        $result = $this->withSession($this->adminSession)->get('teams/'.$activeTeam);
+        $result->assertSee('Active role');
+        $result->assertSee('Archived role');
+        $result->assertDontSee('Archived team');
+
+        // Archived teams are displayed on demand
+        $result = $this->withSession($this->adminSession)->get('teams/'.$activeTeam.'?with_archived=1');
+        $result->assertSee('Archived team ('.lang('members_lang.archived').')');
+
+        // Archived roles can only be restored
+        $body = $result->getBody();
+        $this->assertStringContainsString('teams/role/restore/'.$archivedRole, $body);
+        $this->assertStringNotContainsString('teams/role/update/'.$archivedRole, $body);
+        $this->assertStringNotContainsString('teams/role/delete/'.$archivedRole, $body);
+
+        // An archived team is displayed with the archives. It can only be restored and no role can be added to it
+        $result = $this->withSession($this->adminSession)->get('teams/'.$archivedTeam);
+        $result->assertOK();
+        $result->assertSee('Role of archived team');
+        $this->assertStringContainsString('teams/restore/'.$archivedTeam, $result->getBody());
+        $this->assertStringNotContainsString('teams/delete/'.$archivedTeam, $result->getBody());
+        $result->assertDontSeeLink(lang('members_lang.btn_add_role'));
+
+        // Restore an archived role of an active team
+        $result = $this->withSession($this->adminSession)->get('teams/role/restore/'.$archivedRole);
+        $result->assertSeeElement('#restore_confirmation');
+        $result->assertDontSee(lang('members_lang.msg_role_team_restored'));
+        $result = $this->withSession($this->adminSession)->post('teams/role/restore/'.$archivedRole);
+        $result->assertRedirectTo('teams/'.$activeTeam.'?with_archived=1');
+        $this->seeInDatabase('role', ['id' => $archivedRole, 'date_delete' => null]);
+
+        // Restoring a role of an archived team restores the team too
+        $result = $this->withSession($this->adminSession)->get('teams/role/restore/'.$roleOfArchivedTeam);
+        $result->assertSee(lang('members_lang.msg_role_team_restored'));
+        $this->withSession($this->adminSession)->post('teams/role/restore/'.$roleOfArchivedTeam);
+        $this->seeInDatabase('role', ['id' => $roleOfArchivedTeam, 'date_delete' => null]);
+        $this->seeInDatabase('team', ['id' => $archivedTeam, 'date_delete' => null]);
+        $this->assertNotNull($this->db->table('role')->where('id', $otherRoleOfArchivedTeam)->get()->getRowArray()['date_delete']);
+
+        // Restoring a team doesn't restore its archived roles
+        $this->db->table('team')->where('id', $archivedTeam)->update(['date_delete' => date('Y-m-d H:i:s')]);
+        $result = $this->withSession($this->adminSession)->get('teams/restore/'.$archivedTeam);
+        $result->assertSeeElement('#restore_confirmation');
+        $result->assertSee(lang('members_lang.msg_team_roles_stay_archived', [1]));
+        $result = $this->withSession($this->adminSession)->post('teams/restore/'.$archivedTeam);
+        $result->assertRedirectTo('teams/'.$archivedTeam.'?with_archived=1');
+        $this->seeInDatabase('team', ['id' => $archivedTeam, 'date_delete' => null]);
+        $this->assertNotNull($this->db->table('role')->where('id', $otherRoleOfArchivedTeam)->get()->getRowArray()['date_delete']);
+
+        // Active teams and roles can't be restored
+        $result = $this->withSession($this->adminSession)->get('teams/restore/'.$activeTeam);
+        $result->assertRedirectTo('teams');
+        $result = $this->withSession($this->adminSession)->post('teams/role/restore/'.$archivedRole);
+        $result->assertRedirectTo('teams');
+    }
+
+    private function createTeam(string $name, bool $archived = false): int
+    {
+        $this->db->table('team')->insert(['name' => $name, 'date_delete' => $archived ? date('Y-m-d H:i:s') : null]);
         return $this->db->insertID();
     }
 
-    private function createRole(?int $teamId, string $name): int
+    private function createRole(?int $teamId, string $name, bool $archived = false): int
     {
-        $this->db->table('role')->insert(['fk_team' => $teamId, 'name' => $name]);
+        $this->db->table('role')->insert(['fk_team' => $teamId, 'name' => $name, 'date_delete' => $archived ? date('Y-m-d H:i:s') : null]);
         return $this->db->insertID();
     }
 

@@ -39,6 +39,8 @@
      * @param deleted_field: Name of the field that is used as a "soft delete key".
      *                     If the field is not empty, the item is soft deleted and will be displayed
      *                     only if "show deleted" checkbox is checked. 
+     * @param deleted_read_only: Bool used to display only the "restore" button for soft deleted items,
+     *                     without the "update" and "hard delete" buttons. False by default.
      * @param url_duplicate: Link to the controller method that gives the possibility to duplicate an item.
      *                     If not set, no "copy" button will be displayed.
      * 
@@ -120,6 +122,11 @@
         $deleted_field = null;
     }
 
+    // If no deleted_read_only variable is sent as parameter, set it to false
+    if (!isset($deleted_read_only)) {
+        $deleted_read_only = false;
+    }
+
     // If no url_duplicate variable is sent as parameter, set it to null
     if (!isset($url_duplicate)) {
         $url_duplicate = null;
@@ -185,6 +192,7 @@
                     <?php endforeach ?>
 
                     <!-- Add the "action" column (for detail/update/delete links) -->
+                    <?php $isDeleted = !empty($itemEntity[$deleted_field] ?? null) ?>
                     <td class="text-right">                        
                         <!-- Bootstrap details icon ("Card text"), redirect to url_detail, adding /primary_key as parameter -->
                         <?php if(isset($url_detail)): ?>
@@ -195,7 +203,7 @@
                         <?php endif ?>
 
                         <!-- Bootstrap edit icon ("Pencil"), redirect to url_update, adding /primary_key as parameter -->
-                        <?php if(isset($url_update)): ?>
+                        <?php if(isset($url_update) && !($isDeleted && $deleted_read_only)): ?>
                             <a href="<?= site_url(esc($url_update.$itemEntity[$primary_key_field])) ?>"
                                     class="text-decoration-none" title="<?=lang('common_lang.btn_edit') ?>" >
                                 <i class="bi bi-pencil" style="font-size: 20px;"></i>
@@ -225,7 +233,7 @@
                                 <i class="bi bi-arrow-counterclockwise" style="font-size: 20px;"></i>
                             </a>
                         <?php endif ?>
-                        <?php if ((isset($url_delete)) and (isset($itemEntity[$deleted_field]) &&  !empty($itemEntity[$deleted_field]))) : ?>
+                        <?php if ((isset($url_delete)) and (isset($itemEntity[$deleted_field]) &&  !empty($itemEntity[$deleted_field])) and !$deleted_read_only) : ?>
                             <!-- Bootstrap delete icon ("Trash") with red color, redirect to url_delete, adding /primary_key as parameter -->
                             <a href="<?= site_url(esc($url_delete.$itemEntity[$primary_key_field])) ?>"
                                     class="text-decoration-none" title="<?=lang('common_lang.btn_hard_delete') ?>" >

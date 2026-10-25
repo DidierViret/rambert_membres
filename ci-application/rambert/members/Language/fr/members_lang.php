@@ -20,6 +20,8 @@ return[
 'title_roles_list'                  => 'Fonctions du groupe',
 'title_role_new'                    => 'Nouvelle fonction',
 'title_role_update'                 => 'Modification d\'une fonction',
+'title_team_restore'                => 'Restauration d\'un groupe',
+'title_role_restore'                => 'Restauration d\'une fonction',
 
 // Subtitles
 'subtitle_person_informations'      => 'Informations personnelles',
@@ -120,6 +122,10 @@ return[
 'msg_role_confirm_delete'           => 'Voulez-vous vraiment supprimer cette fonction ?',
 'msg_team_roles_deleted'            => '{0, plural, =1{Sa fonction sera aussi supprimée} other{Ses # fonctions seront aussi supprimées}}. Les fonctions utilisées dans des contributions resteront visibles dans celles-ci mais ne pourront plus être attribuées.',
 'msg_role_used_in_contributions'    => 'Elle est utilisée dans {0, plural, =1{une contribution, qui la conservera} other{# contributions qui la conserveront}}, mais ne pourra plus être attribuée.',
+'msg_team_confirm_restore'          => 'Voulez-vous vraiment restaurer ce groupe ?',
+'msg_team_roles_stay_archived'      => '{0, plural, =1{Sa fonction désactivée restera désactivée} other{Ses # fonctions désactivées resteront désactivées}}, vous pourrez ensuite la ou les restaurer individuellement.',
+'msg_role_confirm_restore'          => 'Voulez-vous vraiment restaurer cette fonction ?',
+'msg_role_team_restored'            => 'Son groupe est désactivé, il sera aussi restauré.',
 'msg_warning_new_home'              => 'Vous êtes en train de créer un nouveau foyer. Si vous souhaitez ajouter une personne à un foyer existant,
                                         veuillez annuler cette opération et afficher le foyer concerné pour y ajouter une personne.',
 
@@ -127,7 +133,7 @@ return[
 'msg_error_valid_email'             => 'Veuillez entrer une adresse e-mail valide',
 'msg_error_email_length'            => 'L\'adresse e-mail ne doit pas dépasser 150 caractères',
 'msg_error_no_data_to_display'      => 'Il n\'y a pas de données à afficher',
-'msg_error_team_name_exists'        => 'Un groupe portant ce nom existe déjà, éventuellement parmi les groupes archivés.',
+'msg_error_team_name_exists'        => 'Un groupe portant ce nom existe déjà, éventuellement parmi les groupes désactivés.',
 
 // Error code messages
 'code_error_401'                    => '401 - Non autorisé',
@@ -139,6 +145,7 @@ return[
 'no_access_level'                   => 'Pas d\'accès',
 'changes'                           => 'Modifications',
 'no_team'                           => 'Fonctions sans groupe',
+'archived'                          => 'désactivé',
 'log_readmission_after_membership_end' => 'Réadmission après une démission',
 
 ];
